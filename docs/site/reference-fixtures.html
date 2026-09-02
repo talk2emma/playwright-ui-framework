@@ -1,0 +1,1161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference: fixtures, hooks, pages &amp; API — Playwright UI Framework</title>
+<meta name="description" content="How the framework reaches your tests">
+<style>/* Documentation stylesheet: screen layout, print sheet and PDF cover. */
+
+:root {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f2;
+  --border: #e2e1dd;
+  --border-strong: #cfcec9;
+  --text: #1f1e1c;
+  --text-2: #56544f;
+  --text-3: #82807a;
+  --accent: #b0492c;
+  --accent-soft: #fdf2ee;
+  --code-bg: #f6f5f3;
+  --note: #2f6f8f;
+  --note-bg: #eef5f9;
+  --warn: #a2610a;
+  --warn-bg: #fdf4e6;
+  --rule: #4a6b3d;
+  --rule-bg: #f0f5ed;
+  --sx-comment: #8a867d;
+  --sx-keyword: #9c3f6d;
+  --sx-string: #3d7a52;
+  --sx-number: #96591b;
+  --sx-fn: #2f5f92;
+  --sx-type: #7a4a9e;
+  --sx-prop: #b0492c;
+  --sx-op: #6f6b63;
+  --sx-var: #a1531f;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sidebar-w: 268px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17171a;
+    --surface: #1e1e22;
+    --surface-2: #26262b;
+    --border: #32323a;
+    --border-strong: #43434d;
+    --text: #ecebe7;
+    --text-2: #b3b1aa;
+    --text-3: #8b8981;
+    --accent: #e8825f;
+    --accent-soft: #2c211d;
+    --code-bg: #232329;
+    --note: #7fb6d4;
+    --note-bg: #1c262c;
+    --warn: #d8a552;
+    --warn-bg: #2a2419;
+    --rule: #9dc389;
+    --rule-bg: #1f2620;
+    --sx-comment: #7d7a72;
+    --sx-keyword: #e08bb4;
+    --sx-string: #86c99a;
+    --sx-number: #dfa86a;
+    --sx-fn: #8ab6e8;
+    --sx-type: #c2a0e8;
+    --sx-prop: #e8825f;
+    --sx-op: #9a958b;
+    --sx-var: #e0a06a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  z-index: 10;
+}
+.skip:focus { left: 0; }
+
+/* ---------------------------------------------------------------- layout */
+
+.layout { display: flex; align-items: flex-start; }
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.1rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.brand { display: flex; gap: 0.7rem; align-items: center; }
+.brand-mark {
+  flex: 0 0 34px; height: 34px; border-radius: 8px;
+  background: var(--accent); color: #fff;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px; letter-spacing: 0.02em;
+}
+.brand strong { display: block; font-size: 14px; line-height: 1.25; }
+.brand span { font-size: 12px; color: var(--text-3); }
+
+.filter {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.filter:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.nav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.nav a {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+.nav a:hover { background: var(--surface-2); color: var(--text); }
+.nav a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.sidebar-foot a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.sidebar-foot a:hover { text-decoration: underline; }
+
+main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 900px;
+  padding: 2.6rem clamp(1.1rem, 4vw, 3rem) 4rem;
+}
+
+/* ------------------------------------------------------------- typography */
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 11.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 650;
+}
+
+h1 {
+  margin: 0 0 0.4rem;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.subtitle { margin: 0; color: var(--text-2); font-size: 17px; max-width: 62ch; }
+
+.page-head { padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); margin-bottom: 1.8rem; }
+
+h2 {
+  margin: 2.6rem 0 0.9rem;
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+h3 { margin: 2rem 0 0.6rem; font-size: 1.13rem; font-weight: 650; }
+h4 {
+  margin: 1.2rem 0 0.4rem;
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+
+p { margin: 0.85rem 0; max-width: 74ch; }
+ul, ol { margin: 0.85rem 0; padding-left: 1.35rem; max-width: 74ch; }
+li { margin: 0.3rem 0; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.855em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.08em 0.34em;
+  word-break: break-word;
+}
+
+pre {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 12.9px;
+  line-height: 1.55;
+}
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+figure.code { margin: 1.1rem 0; }
+figure.code figcaption {
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 0 0.35rem 0.15rem;
+  font-weight: 600;
+}
+
+pre.tree {
+  font-size: 12.4px;
+  line-height: 1.5;
+  background: var(--surface);
+}
+
+/* ------------------------------------------------------- syntax highlight */
+
+.tok-c { color: var(--sx-comment); font-style: italic; }
+.tok-k { color: var(--sx-keyword); }
+.tok-s { color: var(--sx-string); }
+.tok-r { color: var(--sx-string); }
+.tok-n { color: var(--sx-number); }
+.tok-f { color: var(--sx-fn); }
+.tok-t { color: var(--sx-type); }
+.tok-p { color: var(--sx-prop); }
+.tok-o { color: var(--sx-op); }
+.tok-v { color: var(--sx-var); }
+.tok-a { color: var(--sx-type); }
+
+figure.code figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+figure.code figcaption .lang {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+  text-transform: none;
+}
+
+/* --------------------------------------------------------------- callouts */
+
+.callout {
+  display: flex;
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  max-width: 74ch;
+}
+.callout p { margin: 0; }
+.callout-tag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding-top: 0.15rem;
+}
+.callout.note { background: var(--note-bg); border-color: color-mix(in srgb, var(--note) 30%, transparent); }
+.callout.note .callout-tag { color: var(--note); }
+.callout.warn { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+.callout.warn .callout-tag { color: var(--warn); }
+.callout.rule { background: var(--rule-bg); border-color: color-mix(in srgb, var(--rule) 32%, transparent); }
+.callout.rule .callout-tag { color: var(--rule); }
+
+/* ----------------------------------------------------------------- tables */
+
+.table-wrap { overflow-x: auto; margin: 1.2rem 0; border: 1px solid var(--border); border-radius: 9px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--surface-2); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-2); font-weight: 650; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface); }
+td code { font-size: 12.2px; }
+
+/* ------------------------------------------------------------------ steps */
+
+ol.steps { list-style: none; counter-reset: step; padding-left: 0; max-width: 78ch; }
+ol.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.2rem;
+  margin: 0.9rem 0;
+}
+ol.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+ol.steps > li > p { margin: 0 0 0.5rem; }
+
+/* ------------------------------------------------------------ file blocks */
+
+.file {
+  margin: 1.6rem 0;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+.file-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.file-head h3 { margin: 0; font-size: 1rem; }
+.file-head code { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); font-size: 13px; }
+.file-meta { font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.file-purpose { margin: 0.7rem 0 0; }
+
+.change { margin-top: 1.1rem; padding-top: 0.6rem; border-top: 1px dashed var(--border); }
+.change ul, .change ol { margin-top: 0.4rem; }
+.change.why p { color: var(--text-2); }
+.related { margin-top: 1rem; font-size: 12.5px; color: var(--text-3); }
+.related code { font-size: 11.8px; }
+
+/* -------------------------------------------------------------------- api */
+
+details.api { margin-top: 1.1rem; border-top: 1px dashed var(--border); padding-top: 0.7rem; }
+details.api > summary {
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+details.api[open] > summary { margin-bottom: 0.8rem; color: var(--text-2); }
+
+.api-item { margin: 0.9rem 0; padding-left: 0.8rem; border-left: 2px solid var(--border); }
+.api-head { display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; }
+.api-head code { background: none; border: 0; padding: 0; font-size: 13px; font-weight: 600; }
+.api-heritage { font-size: 11.5px; color: var(--text-3); font-family: var(--mono); }
+.api-doc { margin: 0.3rem 0 0.4rem; font-size: 13.5px; color: var(--text-2); }
+.api-shape { font-size: 12px; margin-top: 0.4rem; }
+table.api-members { font-size: 13px; margin-top: 0.4rem; }
+table.api-members td { padding: 0.3rem 0.6rem 0.3rem 0; border-bottom: 1px solid var(--border); }
+table.api-members td:first-child { width: 46%; }
+table.api-members code { font-size: 12.1px; }
+
+.badge {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.badge-class, .badge-interface { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 22%, transparent); }
+.badge-function, .badge-fn { background: var(--rule-bg); color: var(--rule); border-color: color-mix(in srgb, var(--rule) 25%, transparent); }
+.badge-type { background: var(--note-bg); color: var(--note); border-color: color-mix(in srgb, var(--note) 25%, transparent); }
+.badge-const { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+
+/* -------------------------------------------------------------------- toc */
+
+.toc {
+  margin: 0 0 2rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.toc h2 {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.toc ul { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 1.6rem; }
+.toc li { break-inside: avoid; margin: 0.18rem 0; }
+.toc a { font-size: 13.4px; text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* ----------------------------------------------------------------- footer */
+
+.page-foot { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-3); }
+.pager { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; font-size: 13.5px; }
+.pager a { text-decoration: none; font-weight: 600; }
+.pager a:hover { text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .layout { flex-direction: column; }
+  .sidebar { position: static; width: 100%; height: auto; flex: none; border-right: 0; border-bottom: 1px solid var(--border); }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .toc ul { columns: 1; }
+  main { padding-top: 1.6rem; }
+}
+
+/* ------------------------------------------------------------ print sheet */
+
+body.print {
+  background: #fff;
+  color: #16150f;
+  font-size: 10.6pt;
+  line-height: 1.5;
+  --sx-comment: #6f6b63;
+  --sx-keyword: #8d3560;
+  --sx-string: #2f6942;
+  --sx-number: #855017;
+  --sx-fn: #295585;
+  --sx-type: #6c3f8f;
+  --sx-prop: #9e3f24;
+  --sx-op: #5e5a53;
+  --sx-var: #8f4718;
+}
+body.print .print-page { padding: 0 0 1.5rem; }
+body.print main, body.print .sidebar { all: unset; }
+body.print h1.print-h1 {
+  font-family: var(--serif);
+  font-size: 21pt;
+  margin: 0 0 0.2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid #16150f;
+}
+body.print h2 { font-size: 14pt; margin-top: 1.4rem; }
+body.print h3 { font-size: 11.6pt; }
+body.print pre { font-size: 8.4pt; background: #f6f5f3; border-color: #ddd; }
+body.print table { font-size: 9pt; }
+body.print .file { border-color: #ddd; }
+body.print table.api-members td:first-child { width: 58%; }
+body.print .api-item { break-inside: auto; }
+body.print .toc, body.print .pager, body.print .skip, body.print .filter { display: none; }
+body.print details.api { display: block; }
+body.print details.api > summary { list-style: none; }
+
+.cover {
+  min-height: 245mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4mm;
+  page-break-after: always;
+  break-after: page;
+}
+.cover h1 { font-size: 40pt; margin: 0.2rem 0 0.6rem; letter-spacing: -0.02em; }
+.cover .eyebrow { font-size: 10pt; letter-spacing: 0.14em; }
+.cover-sub { font-size: 14pt; color: #4a4842; max-width: 30ch; margin: 0 0 3rem; }
+.cover-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); gap: 1.2rem 2rem; margin: 0; border-top: 2px solid #16150f; padding-top: 1.2rem; }
+.cover-meta div { margin: 0; }
+.cover-meta dt { font-size: 8.5pt; letter-spacing: 0.09em; text-transform: uppercase; color: #6d6b64; }
+.cover-meta dd { margin: 0.15rem 0 0; font-size: 13pt; font-weight: 600; }
+
+.contents { page-break-after: always; break-after: page; }
+.print-toc { list-style: none; padding: 0; margin: 1.4rem 0 0; counter-reset: toc; }
+.print-toc li { margin: 0.55rem 0; display: grid; grid-template-columns: 2rem 1fr; gap: 0.2rem 0.6rem; align-items: baseline; }
+.print-toc .num { color: #8a887f; font-variant-numeric: tabular-nums; font-size: 10pt; }
+.print-toc a { font-size: 12.5pt; font-weight: 600; text-decoration: none; color: #16150f; }
+.print-toc .sub { grid-column: 2; font-size: 9.4pt; color: #6d6b64; }
+.print-toc .dots { display: none; }
+
+.print-page { page-break-before: always; break-before: page; }
+.print-page:first-of-type { page-break-before: avoid; break-before: avoid; }
+
+@media print {
+  body.print { background: #fff; }
+  pre, .callout, ol.steps > li, .api-item, tr { page-break-inside: avoid; break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; break-after: avoid; }
+  a { color: #16150f; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">PW</span><div><strong>Playwright UI Framework</strong><span>Documentation v1.0</span></div></div>
+    <input id="nav-filter" class="filter" type="search" placeholder="Filter sections…" aria-label="Filter sections">
+    <nav aria-label="Documentation"><ul class="nav"><li><a href="index.html">Overview</a></li><li><a href="architecture.html">Architecture</a></li><li><a href="worked-example.html">Worked example</a></li><li><a href="structure.html">Project structure</a></li><li><a href="reference-root.html">Reference: configuration &amp; tooling</a></li><li><a href="reference-foundation.html">Reference: config, core &amp; types</a></li><li><a href="reference-components.html">Reference: component library</a></li><li><a href="reference-fixtures.html" aria-current="page">Reference: fixtures, hooks, pages &amp; API</a></li><li><a href="reference-utils.html">Reference: utilities, reporters &amp; data</a></li><li><a href="reference-tests.html">Reference: tests &amp; repository docs</a></li><li><a href="playbooks.html">Playbooks</a></li><li><a href="conventions.html">Conventions</a></li><li><a href="troubleshooting.html">Troubleshooting</a></li><li><a href="api-index.html">API index</a></li><li><a href="glossary.html">Glossary</a></li></ul></nav>
+    <div class="sidebar-foot">
+      <a href="playwright-ui-framework-documentation.pdf" download>Download PDF</a>
+      <span>Generated 2026-09-01</span>
+    </div>
+  </aside>
+  <main id="main">
+    <header class="page-head">
+      <p class="eyebrow">Playwright UI Framework</p>
+      <h1>Reference: fixtures, hooks, pages &amp; API</h1>
+      <p class="subtitle">How the framework reaches your tests</p>
+    </header>
+    <nav class="toc" aria-label="On this page"><h2>On this page</h2><ul id="toc"><li><a href="#fixtures-src-fixtures">Fixtures (src/fixtures)</a></li><li><a href="#hooks-src-hooks">Hooks (src/hooks)</a></li><li><a href="#page-objects-src-pages">Page objects (src/pages)</a></li><li><a href="#api-client-src-api">API client (src/api)</a></li></ul></nav>
+    <div class="content"><h2 id="fixtures-src-fixtures">Fixtures (src/fixtures)</h2>
+
+<section class="file" id="f-src-fixtures-auth-fixture-ts">
+  <header class="file-head">
+    <h3><code>src/fixtures/auth.fixture.ts</code></h3>
+    <span class="file-meta">73 lines &middot; 4 exports</span>
+  </header>
+  <p class="file-purpose">Extends the base fixtures with authenticated browsing: <code>authenticatedContext</code> and <code>authenticatedPage</code> for the standard user, and <code>pageAs(role)</code> for signing in as any role on demand. Sessions are replayed from the storage state files written by <code>auth.setup.ts</code>.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Two users in one test</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-f">test</span>(<span class="tok-s">'admin sees the audit trail a viewer cannot'</span>, <span class="tok-k">async</span> ({ pageAs }) <span class="tok-o">=&gt;</span> {
+  <span class="tok-k">const</span> adminPage  <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-f">pageAs</span>(<span class="tok-s">'admin'</span>);
+  <span class="tok-k">const</span> viewerPage <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-f">pageAs</span>(<span class="tok-s">'readonly'</span>);
+  <span class="tok-c">// both contexts are independent and already signed in</span>
+});</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a role that tests need to browse as.</li><li>Your application needs more than cookies to restore a session (a tenant header, a local-storage token).</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the role to <code>UserRole</code>, add its credentials, add it to the <code>ROLES</code> array in <code>auth.setup.ts</code> — then <code>pageAs('auditor')</code> works with no change here.</p></li><li><p>If the session needs extra state, set it on the context after creation.</p><pre><code><span class="tok-k">await</span> context.<span class="tok-f">addInitScript</span>(() <span class="tok-o">=&gt;</span> window.localStorage.<span class="tok-f">setItem</span>(<span class="tok-s">'tenant'</span>, <span class="tok-s">'acme'</span>));</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Replaying a saved session removes a login from every test. On a suite of 300 tests at 8 seconds per login, that is roughly 40 minutes of wall-clock time per run.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li><code>storageStateFor()</code> returns <code>undefined</code> when the file does not exist, so a suite that does not use auth still runs — the tests simply start signed out.</li></ul></div>
+  <p class="related">Related: <code>src/hooks/auth.setup.ts</code> &middot; <code>src/config/env.config.ts</code></p>
+  <details class="api"><summary>API surface (4 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>AuthFixtures</code></div><pre class="api-shape"><code><span class="tok-p">authenticatedContext</span><span class="tok-o">:</span> <span class="tok-t">BrowserContext</span>;
+<span class="tok-p">authenticatedPage</span><span class="tok-o">:</span> <span class="tok-t">Page</span>;
+<span class="tok-p">pageAs</span><span class="tok-o">:</span> (<span class="tok-p">role</span><span class="tok-o">:</span> <span class="tok-t">UserRole</span>) <span class="tok-o">=&gt;</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">Page</span><span class="tok-o">&gt;</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>test</code></div><p class="api-doc">Authentication via saved storage state. Logging in through the UI once per role (in <code>auth.setup.ts</code>) and replaying the cookies afterwards removes a login from every single test — usually the largest single saving available in a UI suite.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">storageStateFor</span>(<span class="tok-p">role</span><span class="tok-o">:</span> <span class="tok-t">UserRole</span>)<span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">undefined</span></code></div><p class="api-doc">Path to a role's saved session, or undefined when it has not been created. Undefined means &quot;start signed out&quot; rather than a hard failure, so a suite that does not use auth still runs.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>expect</code><span class="api-heritage">from './custom-matchers'</span></div></div></details>
+</section>
+
+<section class="file" id="f-src-fixtures-bank-fixture-ts">
+  <header class="file-head">
+    <h3><code>src/fixtures/bank.fixture.ts</code></h3>
+    <span class="file-meta">99 lines &middot; 4 exports</span>
+  </header>
+  <p class="file-purpose">Provides every page object ready-made, plus <code>signedIn</code> and <code>signInAs</code> for tests that need an authenticated session.</p>
+  <h3 id="why-there-is-no-cleanup">Why there is no cleanup</h3>
+<aside class="callout rule"><span class="callout-tag">Rule</span><div>SecureBank keeps all its state in <code>localStorage</code> under <code>bank-app-v4</code>, and Playwright gives every test a <strong>fresh browser context</strong>. Every test therefore starts from the seeded dataset automatically: no cleanup step, no shared account to fight over, no ordering constraints. That is what lets this suite run fully parallel against a single shared demo application — normally the hardest problem in UI automation.</div></aside>
+<h3 id="why-sign-in-is-a-fixture-rather-than-a-beforeeach">Why sign-in is a fixture rather than a <code>beforeEach</code></h3>
+<p>A fixture is constructed only when a test names it, so the login specs — which must start signed *out* — simply do not ask for <code>signedIn</code> and pay nothing. A <code>beforeEach</code> would run for them too and would have to be skipped around.</p>
+<figure class="code" data-lang="ts"><figcaption><span>Three levels of access</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-f">test</span>(<span class="tok-s">'…'</span>, <span class="tok-k">async</span> ({ bank }) <span class="tok-o">=&gt;</span> { … });        <span class="tok-c">// page objects, signed out</span>
+<span class="tok-f">test</span>(<span class="tok-s">'…'</span>, <span class="tok-k">async</span> ({ signedIn }) <span class="tok-o">=&gt;</span> { … });    <span class="tok-c">// signed in as the standard persona</span>
+<span class="tok-f">test</span>(<span class="tok-s">'…'</span>, <span class="tok-k">async</span> ({ signInAs }) <span class="tok-o">=&gt;</span> {          <span class="tok-c">// signed in as anyone</span>
+  <span class="tok-k">const</span> app <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-f">signInAs</span>(<span class="tok-s">'frozen'</span>);
+});</code></pre></figure>
+<p>The layering is <code>base → auth → bank</code>, each adding fixtures without the layer below knowing about it — so a project that deletes the bank suite loses nothing else.</p>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a page object.</li><li>A test needs a differently-prepared session.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the page to <code>BankPages</code> and construct it in the <code>bank</code> fixture — two lines, and every test can reach it.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Constructing eleven page objects in every spec would be eleven lines of noise per file. Doing it once, lazily, is what keeps a spec about the behaviour it is testing.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Page objects only build locators, so constructing all eleven is essentially free — no page is loaded until a test navigates.</li></ul></div>
+  <p class="related">Related: <code>src/pages/bank/index.ts</code> &middot; <code>src/fixtures/index.ts</code> &middot; <code>src/data/personas.ts</code></p>
+  <details class="api"><summary>API surface (4 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>BankPages</code></div><p class="api-doc">Every page object, constructed against the current page.</p><pre class="api-shape"><code><span class="tok-k">readonly</span> <span class="tok-p">login</span><span class="tok-o">:</span> <span class="tok-t">LoginPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">dashboard</span><span class="tok-o">:</span> <span class="tok-t">DashboardPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">accounts</span><span class="tok-o">:</span> <span class="tok-t">AccountsPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">accountDetail</span><span class="tok-o">:</span> <span class="tok-t">AccountDetailPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">transfer</span><span class="tok-o">:</span> <span class="tok-t">TransferPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">sendMoney</span><span class="tok-o">:</span> <span class="tok-t">SendMoneyPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">billPay</span><span class="tok-o">:</span> <span class="tok-t">BillPayPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">transactions</span><span class="tok-o">:</span> <span class="tok-t">TransactionsPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">applyLoan</span><span class="tok-o">:</span> <span class="tok-t">ApplyLoanPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">notifications</span><span class="tok-o">:</span> <span class="tok-t">NotificationsPage</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">profile</span><span class="tok-o">:</span> <span class="tok-t">ProfilePage</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>BankFixtures</code></div><pre class="api-shape"><code><span class="tok-p">bank</span><span class="tok-o">:</span> <span class="tok-t">BankPages</span>;
+<span class="tok-p">signedIn</span><span class="tok-o">:</span> <span class="tok-t">BankPages</span>;
+<span class="tok-p">signInAs</span><span class="tok-o">:</span> (<span class="tok-p">persona</span><span class="tok-o">:</span> <span class="tok-t">PersonaName</span> <span class="tok-o">|</span> <span class="tok-t">Persona</span>) <span class="tok-o">=&gt;</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">BankPages</span><span class="tok-o">&gt;</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>test</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>expect</code><span class="api-heritage">from './custom-matchers'</span></div></div></details>
+</section>
+
+<section class="file" id="f-src-fixtures-base-fixture-ts">
+  <header class="file-head">
+    <h3><code>src/fixtures/base.fixture.ts</code></h3>
+    <span class="file-meta">155 lines &middot; 4 exports</span>
+  </header>
+  <p class="file-purpose">Composes the <code>test</code> object every spec uses. It adds the framework’s fixtures — component factory, logger, network control, console capture, generated data, credentials, API client — and overrides the built-in <code>page</code> fixture to attach diagnostics on failure and enforce the console-error policy.</p>
+  <div class="table-wrap"><table><thead><tr><th>Fixture</th><th>Scope</th><th>Provides</th></tr></thead><tbody><tr><td><code>ui</code></td><td>test</td><td>Component factory bound to the page.</td></tr><tr><td><code>log</code></td><td>test</td><td>Logger scoped to the test title; logs start and finish with status and duration.</td></tr><tr><td><code>network</code></td><td>test</td><td>Mocking, latency, abort, offline and request capture. Routes are reset after the test.</td></tr><tr><td><code>consoleErrors</code></td><td>test</td><td>Console errors, page errors and failed requests recorded during the test.</td></tr><tr><td><code>testData</code></td><td>test</td><td>A generated user, seeded from the test title so retries reproduce the same data.</td></tr><tr><td><code>userFor</code></td><td>test</td><td><code>getUser(role)</code> for credentials.</td></tr><tr><td><code>appConfig</code></td><td>test</td><td>The validated configuration object.</td></tr><tr><td><code>failOnConsoleErrors</code></td><td>test (option)</td><td>Opt-in policy that fails a test if the page logged console errors.</td></tr><tr><td><code>api</code></td><td>worker</td><td>One HTTP client per worker, disposed at the end.</td></tr></tbody></table></div>
+<figure class="code" data-lang="ts"><figcaption><span>Enabling the console-error policy for a file or a test</span><span class="lang">TypeScript</span></figcaption><pre><code>test.<span class="tok-f">use</span>({ <span class="tok-p">failOnConsoleErrors</span><span class="tok-o">:</span> <span class="tok-k">true</span> });
+
+<span class="tok-f">test</span>(<span class="tok-s">'checkout is clean @smoke'</span>, <span class="tok-k">async</span> ({ page, consoleErrors }) <span class="tok-o">=&gt;</span> {
+  <span class="tok-c">// ... the test fails at the end if the page logged an error</span>
+});</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>Every test needs something new — a seeded tenant, a feature-flag override, a page object bundle.</li><li>You want different diagnostics attached on failure.</li><li>A resource is expensive and should be created once per worker instead of per test.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the fixture’s type to <code>TestFixtures</code> (or <code>WorkerFixtures</code>), then implement it. Code before <code>use()</code> is setup; code after is teardown.</p><pre><code><span class="tok-k">export</span> <span class="tok-k">interface</span> <span class="tok-t">TestFixtures</span> {
+  <span class="tok-c">// ...</span>
+  <span class="tok-p">tenant</span><span class="tok-o">:</span> <span class="tok-t">Tenant</span>;
+}
+
+<span class="tok-k">export</span> <span class="tok-k">const</span> test <span class="tok-o">=</span> base.<span class="tok-f">extend</span><span class="tok-o">&lt;</span><span class="tok-t">TestFixtures</span>, <span class="tok-t">WorkerFixtures</span><span class="tok-o">&gt;</span>({
+  <span class="tok-p">tenant</span><span class="tok-o">:</span> <span class="tok-k">async</span> ({ api }, use) <span class="tok-o">=&gt;</span> {
+    <span class="tok-k">const</span> tenant <span class="tok-o">=</span> <span class="tok-k">await</span> api.<span class="tok-f">post</span><span class="tok-o">&lt;</span><span class="tok-t">Tenant</span><span class="tok-o">&gt;</span>(<span class="tok-s">'/tenants'</span>, { <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-f">uniqueId</span>(<span class="tok-s">'tenant'</span>) });
+    <span class="tok-k">await</span> <span class="tok-f">use</span>(tenant);
+    <span class="tok-k">await</span> api.<span class="tok-k">delete</span>(<span class="tok-s">`/tenants/</span><span class="tok-o">${</span>tenant.id<span class="tok-o">}</span><span class="tok-s">`</span>);   <span class="tok-c">// always clean up</span>
+  },
+});</code></pre></li><li><p>To change failure diagnostics, edit <code>attachDiagnostics</code>. Keep each attachment guarded with <code>.catch()</code> so a diagnostic failure never masks the real one.</p></li><li><p>Use worker scope for anything expensive and stateless; use test scope for anything a test could mutate.</p><pre><code><span class="tok-p">api</span><span class="tok-o">:</span> [<span class="tok-k">async</span> ({}, use) <span class="tok-o">=&gt;</span> { <span class="tok-c">/* ... */</span> }, { <span class="tok-p">scope</span><span class="tok-o">:</span> <span class="tok-s">'worker'</span> }],</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Fixtures are how the framework reaches tests without imports or inheritance. Adding a capability here makes it available everywhere, with automatic teardown and no boilerplate in specs.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li><code>consoleErrors</code> deliberately does not depend on <code>page</code>; the overridden <code>page</code> attaches the listeners. A mutual dependency would be a fixture cycle and Playwright would refuse to run.</li><li><code>testData</code> is seeded from the test title, so renaming a test changes its generated data.</li></ul></div>
+  <p class="related">Related: <code>src/fixtures/auth.fixture.ts</code> &middot; <code>src/fixtures/index.ts</code> &middot; <code>src/utils/browser.utils.ts</code></p>
+  <details class="api"><summary>API surface (4 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>WorkerFixtures</code></div><pre class="api-shape"><code><span class="tok-p">api</span><span class="tok-o">:</span> <span class="tok-t">ApiClient</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>TestFixtures</code></div><pre class="api-shape"><code><span class="tok-p">appConfig</span><span class="tok-o">:</span> <span class="tok-t">AppConfig</span>;
+<span class="tok-p">log</span><span class="tok-o">:</span> <span class="tok-t">Logger</span>;
+<span class="tok-p">ui</span><span class="tok-o">:</span> <span class="tok-t">UiFactory</span>;
+<span class="tok-p">network</span><span class="tok-o">:</span> <span class="tok-t">NetworkHelper</span>;
+<span class="tok-p">consoleErrors</span><span class="tok-o">:</span> <span class="tok-t">ConsoleCapture</span>;
+<span class="tok-p">testData</span><span class="tok-o">:</span> <span class="tok-t">GeneratedUser</span>;
+<span class="tok-p">userFor</span><span class="tok-o">:</span> (<span class="tok-p">role</span><span class="tok-o">:</span> <span class="tok-t">UserRole</span>) <span class="tok-o">=&gt;</span> <span class="tok-t">TestUser</span>;
+<span class="tok-p">failOnConsoleErrors</span><span class="tok-o">:</span> <span class="tok-t">boolean</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>test</code></div><p class="api-doc">The framework's test object. Tests import <code>test</code> and <code>expect</code> from <code>@fixtures/index</code> — never from <code>@playwright/test</code> directly — so every test automatically gets logging, console-error capture, network control and the component factory.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>BrowserContext, Page</code><span class="api-heritage">from </span></div></div></details>
+</section>
+
+<section class="file" id="f-src-fixtures-custom-matchers-ts">
+  <header class="file-head">
+    <h3><code>src/fixtures/custom-matchers.ts</code></h3>
+    <span class="file-meta">139 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">Domain-specific matchers that extend Playwright’s <code>expect</code>: <code>toBeAccessible</code>, <code>toBeInteractive</code>, <code>toHaveNormalizedText</code>, <code>toHaveValidationError</code>, <code>toBeInViewport</code> and <code>toBeSorted</code>. Each exists because the equivalent inline check appeared often enough to deserve a name — and because a named matcher produces a far better failure message.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Usage</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">await</span> <span class="tok-f">expect</span>(page).<span class="tok-f">toBeAccessible</span>({ <span class="tok-p">tags</span><span class="tok-o">:</span> [<span class="tok-s">'wcag2aa'</span>] });
+<span class="tok-k">await</span> <span class="tok-f">expect</span>(saveButton.locator).<span class="tok-f">toBeInteractive</span>();
+<span class="tok-k">await</span> <span class="tok-f">expect</span>(total).<span class="tok-f">toHaveNormalizedText</span>(<span class="tok-s">'Total  due'</span>);   <span class="tok-c">// whitespace-insensitive</span>
+<span class="tok-k">await</span> <span class="tok-f">expect</span>(emailField.locator).<span class="tok-f">toHaveValidationError</span>(<span class="tok-r">/valid email/i</span>);
+<span class="tok-f">expect</span>(<span class="tok-k">await</span> table.<span class="tok-f">getColumnValues</span>(<span class="tok-s">'Amount'</span>)).<span class="tok-f">toBeSorted</span>(<span class="tok-s">'desc'</span>);</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The same multi-step assertion appears in three or more tests.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the matcher to the <code>expect.extend</code> object. Return <code>pass</code> plus a <code>message</code> function that explains both directions — the negated form is what makes a matcher pleasant to debug.</p><pre><code><span class="tok-k">async</span> <span class="tok-f">toHaveRowCount</span>(<span class="tok-p">table</span><span class="tok-o">:</span> <span class="tok-t">Table</span>, <span class="tok-p">expected</span><span class="tok-o">:</span> <span class="tok-t">number</span>) {
+  <span class="tok-k">const</span> actual <span class="tok-o">=</span> <span class="tok-k">await</span> table.<span class="tok-f">rowCount</span>();
+  <span class="tok-k">return</span> {
+    <span class="tok-p">pass</span><span class="tok-o">:</span> actual <span class="tok-o">===</span> expected,
+    <span class="tok-p">message</span><span class="tok-o">:</span> () <span class="tok-o">=&gt;</span>
+      actual <span class="tok-o">===</span> expected
+        <span class="tok-o">?</span> <span class="tok-s">`Expected the table not to have </span><span class="tok-o">${</span>expected<span class="tok-o">}</span><span class="tok-s"> rows`</span>
+        <span class="tok-o">:</span> <span class="tok-s">`Expected </span><span class="tok-o">${</span>expected<span class="tok-o">}</span><span class="tok-s"> rows but found </span><span class="tok-o">${</span>actual<span class="tok-o">}</span><span class="tok-s">`</span>,
+    <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-s">'toHaveRowCount'</span>,
+  };
+}</code></pre></li><li><p>TypeScript picks up the new matcher automatically because <code>expect</code> is exported from here; no declaration merging is needed.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A failure that says &quot;expected ascending order: actual 30, 10 / expected 10, 30&quot; is diagnosable from the CI log alone. <code>expect(true).toBe(false)</code> is not.</p></div>
+  
+  <p class="related">Related: <code>src/fixtures/index.ts</code> &middot; <code>src/utils/a11y.utils.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>expect</code></div><p class="api-doc">Domain-specific assertions. Each one exists because the equivalent inline check appeared in enough tests to be worth naming — and because a named matcher produces a far better failure message than <code>expect(await x.y()).toBe(true)</code>.</p></div></details>
+</section>
+
+<section class="file" id="f-src-fixtures-index-ts">
+  <header class="file-head">
+    <h3><code>src/fixtures/index.ts</code></h3>
+    <span class="file-meta">21 lines &middot; 6 exports</span>
+  </header>
+  <p class="file-purpose">Re-exports the composed <code>test</code> and the extended <code>expect</code>. This is the single import surface for specs, and importing from here rather than from <code>@playwright/test</code> is what guarantees a test gets the framework’s fixtures and matchers.</p>
+  <aside class="callout rule"><span class="callout-tag">Rule</span><div>Tests import <code>test</code> and <code>expect</code> from <code>@fixtures/index</code> — never from <code>@playwright/test</code> directly.</div></aside>
+<figure class="code" data-lang="ts"><figcaption><span>Every spec starts this way</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">import</span> { test, expect } <span class="tok-k">from</span> <span class="tok-s">'@fixtures/index'</span>;</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a fixture module that tests should reach.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Extend the chain in <code>auth.fixture.ts</code> (which already extends <code>base.fixture.ts</code>) and re-export here, so tests keep one import line.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>One import path means new capabilities reach every existing test with no edits to those tests.</p></div>
+  
+  <p class="related">Related: <code>src/fixtures/base.fixture.ts</code> &middot; <code>src/fixtures/auth.fixture.ts</code></p>
+  <details class="api"><summary>API surface (6 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>test</code><span class="api-heritage">from './bank.fixture'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>expect</code><span class="api-heritage">from './custom-matchers'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>TestFixtures, WorkerFixtures</code><span class="api-heritage">from './base.fixture'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>AuthFixtures</code><span class="api-heritage">from './auth.fixture'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>storageStateFor</code><span class="api-heritage">from './auth.fixture'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>BankFixtures, BankPages</code><span class="api-heritage">from './bank.fixture'</span></div></div></details>
+</section>
+<h2 id="hooks-src-hooks">Hooks (src/hooks)</h2>
+
+<section class="file" id="f-src-hooks-auth-setup-ts">
+  <header class="file-head">
+    <h3><code>src/hooks/auth.setup.ts</code></h3>
+    <span class="file-meta">69 lines</span>
+  </header>
+  <p class="file-purpose">Runs as the <code>setup</code> project before every other project. For each role it signs in through the UI once and saves the session to <code>storage/&lt;role&gt;.json</code>. Its <code>signIn</code> function contains the only application-specific selectors in the framework.</p>
+  <aside class="callout warn"><span class="callout-tag">Careful</span><div>This is the first file to edit when you point the framework at a real application. Its placeholder selectors will not match your login page.</div></aside>
+<figure class="code" data-lang="ts"><figcaption><span>What to replace</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">async</span> <span class="tok-k">function</span> <span class="tok-f">signIn</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">username</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">password</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span> {
+  <span class="tok-k">await</span> page.<span class="tok-f">goto</span>(<span class="tok-s">'/login'</span>, { <span class="tok-p">waitUntil</span><span class="tok-o">:</span> <span class="tok-s">'domcontentloaded'</span> });
+  <span class="tok-k">await</span> page.<span class="tok-f">getByLabel</span>(<span class="tok-r">/username|email/i</span>).<span class="tok-f">fill</span>(username);
+  <span class="tok-k">await</span> page.<span class="tok-f">getByLabel</span>(<span class="tok-r">/password/i</span>).<span class="tok-f">fill</span>(password);
+  <span class="tok-k">await</span> page.<span class="tok-f">getByRole</span>(<span class="tok-s">'button'</span>, { <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-r">/sign in|log in/i</span> }).<span class="tok-f">click</span>();
+
+  <span class="tok-c">// Prove the session is real before saving it.</span>
+  <span class="tok-k">await</span> page.<span class="tok-f">waitForURL</span>((url) <span class="tok-o">=&gt;</span> <span class="tok-o">!</span>url.pathname.<span class="tok-f">includes</span>(<span class="tok-s">'/login'</span>), {
+    <span class="tok-p">timeout</span><span class="tok-o">:</span> config.timeouts.navigation,
+  });
+}</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>Your login page differs from the placeholder (it will).</li><li>You add a role that needs a saved session.</li><li>Login involves an extra step — SSO, MFA, a tenant chooser, a consent screen.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Replace the selectors in <code>signIn</code>, or delegate to a <code>LoginPage</code> page object once you have one.</p><pre><code><span class="tok-k">const</span> login <span class="tok-o">=</span> <span class="tok-k">new</span> <span class="tok-f">LoginPage</span>(page);
+<span class="tok-k">await</span> login.<span class="tok-f">goto</span>();
+<span class="tok-k">await</span> login.<span class="tok-f">signIn</span>(username, password);</code></pre></li><li><p>Add the role to the <code>ROLES</code> array; a storage state is then produced for it automatically.</p><pre><code><span class="tok-k">const</span> <span class="tok-t">ROLES</span><span class="tok-o">:</span> <span class="tok-t">UserRole</span>[] <span class="tok-o">=</span> [<span class="tok-s">'standard'</span>, <span class="tok-s">'admin'</span>, <span class="tok-s">'auditor'</span>];</code></pre></li><li><p>For MFA, prefer a test account with MFA disabled or a deterministic TOTP seed generated in code — never a manual step.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Verifying the redirect before saving the state is what turns one login failure into one clear setup failure, instead of an entire suite failing later with unexplained authorisation errors.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Storage states expire when your session tokens do. If tests start failing as unauthenticated, delete <code>storage/*.json</code> and re-run.</li><li>Never commit <code>storage/*.json</code> — those files are live sessions.</li></ul></div>
+  <p class="related">Related: <code>src/fixtures/auth.fixture.ts</code> &middot; <code>src/config/env.config.ts</code> &middot; <code>.gitignore</code></p>
+  
+</section>
+
+<section class="file" id="f-src-hooks-global-setup-ts">
+  <header class="file-head">
+    <h3><code>src/hooks/global.setup.ts</code></h3>
+    <span class="file-meta">42 lines</span>
+  </header>
+  <p class="file-purpose">Runs once before the entire suite, in the parent process: creates the report, results, storage and download directories, removes the previous HTML report so a stale one cannot be mistaken for the current run, logs the resolved run configuration, and records the start time.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>The suite needs one-time preparation — a database reset, a feature-flag snapshot, a health check on the target environment.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Keep it cheap and idempotent; it blocks every worker. Anything per-role belongs in <code>auth.setup.ts</code>, anything per-test in a fixture.</p><pre><code><span class="tok-k">const</span> health <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-f">fetch</span>(<span class="tok-s">`</span><span class="tok-o">${</span>config.baseURL<span class="tok-o">}</span><span class="tok-s">/health`</span>);
+<span class="tok-k">if</span> (<span class="tok-o">!</span>health.ok) {
+  <span class="tok-k">throw</span> <span class="tok-k">new</span> <span class="tok-f">Error</span>(<span class="tok-s">`</span><span class="tok-o">${</span>config.env<span class="tok-o">}</span><span class="tok-s"> is not healthy (</span><span class="tok-o">${</span>health.status<span class="tok-o">}</span><span class="tok-s">) — aborting before wasting a full run`</span>);
+}</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Failing here costs seconds and produces one clear message. Discovering the same problem through 300 timing-out tests costs an hour and produces noise.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>This runs in the parent process, so variables set here are not shared with workers except through <code>process.env</code>.</li></ul></div>
+  <p class="related">Related: <code>src/hooks/global.teardown.ts</code> &middot; <code>playwright.config.ts</code></p>
+  
+</section>
+
+<section class="file" id="f-src-hooks-global-teardown-ts">
+  <header class="file-head">
+    <h3><code>src/hooks/global.teardown.ts</code></h3>
+    <span class="file-meta">24 lines</span>
+  </header>
+  <p class="file-purpose">Runs once after the entire suite: removes the temporary scratch directory and logs total duration and where reports were written. Artifacts — traces, videos, reports — are deliberately left in place.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>The suite creates shared external state that must be cleaned up, or you want to publish results somewhere.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the cleanup, and guard it so a teardown failure does not mask the real test results.</p><pre><code><span class="tok-k">try</span> {
+  <span class="tok-k">await</span> <span class="tok-f">archiveReports</span>();
+} <span class="tok-k">catch</span> (error) {
+  logger.<span class="tok-f">warn</span>(<span class="tok-s">'Report archiving failed'</span>, { <span class="tok-p">error</span><span class="tok-o">:</span> <span class="tok-f">String</span>(error) });
+}</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Per-test data should be cleaned by the fixture that created it; teardown is only for suite-wide state, so it stays small and reliable.</p></div>
+  
+  <p class="related">Related: <code>src/hooks/global.setup.ts</code></p>
+  
+</section>
+<h2 id="page-objects-src-pages">Page objects (src/pages)</h2>
+
+<section class="file" id="f-src-pages-bank-account-detail-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/account-detail.page.ts</code></h3>
+    <span class="file-meta">80 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">A single account: its balance and a filterable, sortable transaction table.</p>
+  <aside class="callout note"><span class="callout-tag">Note</span><div>Its URL carries an account id, so <code>goto()</code> is not used — the page is reached by clicking through from the accounts list, which is how a user reaches it and therefore what should be tested.</div></aside>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The detail page gains a filter.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the component and a method that waits for the list to settle.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>The detail balance and the list balance are two renderings of one number — the place a stale cache shows up, and the reason this page object exists rather than being folded into the list.</p></div>
+  
+  <p class="related">Related: <code>src/pages/bank/accounts.page.ts</code> &middot; <code>tests/ui/accounts.spec.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>AccountDetailPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">A single account's page: balance plus a filterable, sortable transaction table. Its <code>path</code> carries an account id, so <code>goto()</code> is not used — the page is reached by clicking through from the accounts list, which is how a user reaches it and therefore what should be tested.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>backLink</code></td><td></td></tr><tr><td><code>accountName</code></td><td></td></tr><tr><td><code>accountTypeBadge</code></td><td></td></tr><tr><td><code>accountBalance</code></td><td></td></tr><tr><td><code>searchInput</code></td><td></td></tr><tr><td><code>dateFromInput</code></td><td></td></tr><tr><td><code>dateToInput</code></td><td></td></tr><tr><td><code>typeFilter</code></td><td></td></tr><tr><td><code>transactionsTable</code></td><td></td></tr><tr><td><code><span class="tok-f">balance</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">search</span>(<span class="tok-p">term</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Types into the search field and waits for the debounce to settle.</td></tr><tr><td><code><span class="tok-f">descriptions</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>[]<span class="tok-o">&gt;</span></code></td><td>Descriptions of every visible transaction row.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-accounts-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/accounts.page.ts</code></h3>
+    <span class="file-meta">173 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">The account list and the add/edit dialog it opens.</p>
+  <p>One component models <strong>both</strong> the add and edit dialogs, because the application reuses the same form and changes only the container test id and the title. Two nearly identical members would have to be kept in step for no benefit.</p>
+<h3 id="every-field-in-the-dialog-is-required">Every field in the dialog is required</h3>
+<p>Established by submitting an incomplete form and reading what came back — first &quot;Please select an account type&quot;, then &quot;Please enter a valid starting balance&quot;. A page object that filled only the name failed with a dialog that never closed, and the cause was not obvious.</p>
+<aside class="callout warn"><span class="callout-tag">Careful</span><div>The starting-balance field carries <strong>no <code>data-testid</code></strong> — only a generated id (<code>base-ui-_r_a_</code>) that changes between renders and must never be selected on. It is located by placeholder, scoped to the dialog: a placeholder is user-visible text, which makes it a more meaningful anchor than a generated id.</div></aside>
+<p>The terms checkbox is a <code>span[role=&quot;checkbox&quot;]</code>, not a native input. The Checkbox component already handles that — <code>check()</code> falls back to a click when Playwright's strict <code>check()</code> refuses a non-input element.</p>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The account form gains a field.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the component and fill it in <code>addAccount()</code>. Check whether it is required by submitting without it.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Discovering required fields by reading the application's own validation messages is faster and more reliable than reading its markup.</p></div>
+  
+  <p class="related">Related: <code>tests/ui/accounts.spec.ts</code> &middot; <code>src/pages/bank/account-detail.page.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>AccountsPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">The account list, plus the add/edit dialog it opens.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>pageTitle</code></td><td></td></tr><tr><td><code>addAccountButton</code></td><td></td></tr><tr><td><code>accountsTable</code></td><td></td></tr><tr><td><code>accountDialog</code></td><td>The add/edit dialog. One component for both, because the application reuses the same form and only changes the container's test id and the title. Two nearly identical page-object members would have to be kept in step for no benefit.</td></tr><tr><td><code>accountNameInput</code></td><td></td></tr><tr><td><code>accountTypeDropdown</code></td><td></td></tr><tr><td><code>startingBalanceInput</code></td><td></td></tr><tr><td><code>acceptTermsCheckbox</code></td><td></td></tr><tr><td><code>saveAccountButton</code></td><td></td></tr><tr><td><code>cancelAccountButton</code></td><td></td></tr><tr><td><code><span class="tok-f">accountNames</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>[]<span class="tok-o">&gt;</span></code></td><td>Account names in display order.</td></tr><tr><td><code><span class="tok-f">accounts</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span>{ <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">balance</span><span class="tok-o">:</span> <span class="tok-t">number</span> }[]<span class="tok-o">&gt;</span></code></td><td>Every account's name and balance, parsed.</td></tr><tr><td><code><span class="tok-f">totalBalance</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>Sum of every account balance — the figure the dashboard should agree with.</td></tr><tr><td><code><span class="tok-f">openAccount</span>(<span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Opens the detail page for an account by its displayed name.</td></tr><tr><td><code><span class="tok-f">editAccount</span>(<span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Opens the edit dialog for an account by its displayed name.</td></tr><tr><td><code><span class="tok-f">addAccount</span>(<span class="tok-p">input</span><span class="tok-o">:</span> {
+    <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+    <span class="tok-k">type</span><span class="tok-o">?:</span> <span class="tok-t">string</span>;
+    startingBalance<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+  })<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Creates an account through the dialog. Every field here is <strong>required</strong>, which was established by submitting an incomplete form and reading the messages the application returned — first &quot;Please select an account type&quot;, then &quot;Please enter a valid starting balance&quot;. A page object that only filled the name would fail with a dialog that never closes, and the cause would not be obvious. The terms checkbox exists only on *create*, not on edit, so it is checked conditionally — an unconditional <code>check()</code> would break the edit flow.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-apply-loan-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/apply-loan.page.ts</code></h3>
+    <span class="file-meta">234 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">Loan applications and their history — including the page that carries the application's planted defect.</p>
+  <h3 id="why-allhistoryrows-walks-the-pages">Why <code>allHistoryRows()</code> walks the pages</h3>
+<p>The history paginates at five rows, and the total beneath it is labelled <strong>&quot;Total (Active/Pending)&quot;</strong> — it covers all loans but counts only the ones that are not closed. Comparing the total against the visible page is therefore wrong twice over: it misses later pages and it includes closed loans.</p>
+<aside class="callout note"><span class="callout-tag">Note</span><div>An earlier version of the loan test did exactly that and reported a mismatch for a perfectly healthy account. Walking the pages and filtering by status is what makes the comparison mean anything — and it is what allows the planted defect to be demonstrated credibly.</div></aside>
+<figure class="code" data-lang="ts"><figcaption><span></span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">async</span> <span class="tok-f">expectedActiveTotal</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span> {
+  <span class="tok-k">const</span> rows <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">allHistoryRows</span>();
+  <span class="tok-k">return</span> rows.<span class="tok-f">filter</span>((row) <span class="tok-o">=&gt;</span> <span class="tok-o">!/</span>closed<span class="tok-o">/</span>i.<span class="tok-f">test</span>(row.status))
+             .<span class="tok-f">reduce</span>((sum, row) <span class="tok-o">=&gt;</span> sum <span class="tok-o">+</span> row.amount, <span class="tok-n">0</span>);
+}</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The loan form changes.</li><li>The history gains a column.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Update the components. If the total's definition changes, <code>expectedActiveTotal()</code> is the one place to change.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>The defect this page carries is the suite's most valuable result, and it is only credible because the comparison it rests on is provably correct for a healthy account.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li><code>resetData()</code> is for a human debugging in headed mode. Tests never need it — a fresh context already reseeds.</li></ul></div>
+  <p class="related">Related: <code>tests/ui/apply-loan.spec.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>ApplyLoanPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">Loan applications and their history. This page carries the application's <strong>planted defect</strong>: for <code>error_user</code>, the history total omits the most recently added loan. That is deliberate on the application's part, and the suite reproduces it rather than working around it — a test framework that cannot demonstrate finding a real bug has not been demonstrated at all.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>openApplyLoanButton</code></td><td></td></tr><tr><td><code>resetDataButton</code></td><td></td></tr><tr><td><code>loanDialog</code></td><td></td></tr><tr><td><code>loanTypeDropdown</code></td><td></td></tr><tr><td><code>loanAmountInput</code></td><td></td></tr><tr><td><code>loanTermDropdown</code></td><td></td></tr><tr><td><code>interestRateInput</code></td><td></td></tr><tr><td><code>loanAccountDropdown</code></td><td></td></tr><tr><td><code>reviewLoanButton</code></td><td></td></tr><tr><td><code>cancelLoanButton</code></td><td></td></tr><tr><td><code>historyTable</code></td><td></td></tr><tr><td><code>historySearch</code></td><td></td></tr><tr><td><code>historyTypeFilter</code></td><td></td></tr><tr><td><code>historyDateFrom</code></td><td></td></tr><tr><td><code>historyDateTo</code></td><td></td></tr><tr><td><code>historyTotal</code></td><td></td></tr><tr><td><code>historyPagination</code></td><td></td></tr><tr><td><code>historyPaginationInfo</code></td><td></td></tr><tr><td><code>historyNextButton</code></td><td></td></tr><tr><td><code>historyPreviousButton</code></td><td></td></tr><tr><td><code><span class="tok-f">openApplication</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Opens the application dialog.</td></tr><tr><td><code><span class="tok-f">fillApplication</span>(<span class="tok-p">input</span><span class="tok-o">:</span> {
+    <span class="tok-k">type</span><span class="tok-o">?:</span> <span class="tok-t">string</span>;
+    amount<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+    term<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+    account<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+  })<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Fills the dialog without submitting, so validation can be asserted.</td></tr><tr><td><code><span class="tok-f">historyAmounts</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span>[]<span class="tok-o">&gt;</span></code></td><td>The amounts on the CURRENT page of history, parsed.</td></tr><tr><td><code><span class="tok-f">allHistoryRows</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span>{ <span class="tok-p">amount</span><span class="tok-o">:</span> <span class="tok-t">number</span>; <span class="tok-p">status</span><span class="tok-o">:</span> <span class="tok-t">string</span> }[]<span class="tok-o">&gt;</span></code></td><td>Every loan across every page, with its status. The history paginates at five rows, and the total beneath it is labelled <strong>&quot;Total (Active/Pending)&quot;</strong> — it covers all loans but counts only the ones that are not closed. So comparing the total against the visible page is wrong twice over: it misses later pages and it includes closed loans. An earlier version of the loan test did exactly that and reported a mismatch for a perfectly healthy account. Walking the pages and filtering by status is what makes the comparison mean something.</td></tr><tr><td><code><span class="tok-f">expectedActiveTotal</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>The figure the displayed total is supposed to equal: every loan that is not closed, summed across all pages.</td></tr><tr><td><code><span class="tok-f">displayedTotal</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>The total the page displays beneath the history table.</td></tr><tr><td><code><span class="tok-f">historyRowCount</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>How many loan rows are on the current page.</td></tr><tr><td><code><span class="tok-f">resetData</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Restores the seeded dataset. Not needed for isolation — every test gets a fresh browser context and the application stores its state in <code>localStorage</code>, so state never leaks between tests. It is here for the human who has been clicking around in a headed debugging session and wants a clean slate.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-bank-shell-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/bank-shell.ts</code></h3>
+    <span class="file-meta">189 lines &middot; 2 exports</span>
+  </header>
+  <p class="file-purpose">The application chrome — top bar and sidebar — modelled once as a component and composed into every page object.</p>
+  <p>A <strong>component, not a page object</strong>: it has no URL of its own and appears on ten pages. Modelling it once means a navigation change is one edit rather than ten, and keeps each page object about that page.</p>
+<h3 id="the-theme-toggle-has-no-test-id">The theme toggle has no test id</h3>
+<p>It is located by accessible name instead. That is not a workaround — an accessible-name locator asserts something a test id cannot: that the control is announced correctly to a screen reader. If the label were removed, this locator would fail, and it should.</p>
+<h3 id="two-bugs-this-file-records">Two bugs this file records</h3>
+<figure class="code" data-lang="ts"><figcaption><span>The state must be read BEFORE the click</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> wasDark <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">isDarkMode</span>();
+<span class="tok-k">await</span> <span class="tok-k">this</span>.themeToggle.<span class="tok-f">click</span>();
+<span class="tok-k">await</span> <span class="tok-k">this</span>.page.<span class="tok-f">waitForFunction</span>(
+  (previous) <span class="tok-o">=&gt;</span> document.documentElement.classList.<span class="tok-f">contains</span>(<span class="tok-s">'dark'</span>) <span class="tok-o">!==</span> previous,
+  wasDark,
+);</code></pre></figure>
+<p>An earlier version read the mode *after* clicking and passed the already-changed value into the wait, so the condition could never become true. Cheap mistake, expensive symptom: it looked like the application failed to switch theme.</p>
+<aside class="callout warn"><span class="callout-tag">Careful</span><div>Opening the mobile drawer renders a <strong>second</strong> <code>[data-testid=&quot;bank-sidebar&quot;]</code>, so an unscoped lookup fails strict mode and <code>.first()</code> silently picks the hidden desktop copy — an assertion that can never pass. <code>mobileNavLink()</code> scopes to the overlay, which is the only correct answer.</div></aside>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The navigation gains a destination.</li><li>The chrome changes.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the slug to <code>NavDestination</code>. The compiler then lists every place that must handle it, and <code>navLink()</code> works without further change.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Anything on every page belongs in one component. Re-asserting the sidebar in ten specs would be ten places to update and ten chances to disagree.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>The unread badge is <strong>removed</strong> from the DOM at zero, so <code>unreadCount()</code> reads absence as zero rather than waiting for the text &quot;0&quot;.</li></ul></div>
+  <p class="related">Related: <code>tests/ui/navigation.spec.ts</code> &middot; <code>src/pages/bank/index.ts</code></p>
+  <details class="api"><summary>API surface (2 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>BankShell</code></div><p class="api-doc">The application chrome that surrounds every signed-in page: the top bar and the left sidebar. It is a <strong>component, not a page object</strong>, because it has no URL of its own and appears on ten different pages. Modelling it once and composing it into each page means a change to the navigation is one edit here, rather than ten — and it keeps each page object about that page. Every page object exposes it as <code>shell</code>, so a test navigates the same way regardless of where it happens to be.</p><table class="api-members"><tbody><tr><td><code>brandLink</code></td><td></td></tr><tr><td><code>logoutButton</code></td><td></td></tr><tr><td><code>notificationsLink</code></td><td></td></tr><tr><td><code>topbarNotificationBadge</code></td><td></td></tr><tr><td><code>mobileMenuButton</code></td><td></td></tr><tr><td><code>sidebar</code></td><td></td></tr><tr><td><code>sidebarNotificationBadge</code></td><td></td></tr><tr><td><code>userInfo</code></td><td></td></tr><tr><td><code><span class="tok-f">navLink</span>(<span class="tok-p">destination</span><span class="tok-o">:</span> <span class="tok-t">NavDestination</span>)<span class="tok-o">:</span> <span class="tok-t">Link</span></code></td><td>The sidebar destinations, keyed by the slug the application uses. A record rather than a method per link: the pattern is completely regular, and eleven near-identical methods would be eleven places to update.</td></tr><tr><td><code><span class="tok-f">navigateTo</span>(<span class="tok-p">destination</span><span class="tok-o">:</span> <span class="tok-t">NavDestination</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Clicks a sidebar destination and waits for the URL to settle.</td></tr><tr><td><code><span class="tok-k">get</span> <span class="tok-p">themeToggle</span><span class="tok-o">:</span> <span class="tok-t">Button</span></code></td><td>The theme toggle. This is the one control in the application with <strong>no <code>data-testid</code></strong>, so it is located by its accessible name instead. That is not a workaround: an accessible-name locator asserts something a test id cannot — that the control is announced correctly to a screen reader. If the label were ever removed, this locator would fail, and it should.</td></tr><tr><td><code><span class="tok-f">isDarkMode</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td>True when the application is currently rendering its dark theme.</td></tr><tr><td><code><span class="tok-f">toggleTheme</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td>Flips the theme and returns the mode that is now active.</td></tr><tr><td><code><span class="tok-f">unreadCount</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>The unread-notification count, or 0 when the badge is absent entirely.</td></tr><tr><td><code><span class="tok-f">logout</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Signs out and waits for the login page.</td></tr><tr><td><code><span class="tok-k">get</span> <span class="tok-p">mobileDrawer</span><span class="tok-o">:</span> <span class="tok-t">Locator</span></code></td><td>The navigation drawer shown on narrow viewports. Opening it renders a <strong>second</strong> <code>[data-testid=&quot;bank-sidebar&quot;]</code> inside an overlay, so the desktop sidebar and the drawer both match that selector and Playwright's strict mode rejects an unscoped lookup. Scoping to the overlay is the fix; <code>.first()</code> would silently pick the hidden desktop copy and produce a &quot;visible&quot; assertion that can never pass.</td></tr><tr><td><code><span class="tok-f">mobileNavLink</span>(<span class="tok-p">destination</span><span class="tok-o">:</span> <span class="tok-t">NavDestination</span>)<span class="tok-o">:</span> <span class="tok-t">Locator</span></code></td><td>A navigation link inside the mobile drawer specifically.</td></tr><tr><td><code><span class="tok-f">openMobileMenu</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Opens the mobile drawer and waits for it to be usable.</td></tr><tr><td><code><span class="tok-k">get</span> <span class="tok-p">skipLink</span><span class="tok-o">:</span> <span class="tok-t">Locator</span></code></td><td>The &quot;skip to content&quot; link. Visually hidden until focused — the standard pattern. It is exposed here because its behaviour is asserted by the accessibility suite.</td></tr><tr><td><code><span class="tok-f">signedInAs</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td>The username shown in the sidebar footer.</td></tr></tbody></table></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>NavDestination</code></div><p class="api-doc">Every sidebar destination, as the application slugs them.</p><pre class="api-shape"><code><span class="tok-o">|</span> <span class="tok-s">'dashboard'</span> <span class="tok-o">|</span> <span class="tok-s">'accounts'</span> <span class="tok-o">|</span> <span class="tok-s">'transfer'</span> <span class="tok-o">|</span> <span class="tok-s">'send-money'</span> <span class="tok-o">|</span> <span class="tok-s">'bill-pay'</span> <span class="tok-o">|</span> <span class="tok-s">'transactions'</span> <span class="tok-o">|</span> <span class="tok-s">'apply-loan'</span> <span class="tok-o">|</span> <span class="tok-s">'notifications'</span> <span class="tok-o">|</span> <span class="tok-s">'profile'</span> <span class="tok-o">|</span> <span class="tok-s">'test-cases'</span></code></pre></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-bill-pay-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/bill-pay.page.ts</code></h3>
+    <span class="file-meta">134 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">Bill payment: a biller search, an amount, a date and a memo.</p>
+  <h3 id="two-component-choices-worth-explaining">Two component choices worth explaining</h3>
+<p>The biller field is an <strong>Autocomplete</strong>, not a Dropdown: typing filters a list. The payment date is modelled as a <strong>TextInput</strong>, not a DatePicker — the DatePicker component drives a *custom* calendar by clicking through months, which this control does not have. A native date input is set by writing its <code>yyyy-mm-dd</code> value, and TextInput is the component that does that.</p>
+<aside class="callout rule"><span class="callout-tag">Rule</span><div>Using the fancier component because of its name would be reaching for the wrong tool. Match the component to the markup, not to the label on the field.</div></aside>
+<aside class="callout warn"><span class="callout-tag">Careful</span><div>The add-biller dialog has a second required field — the account/reference number — with <strong>no test id and no associated <code>&lt;label&gt;</code></strong>, verified against the running application. It is located by placeholder, which is the only user-visible anchor available. The accessibility suite records the underlying labelling gap.</div></aside>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The biller dialog changes.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Update the components. Confirm which fields are required by submitting without them.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A dialog that never closes is the symptom of an unfilled required field, and it is worth writing down which they are so the next person does not rediscover it.</p></div>
+  
+  <p class="related">Related: <code>tests/ui/money-movement.spec.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>BillPayPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">Bill payment: pick a biller, an amount and a date.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>fromAccount</code></td><td></td></tr><tr><td><code>addBillerButton</code></td><td></td></tr><tr><td><code>billerSearch</code></td><td>The biller field is a <strong>search box</strong>, not a dropdown — typing filters a list of billers. Modelled as an Autocomplete so the type-filter-select sequence comes from the component rather than being rebuilt per test.</td></tr><tr><td><code>amountInput</code></td><td></td></tr><tr><td><code>paymentDateInput</code></td><td></td></tr><tr><td><code>memoInput</code></td><td></td></tr><tr><td><code>reviewButton</code></td><td></td></tr><tr><td><code>cancelButton</code></td><td></td></tr><tr><td><code>addBillerDialog</code></td><td></td></tr><tr><td><code>billerNameInput</code></td><td></td></tr><tr><td><code>billerReferenceInput</code></td><td>The account/reference number. Carries <strong>no <code>data-testid</code></strong> and — verified against the running application — <strong>no associated <code>&lt;label&gt;</code> either</strong>, so <code>getByLabel</code> cannot find it. That is an accessibility gap in the application: a screen reader announces an unlabelled text box. Located by placeholder, which is the only user-visible anchor available. Placeholder text is a weaker locator than a label (it is a hint, not a name, and it disappears on input) — using it here is a compromise forced by the markup, and the accessibility suite records the underlying gap.</td></tr><tr><td><code>saveBillerButton</code></td><td></td></tr><tr><td><code>cancelBillerButton</code></td><td></td></tr><tr><td><code><span class="tok-f">addBiller</span>(<span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>, reference <span class="tok-o">=</span> <span class="tok-s">`REF-</span><span class="tok-o">${</span><span class="tok-t">Date</span>.<span class="tok-f">now</span>().<span class="tok-f">toString</span>().<span class="tok-f">slice</span>(<span class="tok-o">-</span><span class="tok-n">8</span>)<span class="tok-o">}</span><span class="tok-s">`</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Adds a biller through the dialog. Both fields are required. An earlier version filled only the name and the dialog simply never closed — the application was rejecting the submission and the test was waiting for a close that would never come.</td></tr><tr><td><code><span class="tok-f">futureDate</span>(<span class="tok-p">days</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></td><td>A date <code>days</code> in the future, in the <code>yyyy-mm-dd</code> a date input requires.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-dashboard-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/dashboard.page.ts</code></h3>
+    <span class="file-meta">111 lines &middot; 3 exports</span>
+  </header>
+  <p class="file-purpose">The landing page: net-worth cards, quick-action tiles and the recent-activity widget. Also exports <code>parseCurrency</code>, which six page objects share.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Currency parsing lives in one place</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">export</span> <span class="tok-k">function</span> <span class="tok-f">parseCurrency</span>(<span class="tok-p">text</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">number</span> { … }</code></pre></figure>
+<p><code>$17,050.00</code> has a symbol, a thousands separator and two decimals, and the application also renders signed amounts (<code>+$3,200.00</code>, <code>-$87.43</code>). Re-deriving that in nine specs is nine chances to get it subtly wrong, and it throws on unparseable text rather than silently returning <code>NaN</code>.</p>
+<p>The recent-activity widget is modelled as a <strong>Table</strong>, so row access, column lookup and sorting come from the component rather than from ad-hoc locators in each test.</p>
+  <div class="change"><h4>When you need to change it</h4><ul><li>A stat card is added.</li><li>A quick action is added.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the slug to <code>QuickAction</code>; <code>quickAction()</code> and <code>useQuickAction()</code> then work unchanged.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>The dashboard is where two independently rendered views of the same data meet, which is why its most valuable test compares its total against the accounts page rather than against a constant.</p></div>
+  
+  <p class="related">Related: <code>tests/ui/dashboard.spec.ts</code> &middot; <code>src/pages/bank/accounts.page.ts</code></p>
+  <details class="api"><summary>API surface (3 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>DashboardPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">The landing page after sign-in: net-worth cards, quick actions, recent activity.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>welcomeMessage</code></td><td></td></tr><tr><td><code>statCards</code></td><td></td></tr><tr><td><code>netWorthValue</code></td><td></td></tr><tr><td><code>quickActions</code></td><td></td></tr><tr><td><code>recentTransactions</code></td><td></td></tr><tr><td><code>viewAllTransactionsButton</code></td><td></td></tr><tr><td><code><span class="tok-f">quickAction</span>(<span class="tok-p">action</span><span class="tok-o">:</span> <span class="tok-t">QuickAction</span>)<span class="tok-o">:</span> <span class="tok-t">Link</span></code></td><td>A quick-action tile, by the slug the application uses.</td></tr><tr><td><code><span class="tok-f">useQuickAction</span>(<span class="tok-p">action</span><span class="tok-o">:</span> <span class="tok-t">QuickAction</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Clicks a quick action and waits for its destination.</td></tr><tr><td><code><span class="tok-f">netWorth</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>The Total Net Worth figure, as a number. Currency parsing lives here rather than in each test: <code>$17,050.00</code> has a symbol, a thousands separator and two decimals, and re-deriving that regex in nine specs is nine chances to get it subtly wrong.</td></tr><tr><td><code><span class="tok-f">stats</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span>{ <span class="tok-p">label</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span> }[]<span class="tok-o">&gt;</span></code></td><td>Every stat card's label and value, in display order.</td></tr></tbody></table></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>QuickAction</code></div><pre class="api-shape"><code><span class="tok-s">'transfer'</span> <span class="tok-o">|</span> <span class="tok-s">'send-money'</span> <span class="tok-o">|</span> <span class="tok-s">'bill-pay'</span> <span class="tok-o">|</span> <span class="tok-s">'apply-loan'</span> <span class="tok-o">|</span> <span class="tok-s">'transactions'</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">parseCurrency</span>(<span class="tok-p">text</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">number</span></code></div><p class="api-doc">Turns a displayed money string into a number. Exported because six page objects need it and the alternative is six slightly different regexes. Handles the leading sign the application uses on credits and debits (<code>+$3,200.00</code>, <code>-$87.43</code>) and parenthesised negatives.</p></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-dropdown-panel-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/dropdown-panel.ts</code></h3>
+    <span class="file-meta">24 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">The <code>VISIBLE_LISTBOX</code> selector every custom dropdown in the application shares.</p>
+  <figure class="code" data-lang="ts"><figcaption><span></span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">export</span> <span class="tok-k">const</span> <span class="tok-t">VISIBLE_LISTBOX</span> <span class="tok-o">=</span> <span class="tok-s">'[role=&quot;listbox&quot;]:visible'</span>;</code></pre></figure>
+<p>The application renders each dropdown panel as a <code>[role=&quot;listbox&quot;]</code> and <strong>leaves it in the DOM when it closes</strong>, merely hidden. On the transfer page, once &quot;From&quot; has been used there are two listboxes: the closed one and the one being opened.</p>
+<aside class="callout warn"><span class="callout-tag">Careful</span><div>A plain <code>[role=&quot;listbox&quot;]</code> therefore resolves to the *first* match — the hidden one — and the Dropdown component waits for it to become visible until it times out. The failure reads &quot;waiting for [role=listbox] to be visible&quot; while a perfectly good panel is open a few pixels away. That is about as misleading as a failure gets, and it cost a debugging cycle to find.</div></aside>
+<p><code>:visible</code> is Playwright's own pseudo-class and resolves to whichever panel is open. It is preferred over per-dropdown container test ids because the application provides those only inconsistently.</p>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The application changes how it renders dropdown panels.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Change the constant. Every dropdown in every page object picks it up.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>One shared constant with the reasoning attached, rather than the same subtle selector repeated in six files with the reasoning nowhere.</p></div>
+  
+  <p class="related">Related: <code>src/components/form/dropdown.ts</code> &middot; <code>src/pages/bank/transfer.page.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>VISIBLE_LISTBOX</code></div><p class="api-doc">The selector every custom dropdown in SecureBank shares. --------------------------------------------------------------------------- WHY <code>:visible</code> IS LOAD-BEARING --------------------------------------------------------------------------- The application renders each dropdown's panel as a <code>[role=&quot;listbox&quot;]</code> and <strong>leaves it in the DOM when it closes</strong>, merely hidden. So on the transfer page, once the &quot;From&quot; dropdown has been used there are two listboxes: the closed one and the one being opened. A plain <code>[role=&quot;listbox&quot;]</code> therefore resolves to the *first* match — the hidden one — and the Dropdown component waits for it to become visible until it times out. The failure message says &quot;waiting for [role=listbox] to be visible&quot; while a perfectly good panel is open a few pixels away, which is about as misleading as a failure can be. <code>:visible</code> is Playwright's own pseudo-class and resolves to the open panel, whichever it is. It is used in preference to a per-dropdown container test id because the application only provides those inconsistently — some panels have one, several do not.</p></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-index-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/index.ts</code></h3>
+    <span class="file-meta">23 lines &middot; 15 exports</span>
+  </header>
+  <p class="file-purpose">Barrel for the SecureBank page objects.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a page object.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Export it here and construct it in the <code>bank</code> fixture.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>One import path, and one place to see every page the suite drives.</p></div>
+  
+  <p class="related">Related: <code>src/fixtures/bank.fixture.ts</code></p>
+  <details class="api"><summary>API surface (15 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>VISIBLE_LISTBOX</code><span class="api-heritage">from './dropdown-panel'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>BankShell</code><span class="api-heritage">from './bank-shell'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>NavDestination</code><span class="api-heritage">from './bank-shell'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>LoginPage</code><span class="api-heritage">from './login.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>DashboardPage, parseCurrency</code><span class="api-heritage">from './dashboard.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>QuickAction</code><span class="api-heritage">from './dashboard.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>AccountsPage</code><span class="api-heritage">from './accounts.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>AccountDetailPage</code><span class="api-heritage">from './account-detail.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>TransferPage</code><span class="api-heritage">from './transfer.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>SendMoneyPage</code><span class="api-heritage">from './send-money.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>BillPayPage</code><span class="api-heritage">from './bill-pay.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>TransactionsPage</code><span class="api-heritage">from './transactions.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>ApplyLoanPage</code><span class="api-heritage">from './apply-loan.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>NotificationsPage</code><span class="api-heritage">from './notifications.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>ProfilePage</code><span class="api-heritage">from './profile.page'</span></div></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-login-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/login.page.ts</code></h3>
+    <span class="file-meta">146 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">The sign-in page — the only page reachable without authenticating, and therefore the entry point for every other page object.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Failure and success share one method</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">async</span> <span class="tok-f">signIn</span>(<span class="tok-p">persona</span><span class="tok-o">:</span> <span class="tok-t">Persona</span>, <span class="tok-p">options</span><span class="tok-o">:</span> { rememberMe<span class="tok-o">?:</span> <span class="tok-t">boolean</span> } <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span> { … }
+<span class="tok-k">async</span> <span class="tok-f">signInSuccessfully</span>(<span class="tok-p">persona</span><span class="tok-o">:</span> <span class="tok-t">Persona</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span> { … }   <span class="tok-c">// waits for the dashboard</span>
+<span class="tok-k">async</span> <span class="tok-f">signInExpectingFailure</span>(<span class="tok-p">persona</span><span class="tok-o">:</span> <span class="tok-t">Persona</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span> { … }  <span class="tok-c">// returns the message</span></code></pre></figure>
+<p><code>signIn</code> does not assert the outcome, so a login expected to fail uses exactly the same call. The two wrappers make the *intent* explicit at the call site without duplicating the form filling.</p>
+<aside class="callout note"><span class="callout-tag">Note</span><div><code>signInSuccessfully</code> waits for the <strong>URL</strong>, not for a timeout. The application shows a &quot;Signing in…&quot; state first, and a test that continued at that point would assert against a page still in flight.</div></aside>
+<p><code>publishedCredentials()</code> reads the application's own credentials table, which is what lets one test cross-check <code>src/data/personas.ts</code> against reality.</p>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The login form changes.</li><li>A new field is added.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Update the component declarations. <code>src/hooks/auth.setup.ts</code> delegates here, so the setup project follows automatically.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Login is used by every other spec indirectly. Concentrating it here means a login change is one edit rather than a suite-wide failure.</p></div>
+  
+  <p class="related">Related: <code>tests/ui/login.spec.ts</code> &middot; <code>src/hooks/auth.setup.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>LoginPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">The SecureBank sign-in page. It is the only page a test can reach without authenticating, which makes it the entry point for every other page object.</p><table class="api-members"><tbody><tr><td><code>usernameInput</code></td><td></td></tr><tr><td><code>passwordInput</code></td><td></td></tr><tr><td><code>rememberMeCheckbox</code></td><td></td></tr><tr><td><code>submitButton</code></td><td></td></tr><tr><td><code>forgotPasswordLink</code></td><td></td></tr><tr><td><code>errorBanner</code></td><td></td></tr><tr><td><code>errorMessage</code></td><td></td></tr><tr><td><code>credentialsPanel</code></td><td></td></tr><tr><td><code>credentialsTable</code></td><td></td></tr><tr><td><code><span class="tok-k">get</span> <span class="tok-p">passwordVisibilityToggle</span><span class="tok-o">:</span> <span class="tok-t">Button</span></code></td><td>The password-visibility control. Located by accessible name because it carries no test id, and because the name is itself the thing worth asserting — it flips between &quot;Show password&quot; and &quot;Hide password&quot;, which is how a screen-reader user knows the state changed.</td></tr><tr><td><code><span class="tok-f">signIn</span>(<span class="tok-p">persona</span><span class="tok-o">:</span> <span class="tok-t">Persona</span>, <span class="tok-p">options</span><span class="tok-o">:</span> { rememberMe<span class="tok-o">?:</span> <span class="tok-t">boolean</span> } <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Fills the form and submits it. Does <strong>not</strong> assert the outcome — a login that is expected to fail uses exactly the same call.</td></tr><tr><td><code><span class="tok-f">signInSuccessfully</span>(<span class="tok-p">persona</span><span class="tok-o">:</span> <span class="tok-t">Persona</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Signs in and waits for the dashboard. The wait is on the <strong>URL</strong>, not on a timeout: the application shows a &quot;Signing in…&quot; state first, and a test that continued at that point would assert against a page still in flight.</td></tr><tr><td><code><span class="tok-f">signInExpectingFailure</span>(<span class="tok-p">persona</span><span class="tok-o">:</span> <span class="tok-t">Persona</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td>Signs in expecting refusal, and returns the message the app displayed.</td></tr><tr><td><code><span class="tok-f">isPasswordMasked</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td>Whether the password field is currently masked.</td></tr><tr><td><code><span class="tok-f">publishedCredentials</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span>
+    { <span class="tok-p">username</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">password</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">description</span><span class="tok-o">:</span> <span class="tok-t">string</span> }[]
+  <span class="tok-o">&gt;</span></code></td><td>The credentials the application publishes, read from its own table. Used by one test to cross-check <code>src/data/personas.ts</code> against reality — if the app adds or renames an account, that fixture is now wrong and the suite should say so rather than silently testing a stale list.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-notifications-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/notifications.page.ts</code></h3>
+    <span class="file-meta">76 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">The notification centre and the unread badges it drives.</p>
+  <aside class="callout warn"><span class="callout-tag">Careful</span><div>The unread count element is <strong>removed from the DOM</strong> once everything is read. A test that waited for it to say &quot;0&quot; would hang until its timeout — which is exactly why absence deserves a method (<code>unreadCount()</code>) rather than an inline locator in each test.</div></aside>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The notification list changes.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Update the list component and its item selector.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>The badge and the page are two renderings of one number; the page object exposes both so a test can assert they agree.</p></div>
+  
+  <p class="related">Related: <code>tests/ui/account-settings.spec.ts</code> &middot; <code>src/pages/bank/bank-shell.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>NotificationsPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">The notification centre, and the unread badges it drives.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>unreadCountText</code></td><td></td></tr><tr><td><code>markAllReadButton</code></td><td></td></tr><tr><td><code>list</code></td><td></td></tr><tr><td><code><span class="tok-f">itemCount</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>How many notifications are shown, read and unread together.</td></tr><tr><td><code><span class="tok-f">unreadCount</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>The unread count. The element is <strong>removed from the DOM</strong> once everything is read, so its absence has to be read as zero. A test that waited for it to say &quot;0&quot; would hang until the timeout — a good example of why an &quot;absent&quot; state deserves a method rather than an inline locator.</td></tr><tr><td><code><span class="tok-f">unreadItemCount</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>How many items still offer a &quot;mark as read&quot; control.</td></tr><tr><td><code><span class="tok-f">markFirstAsRead</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Marks the first unread item as read.</td></tr><tr><td><code><span class="tok-f">markAllAsRead</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Marks everything as read and waits for the count to disappear.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-profile-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/profile.page.ts</code></h3>
+    <span class="file-meta">134 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">Profile, password change and security settings.</p>
+  <aside class="callout note"><span class="callout-tag">Note</span><div>The edit affordance is <strong>not a dialog</strong> — it replaces the read-only display with an inline form. Every other &quot;edit&quot; in the application opens a modal, so a page object written from that pattern would wait for one that never appears. Checked against the running application rather than assumed.</div></aside>
+<p>Two-factor is a <code>button[role=&quot;switch&quot;]</code> with <code>aria-checked</code> — the ARIA switch pattern, which the Toggle component reads directly.</p>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The profile form changes.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Update the display and edit-form components together; they mirror each other.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>The inline-edit surprise is the reason this page object is worth reading before writing a test against it.</p></div>
+  
+  <p class="related">Related: <code>tests/ui/account-settings.spec.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>ProfilePage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">Profile, password change and security settings. Notable because the &quot;edit&quot; affordance is <strong>not a dialog</strong> — it replaces the read-only display with an inline form. A page object that assumed a modal would wait forever, which is why this was checked against the running application rather than assumed from the pattern used elsewhere.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>display</code></td><td></td></tr><tr><td><code>username</code></td><td></td></tr><tr><td><code>firstName</code></td><td></td></tr><tr><td><code>lastName</code></td><td></td></tr><tr><td><code>email</code></td><td></td></tr><tr><td><code>phone</code></td><td></td></tr><tr><td><code>address</code></td><td></td></tr><tr><td><code>editButton</code></td><td></td></tr><tr><td><code>editForm</code></td><td></td></tr><tr><td><code>firstNameInput</code></td><td></td></tr><tr><td><code>lastNameInput</code></td><td></td></tr><tr><td><code>emailInput</code></td><td></td></tr><tr><td><code>phoneInput</code></td><td></td></tr><tr><td><code>addressInput</code></td><td></td></tr><tr><td><code>saveProfileButton</code></td><td></td></tr><tr><td><code>cancelEditButton</code></td><td></td></tr><tr><td><code>currentPasswordInput</code></td><td></td></tr><tr><td><code>newPasswordInput</code></td><td></td></tr><tr><td><code>confirmPasswordInput</code></td><td></td></tr><tr><td><code>savePasswordButton</code></td><td></td></tr><tr><td><code>twoFactorToggle</code></td><td></td></tr><tr><td><code>resetDataButton</code></td><td></td></tr><tr><td><code><span class="tok-f">startEditing</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Switches the profile section into edit mode.</td></tr><tr><td><code><span class="tok-f">updateProfile</span>(<span class="tok-p">changes</span><span class="tok-o">:</span> {
+    firstName<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+    lastName<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+    email<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+  })<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Edits the profile and saves, returning to the read-only display.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-send-money-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/send-money.page.ts</code></h3>
+    <span class="file-meta">105 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">External payments to a saved payee, and the add-payee dialog.</p>
+  <p><code>isBlocked()</code> reports whether money movement is disabled, which is how the frozen-persona tests assert the block without duplicating the selector.</p>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The payee form changes.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Update the dialog components and <code>addPayee()</code>.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Saving a payee only matters if it appears next time — which is why the page object exposes the payee dropdown rather than just the dialog.</p></div>
+  
+  <p class="related">Related: <code>tests/ui/money-movement.spec.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>SendMoneyPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">External payments to a saved payee, plus the &quot;add payee&quot; dialog.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>fromAccount</code></td><td></td></tr><tr><td><code>payee</code></td><td></td></tr><tr><td><code>addPayeeButton</code></td><td></td></tr><tr><td><code>amountInput</code></td><td></td></tr><tr><td><code>noteInput</code></td><td></td></tr><tr><td><code>reviewButton</code></td><td></td></tr><tr><td><code>cancelButton</code></td><td></td></tr><tr><td><code>addPayeeDialog</code></td><td></td></tr><tr><td><code>payeeNameInput</code></td><td></td></tr><tr><td><code>payeeBankInput</code></td><td></td></tr><tr><td><code>payeeRoutingInput</code></td><td></td></tr><tr><td><code>payeeAccountInput</code></td><td></td></tr><tr><td><code>savePayeeButton</code></td><td></td></tr><tr><td><code>cancelPayeeButton</code></td><td></td></tr><tr><td><code><span class="tok-f">addPayee</span>(<span class="tok-p">input</span><span class="tok-o">:</span> {
+    <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+    <span class="tok-p">bank</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+    <span class="tok-p">routing</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+    <span class="tok-p">account</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+  })<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Opens the dialog, fills it and saves. Returns without asserting.</td></tr><tr><td><code><span class="tok-f">isBlocked</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td>Whether money movement is blocked — true for the frozen persona.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-transactions-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/transactions.page.ts</code></h3>
+    <span class="file-meta">124 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">All activity across every account: search, account filter, type filter, three sortable columns, pagination and CSV export. The page that exercises the most of the component library.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>A parser with a trap in it</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">async</span> <span class="tok-f">paginationState</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span>{ <span class="tok-k">from</span><span class="tok-o">:</span> <span class="tok-t">number</span>; <span class="tok-p">to</span><span class="tok-o">:</span> <span class="tok-t">number</span>; <span class="tok-p">total</span><span class="tok-o">:</span> <span class="tok-t">number</span> }<span class="tok-o">&gt;</span> {
+  <span class="tok-k">const</span> text <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-k">this</span>.paginationInfo.<span class="tok-f">getText</span>();
+  <span class="tok-k">const</span> match <span class="tok-o">=</span> <span class="tok-r">/(\d+)\s*[–-]\s*(\d+)\s+of\s+(\d+)/</span>.<span class="tok-f">exec</span>(text);
+  …
+}</code></pre></figure>
+<aside class="callout warn"><span class="callout-tag">Careful</span><div>The dash in &quot;Showing 1–10 of 18&quot; is an <strong>en dash</strong>, not a hyphen. Matching only on <code>-</code> silently returns nothing — the sort of thing that costs an afternoon, which is why the character class contains both.</div></aside>
+<p>The type filter is a segmented <code>div[role=&quot;group&quot;]</code> of buttons rather than native radios, so tests drive it by clicking the visible option.</p>
+  <div class="change"><h4>When you need to change it</h4><ul><li>A filter or column is added.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the component and a method that waits for the table to settle after the interaction.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Pagination, sorting and filtering are where a table stops being a list and starts being a feature, and each needs its own accessor rather than a locator in every test.</p></div>
+  
+  <p class="related">Related: <code>tests/ui/transactions.spec.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>TransactionsPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">All activity across every account: search, filter, sort, paginate, export. The richest page in the application, and the one that exercises the most of the component library in a single place.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>searchInput</code></td><td></td></tr><tr><td><code>accountFilter</code></td><td></td></tr><tr><td><code>typeFilter</code></td><td></td></tr><tr><td><code>table</code></td><td></td></tr><tr><td><code>pagination</code></td><td></td></tr><tr><td><code>paginationInfo</code></td><td></td></tr><tr><td><code>previousPageButton</code></td><td></td></tr><tr><td><code>nextPageButton</code></td><td></td></tr><tr><td><code>downloadButton</code></td><td></td></tr><tr><td><code>emptyMessage</code></td><td></td></tr><tr><td><code><span class="tok-f">search</span>(<span class="tok-p">term</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Types into search and waits for the debounce.</td></tr><tr><td><code><span class="tok-f">descriptions</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>[]<span class="tok-o">&gt;</span></code></td><td>Descriptions of every row currently displayed.</td></tr><tr><td><code><span class="tok-f">dates</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>[]<span class="tok-o">&gt;</span></code></td><td>Dates of every row currently displayed, as text.</td></tr><tr><td><code><span class="tok-f">amounts</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span>[]<span class="tok-o">&gt;</span></code></td><td>Amounts of every row, parsed — sign included.</td></tr><tr><td><code><span class="tok-f">sortBy</span>(<span class="tok-p">column</span><span class="tok-o">:</span> <span class="tok-s">'date'</span> <span class="tok-o">|</span> <span class="tok-s">'category'</span> <span class="tok-o">|</span> <span class="tok-s">'amount'</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Clicks a sortable column header by its slug.</td></tr><tr><td><code><span class="tok-f">paginationState</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span>{ <span class="tok-k">from</span><span class="tok-o">:</span> <span class="tok-t">number</span>; <span class="tok-p">to</span><span class="tok-o">:</span> <span class="tok-t">number</span>; <span class="tok-p">total</span><span class="tok-o">:</span> <span class="tok-t">number</span> }<span class="tok-o">&gt;</span></code></td><td>Parses &quot;Showing 1–10 of 20&quot; into numbers. The dash is an <strong>en dash</strong>, not a hyphen — matching on <code>-</code> silently returns nothing, which is the sort of thing that costs an afternoon.</td></tr><tr><td><code><span class="tok-f">isEmpty</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td>True when the &quot;no transactions match&quot; message is showing.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-bank-transfer-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/bank/transfer.page.ts</code></h3>
+    <span class="file-meta">167 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">Internal transfers. Models all <strong>three</strong> screens of the flow: the form, the confirmation modal and the success page.</p>
+  <aside class="callout rule"><span class="callout-tag">Rule</span><div>A test that stops at &quot;the form submitted&quot; has not tested a transfer. Modelling all three screens is what lets a test assert the reference number, the confirmed amounts and the resulting balances.</div></aside>
+<figure class="code" data-lang="ts"><figcaption><span>The happy path returns the one thing a caller cannot get otherwise</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">async</span> <span class="tok-f">completeTransfer</span>(<span class="tok-p">input</span><span class="tok-o">:</span> { <span class="tok-k">from</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">to</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">amount</span><span class="tok-o">:</span> <span class="tok-t">string</span> })<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span> {
+  <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">fillForm</span>(input);
+  <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">review</span>();
+  <span class="tok-k">await</span> <span class="tok-k">this</span>.confirmDialog.<span class="tok-f">waitForOpen</span>();
+  <span class="tok-k">await</span> <span class="tok-k">this</span>.confirmButton.<span class="tok-f">click</span>();
+  <span class="tok-k">await</span> <span class="tok-k">this</span>.successHeading.<span class="tok-f">waitForVisible</span>();
+  <span class="tok-k">return</span> (<span class="tok-k">await</span> <span class="tok-k">this</span>.referenceId.<span class="tok-f">getText</span>()).<span class="tok-f">trim</span>();
+}</code></pre></figure>
+<aside class="callout warn"><span class="callout-tag">Careful</span><div><code>to</code> must be filled <strong>after</strong> <code>from</code>: the application removes the selected source from the destination list, so the other order picks an option that is about to disappear.</div></aside>
+<p>That removal is also how the application prevents a same-account transfer — structurally, rather than by validating afterwards. The test asserts the mechanism the app actually uses rather than forcing an invalid selection to produce a message that never appears.</p>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The flow gains a step.</li><li>The form gains a field.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the components under the step they belong to; the three comment banners keep the file navigable.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Money movement is the one action that has to be right in three separate places — validation, confirmation and the resulting balances — and only a page object that models all three lets a test check all three.</p></div>
+  
+  <p class="related">Related: <code>tests/ui/transfer.spec.ts</code> &middot; <code>src/pages/bank/dropdown-panel.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>TransferPage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">Internal transfers between the signed-in user's own accounts. The flow has three distinct screens, and the page object models all three because a test that stops at &quot;the form submitted&quot; has not tested a transfer: 1. the form → <code>review-transfer-btn</code> 2. a confirmation modal → <code>confirm-transfer-btn</code> 3. a success page → reference number and a summary</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">shell</span><span class="tok-o">:</span> <span class="tok-t">BankShell</span></code></td><td></td></tr><tr><td><code>fromAccount</code></td><td></td></tr><tr><td><code>toAccount</code></td><td></td></tr><tr><td><code>amountInput</code></td><td></td></tr><tr><td><code>dateTypeToday</code></td><td></td></tr><tr><td><code>dateTypeScheduled</code></td><td></td></tr><tr><td><code>reviewButton</code></td><td></td></tr><tr><td><code>cancelButton</code></td><td></td></tr><tr><td><code>errorMessage</code></td><td></td></tr><tr><td><code>confirmDialog</code></td><td></td></tr><tr><td><code>confirmButton</code></td><td></td></tr><tr><td><code>cancelConfirmButton</code></td><td></td></tr><tr><td><code>successHeading</code></td><td></td></tr><tr><td><code>referenceId</code></td><td></td></tr><tr><td><code>confirmedFrom</code></td><td></td></tr><tr><td><code>confirmedTo</code></td><td></td></tr><tr><td><code>confirmedAmount</code></td><td></td></tr><tr><td><code>backToDashboardButton</code></td><td></td></tr><tr><td><code>anotherTransferButton</code></td><td></td></tr><tr><td><code><span class="tok-f">fillForm</span>(<span class="tok-p">input</span><span class="tok-o">:</span> { <span class="tok-k">from</span><span class="tok-o">?:</span> <span class="tok-t">string</span>; to<span class="tok-o">?:</span> <span class="tok-t">string</span>; amount<span class="tok-o">?:</span> <span class="tok-t">string</span> })<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Fills the form. Stops short of submitting, so a validation test and a happy-path test can share it. <code>to</code> is filled after <code>from</code> because the application removes the selected source from the destination list — filling them in the other order picks an option that is about to disappear.</td></tr><tr><td><code><span class="tok-f">review</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Submits the form to reach the confirmation modal.</td></tr><tr><td><code><span class="tok-f">completeTransfer</span>(<span class="tok-p">input</span><span class="tok-o">:</span> { <span class="tok-k">from</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">to</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">amount</span><span class="tok-o">:</span> <span class="tok-t">string</span> })<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td>The whole happy path: fill, review, confirm, and land on the success page. Returns the reference number, because that is the one piece of information a caller cannot obtain any other way and is what a follow-up assertion needs.</td></tr><tr><td><code><span class="tok-f">validationError</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">null</span><span class="tok-o">&gt;</span></code></td><td>The validation message the form is currently showing, or <code>null</code>.</td></tr><tr><td><code><span class="tok-f">availableBalance</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td>The &quot;Available: $X&quot; hint under the amount field, as a number.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-pages-index-ts">
+  <header class="file-head">
+    <h3><code>src/pages/index.ts</code></h3>
+    <span class="file-meta">9 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">Exports every page object so tests and fixtures have one import path, and so a <code>pages</code> fixture can construct them all in one place if you add one.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a page object.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the export. If tests construct the same pages repeatedly, consider a fixture that builds them all.</p><pre><code><span class="tok-p">pages</span><span class="tok-o">:</span> <span class="tok-k">async</span> ({ page }, use) <span class="tok-o">=&gt;</span> {
+  <span class="tok-k">await</span> <span class="tok-f">use</span>({ <span class="tok-p">login</span><span class="tok-o">:</span> <span class="tok-k">new</span> <span class="tok-f">LoginPage</span>(page), <span class="tok-p">checkout</span><span class="tok-o">:</span> <span class="tok-k">new</span> <span class="tok-f">CheckoutPage</span>(page) });
+},</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A registry keeps the import surface flat and makes a page-bundle fixture a small step rather than a refactor.</p></div>
+  
+  <p class="related">Related: <code>src/pages/template.page.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>TemplatePage</code><span class="api-heritage">from './template.page'</span></div></div></details>
+</section>
+
+<section class="file" id="f-src-pages-template-page-ts">
+  <header class="file-head">
+    <h3><code>src/pages/template.page.ts</code></h3>
+    <span class="file-meta">66 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">A copy-me starting point that encodes the four page-object conventions: declare <code>path</code> and <code>readyIndicator</code>; build components once as readonly fields; expose business actions rather than selector wrappers; keep business assertions out.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>The shape of a real page object</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">export</span> <span class="tok-k">class</span> <span class="tok-t">CheckoutPage</span> <span class="tok-k">extends</span> <span class="tok-t">BasePage</span> {
+  <span class="tok-k">protected</span> <span class="tok-k">readonly</span> path <span class="tok-o">=</span> <span class="tok-s">'/checkout'</span>;
+  <span class="tok-k">protected</span> <span class="tok-k">readonly</span> <span class="tok-p">readyIndicator</span><span class="tok-o">:</span> <span class="tok-t">SelectorLike</span> <span class="tok-o">=</span> <span class="tok-s">'[data-testid=&quot;checkout-root&quot;]'</span>;
+
+  <span class="tok-k">private</span> <span class="tok-k">readonly</span> factory <span class="tok-o">=</span> <span class="tok-f">ui</span>(<span class="tok-k">this</span>.page);
+
+  <span class="tok-k">readonly</span> items       <span class="tok-o">=</span> <span class="tok-k">this</span>.factory.<span class="tok-f">table</span>(<span class="tok-s">'[data-testid=&quot;line-items&quot;]'</span>, { <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-s">'Line items'</span> });
+  <span class="tok-k">readonly</span> promoCode   <span class="tok-o">=</span> <span class="tok-k">this</span>.factory.<span class="tok-f">input</span>(<span class="tok-s">'[data-testid=&quot;promo&quot;]'</span>, { <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-s">'Promo code'</span> });
+  <span class="tok-k">readonly</span> applyPromo  <span class="tok-o">=</span> <span class="tok-k">this</span>.factory.<span class="tok-f">button</span>(<span class="tok-s">'[data-testid=&quot;apply-promo&quot;]'</span>, { <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-s">'Apply promo'</span> });
+  <span class="tok-k">readonly</span> toast       <span class="tok-o">=</span> <span class="tok-k">this</span>.factory.<span class="tok-f">alert</span>(<span class="tok-s">'[role=&quot;status&quot;]'</span>, { <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-s">'Toast'</span> });
+
+  <span class="tok-c">/** Business action, not a selector wrapper. */</span>
+  <span class="tok-k">async</span> <span class="tok-f">applyDiscount</span>(<span class="tok-p">code</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span> {
+    <span class="tok-k">await</span> <span class="tok-k">this</span>.promoCode.<span class="tok-k">type</span>(code);
+    <span class="tok-k">await</span> <span class="tok-k">this</span>.applyPromo.<span class="tok-f">clickAndWaitForCompletion</span>();
+    <span class="tok-k">return</span> <span class="tok-k">this</span>.toast.<span class="tok-f">waitForMessage</span>();
+  }
+}</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You are creating a page object — copy this file. Edit the template itself only when a convention changes.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Copy to <code>src/pages/&lt;feature&gt;.page.ts</code>, rename the class, set <code>path</code> and <code>readyIndicator</code>, replace the components, then export it from <code>src/pages/index.ts</code>.</p></li><li><p>If a method reads like the DOM (<code>clickButtonFour</code>), it belongs in a component. If it reads like a user story (<code>applyDiscount</code>), it belongs here.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A template is cheaper to follow than a written convention. Anyone can copy a file; not everyone reads the style guide before their first page object.</p></div>
+  
+  <p class="related">Related: <code>src/core/base.page.ts</code> &middot; <code>src/pages/index.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>TemplatePage</code><span class="api-heritage">extends BasePage</span></div><p class="api-doc">TEMPLATE — copy this file to create a real page object, then delete the placeholder selectors. Conventions this template encodes: 1. <code>path</code> and <code>readyIndicator</code> are declared, never re-derived per method. 2. Components are declared as readonly fields, built once by the factory — so a selector change is a one-line edit and IDE autocomplete lists the whole page's surface. 3. Methods are *business actions* (&quot;submit the order&quot;), not selector wrappers (&quot;click #btn-4&quot;). If a method reads like the DOM, it belongs in a component instead. 4. No assertions about business outcomes here — those live in tests. Page objects may only assert that they themselves loaded.</p><table class="api-members"><tbody><tr><td><code>searchInput</code></td><td></td></tr><tr><td><code>submitButton</code></td><td></td></tr><tr><td><code>resultsTable</code></td><td></td></tr><tr><td><code>successToast</code></td><td></td></tr><tr><td><code>filtersForm</code></td><td></td></tr><tr><td><code><span class="tok-f">search</span>(<span class="tok-p">term</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Runs a search and waits for the results table to refresh.</td></tr><tr><td><code><span class="tok-f">applyFilters</span>(<span class="tok-p">filters</span><span class="tok-o">:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">boolean</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Applies a set of filters expressed as plain data.</td></tr><tr><td><code><span class="tok-f">getResultCount</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td></td></tr></tbody></table></div></details>
+</section>
+<h2 id="api-client-src-api">API client (src/api)</h2>
+
+<section class="file" id="f-src-api-api-client-ts">
+  <header class="file-head">
+    <h3><code>src/api/api.client.ts</code></h3>
+    <span class="file-meta">102 lines &middot; 2 exports</span>
+  </header>
+  <p class="file-purpose">A thin HTTP client for <strong>test setup</strong>, not for testing the API itself. GET, POST, PUT, PATCH, DELETE and a raw fetch, with the base URL, auth header and TLS policy taken from the validated configuration, and errors that include status and body.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Seed over HTTP, assert in the UI</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> order <span class="tok-o">=</span> <span class="tok-k">await</span> api.<span class="tok-f">post</span><span class="tok-o">&lt;</span><span class="tok-t">Order</span><span class="tok-o">&gt;</span>(<span class="tok-t">ENDPOINTS</span>.orders.create, { <span class="tok-p">items</span><span class="tok-o">:</span> [{ <span class="tok-p">sku</span><span class="tok-o">:</span> <span class="tok-s">'A1'</span>, <span class="tok-p">qty</span><span class="tok-o">:</span> <span class="tok-n">2</span> }] });
+<span class="tok-k">await</span> ordersPage.<span class="tok-f">goto</span>();
+<span class="tok-k">await</span> <span class="tok-f">expect</span>(ordersPage.<span class="tok-f">rowFor</span>(order.id)).<span class="tok-f">toBeVisible</span>();</code></pre></figure>
+<aside class="callout note"><span class="callout-tag">Note</span><div>Seeding through the API takes about 200 ms. Driving the same setup through the UI takes 20 seconds and couples the test to screens it is not testing.</div></aside>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You need a new HTTP verb, different auth (cookie, API key, mTLS), retries, or request logging.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the header or option in the context creation so every request inherits it.</p><pre><code><span class="tok-p">extraHTTPHeaders</span><span class="tok-o">:</span> {
+  <span class="tok-s">'Content-Type'</span><span class="tok-o">:</span> <span class="tok-s">'application/json'</span>,
+  <span class="tok-o">...</span>(token <span class="tok-o">?</span> { <span class="tok-t">Authorization</span><span class="tok-o">:</span> <span class="tok-s">`Bearer </span><span class="tok-o">${</span>token<span class="tok-o">}</span><span class="tok-s">`</span> } <span class="tok-o">:</span> {}),
+  <span class="tok-s">'X-Tenant'</span><span class="tok-o">:</span> config.tenant,
+},</code></pre></li><li><p>Wrap a flaky endpoint with the <code>retry</code> helper rather than adding retries to every call site.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Restricting this client to setup keeps the boundary clear: UI tests verify the interface, and the API is used to arrange state quickly. Testing the API itself belongs in an API suite.</p></div>
+  
+  <p class="related">Related: <code>src/api/endpoints.ts</code> &middot; <code>src/utils/retry.utils.ts</code></p>
+  <details class="api"><summary>API surface (2 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>ApiClientOptions</code></div><pre class="api-shape"><code>baseURL<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+token<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+extraHeaders<span class="tok-o">?:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">string</span><span class="tok-o">&gt;</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>ApiClient</code></div><p class="api-doc">Thin HTTP client for *test setup*, not for testing the API itself. UI tests should create their fixtures over HTTP — seeding a user through the API takes 200ms, whereas driving the signup form takes 20 seconds and couples every test to a screen it is not testing.</p><table class="api-members"><tbody><tr><td><code><span class="tok-k">get</span>(<span class="tok-p">path</span><span class="tok-o">:</span> <span class="tok-t">string</span>, params<span class="tok-o">?:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">number</span> <span class="tok-o">|</span> <span class="tok-t">boolean</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">post</span>(<span class="tok-p">path</span><span class="tok-o">:</span> <span class="tok-t">string</span>, data<span class="tok-o">?:</span> <span class="tok-t">unknown</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">put</span>(<span class="tok-p">path</span><span class="tok-o">:</span> <span class="tok-t">string</span>, data<span class="tok-o">?:</span> <span class="tok-t">unknown</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">patch</span>(<span class="tok-p">path</span><span class="tok-o">:</span> <span class="tok-t">string</span>, data<span class="tok-o">?:</span> <span class="tok-t">unknown</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-k">delete</span>(<span class="tok-p">path</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">raw</span>(<span class="tok-p">method</span><span class="tok-o">:</span> <span class="tok-s">'get'</span> <span class="tok-o">|</span> <span class="tok-s">'post'</span> <span class="tok-o">|</span> <span class="tok-s">'put'</span> <span class="tok-o">|</span> <span class="tok-s">'delete'</span>, <span class="tok-p">path</span><span class="tok-o">:</span> <span class="tok-t">string</span>, data<span class="tok-o">?:</span> <span class="tok-t">unknown</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">APIResponse</span><span class="tok-o">&gt;</span></code></td><td>Raw response, for callers that need headers or a non-JSON body.</td></tr><tr><td><code><span class="tok-f">dispose</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-api-endpoints-ts">
+  <header class="file-head">
+    <h3><code>src/api/endpoints.ts</code></h3>
+    <span class="file-meta">28 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">Every API path the suite touches, in one place, with functions for parameterised paths. Tests and fixtures reference these constants rather than raw strings.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You start using a new endpoint, or the backend changes a route.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add it to the matching group, using a function when the path takes parameters.</p><pre><code><span class="tok-p">invoices</span><span class="tok-o">:</span> {
+  <span class="tok-p">list</span><span class="tok-o">:</span> <span class="tok-s">'/invoices'</span>,
+  <span class="tok-p">byId</span><span class="tok-o">:</span> (<span class="tok-p">id</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">=&gt;</span> <span class="tok-s">`/invoices/</span><span class="tok-o">${</span>id<span class="tok-o">}</span><span class="tok-s">`</span>,
+  <span class="tok-p">download</span><span class="tok-o">:</span> (<span class="tok-p">id</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">=&gt;</span> <span class="tok-s">`/invoices/</span><span class="tok-o">${</span>id<span class="tok-o">}</span><span class="tok-s">/pdf`</span>,
+},</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A backend route change becomes a one-line edit instead of a repository-wide search through string literals.</p></div>
+  
+  <p class="related">Related: <code>src/api/api.client.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>ENDPOINTS</code></div><p class="api-doc">Every API path the test suite touches, in one place. Tests and fixtures reference these constants rather than raw strings so a backend route change is a one-line edit.</p></div></details>
+</section></div>
+    <footer class="page-foot">
+      <div class="pager">
+        <a class="prev" href="reference-components.html">&larr; Reference: component library</a><a class="next" href="reference-utils.html">Reference: utilities, reporters &amp; data &rarr;</a>
+      </div>
+      <p>Generated from source by <code>npm run docs</code>. 151 files documented, 331 exports extracted.</p>
+    </footer>
+  </main>
+</div>
+<script>
+document.querySelectorAll('.filter').forEach((input) => {
+  input.addEventListener('input', () => {
+    const term = input.value.toLowerCase();
+    const table = document.getElementById(input.dataset.filterTarget);
+    if (!table) return;
+    for (const row of table.tBodies[0].rows) {
+      row.hidden = term !== '' && !row.textContent.toLowerCase().includes(term);
+    }
+  });
+});
+const navFilter = document.getElementById('nav-filter');
+if (navFilter) {
+  navFilter.addEventListener('input', () => {
+    const term = navFilter.value.toLowerCase();
+    document.querySelectorAll('#toc li').forEach((li) => {
+      li.hidden = term !== '' && !li.textContent.toLowerCase().includes(term);
+    });
+  });
+}
+</script>
+</body>
+</html>

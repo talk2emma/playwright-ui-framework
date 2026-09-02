@@ -1,0 +1,22 @@
+services:
+  ui-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      TEST_ENV: ${TEST_ENV:-dev}
+      BASE_URL: ${BASE_URL:-}
+      STANDARD_USER: ${STANDARD_USER:-}
+      STANDARD_PASSWORD: ${STANDARD_PASSWORD:-}
+      ADMIN_USER: ${ADMIN_USER:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      WORKERS: ${WORKERS:-4}
+    volumes:
+      - ./reports:/app/reports
+      - ./test-results:/app/test-results
+      # Baselines are written back so `--update-snapshots` in the container
+      # updates the committed images.
+      - ./tests:/app/tests
+    # Chromium needs more than Docker's default 64MB of shared memory.
+    shm_size: '2gb'
+    ipc: host

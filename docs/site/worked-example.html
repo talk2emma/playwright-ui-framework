@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worked example — Playwright UI Framework</title>
+<meta name="description" content="The suite against a real banking application, and the defects it found">
+<style>/* Documentation stylesheet: screen layout, print sheet and PDF cover. */
+
+:root {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f2;
+  --border: #e2e1dd;
+  --border-strong: #cfcec9;
+  --text: #1f1e1c;
+  --text-2: #56544f;
+  --text-3: #82807a;
+  --accent: #b0492c;
+  --accent-soft: #fdf2ee;
+  --code-bg: #f6f5f3;
+  --note: #2f6f8f;
+  --note-bg: #eef5f9;
+  --warn: #a2610a;
+  --warn-bg: #fdf4e6;
+  --rule: #4a6b3d;
+  --rule-bg: #f0f5ed;
+  --sx-comment: #8a867d;
+  --sx-keyword: #9c3f6d;
+  --sx-string: #3d7a52;
+  --sx-number: #96591b;
+  --sx-fn: #2f5f92;
+  --sx-type: #7a4a9e;
+  --sx-prop: #b0492c;
+  --sx-op: #6f6b63;
+  --sx-var: #a1531f;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sidebar-w: 268px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17171a;
+    --surface: #1e1e22;
+    --surface-2: #26262b;
+    --border: #32323a;
+    --border-strong: #43434d;
+    --text: #ecebe7;
+    --text-2: #b3b1aa;
+    --text-3: #8b8981;
+    --accent: #e8825f;
+    --accent-soft: #2c211d;
+    --code-bg: #232329;
+    --note: #7fb6d4;
+    --note-bg: #1c262c;
+    --warn: #d8a552;
+    --warn-bg: #2a2419;
+    --rule: #9dc389;
+    --rule-bg: #1f2620;
+    --sx-comment: #7d7a72;
+    --sx-keyword: #e08bb4;
+    --sx-string: #86c99a;
+    --sx-number: #dfa86a;
+    --sx-fn: #8ab6e8;
+    --sx-type: #c2a0e8;
+    --sx-prop: #e8825f;
+    --sx-op: #9a958b;
+    --sx-var: #e0a06a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  z-index: 10;
+}
+.skip:focus { left: 0; }
+
+/* ---------------------------------------------------------------- layout */
+
+.layout { display: flex; align-items: flex-start; }
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.1rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.brand { display: flex; gap: 0.7rem; align-items: center; }
+.brand-mark {
+  flex: 0 0 34px; height: 34px; border-radius: 8px;
+  background: var(--accent); color: #fff;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px; letter-spacing: 0.02em;
+}
+.brand strong { display: block; font-size: 14px; line-height: 1.25; }
+.brand span { font-size: 12px; color: var(--text-3); }
+
+.filter {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.filter:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.nav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.nav a {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+.nav a:hover { background: var(--surface-2); color: var(--text); }
+.nav a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.sidebar-foot a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.sidebar-foot a:hover { text-decoration: underline; }
+
+main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 900px;
+  padding: 2.6rem clamp(1.1rem, 4vw, 3rem) 4rem;
+}
+
+/* ------------------------------------------------------------- typography */
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 11.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 650;
+}
+
+h1 {
+  margin: 0 0 0.4rem;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.subtitle { margin: 0; color: var(--text-2); font-size: 17px; max-width: 62ch; }
+
+.page-head { padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); margin-bottom: 1.8rem; }
+
+h2 {
+  margin: 2.6rem 0 0.9rem;
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+h3 { margin: 2rem 0 0.6rem; font-size: 1.13rem; font-weight: 650; }
+h4 {
+  margin: 1.2rem 0 0.4rem;
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+
+p { margin: 0.85rem 0; max-width: 74ch; }
+ul, ol { margin: 0.85rem 0; padding-left: 1.35rem; max-width: 74ch; }
+li { margin: 0.3rem 0; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.855em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.08em 0.34em;
+  word-break: break-word;
+}
+
+pre {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 12.9px;
+  line-height: 1.55;
+}
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+figure.code { margin: 1.1rem 0; }
+figure.code figcaption {
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 0 0.35rem 0.15rem;
+  font-weight: 600;
+}
+
+pre.tree {
+  font-size: 12.4px;
+  line-height: 1.5;
+  background: var(--surface);
+}
+
+/* ------------------------------------------------------- syntax highlight */
+
+.tok-c { color: var(--sx-comment); font-style: italic; }
+.tok-k { color: var(--sx-keyword); }
+.tok-s { color: var(--sx-string); }
+.tok-r { color: var(--sx-string); }
+.tok-n { color: var(--sx-number); }
+.tok-f { color: var(--sx-fn); }
+.tok-t { color: var(--sx-type); }
+.tok-p { color: var(--sx-prop); }
+.tok-o { color: var(--sx-op); }
+.tok-v { color: var(--sx-var); }
+.tok-a { color: var(--sx-type); }
+
+figure.code figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+figure.code figcaption .lang {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+  text-transform: none;
+}
+
+/* --------------------------------------------------------------- callouts */
+
+.callout {
+  display: flex;
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  max-width: 74ch;
+}
+.callout p { margin: 0; }
+.callout-tag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding-top: 0.15rem;
+}
+.callout.note { background: var(--note-bg); border-color: color-mix(in srgb, var(--note) 30%, transparent); }
+.callout.note .callout-tag { color: var(--note); }
+.callout.warn { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+.callout.warn .callout-tag { color: var(--warn); }
+.callout.rule { background: var(--rule-bg); border-color: color-mix(in srgb, var(--rule) 32%, transparent); }
+.callout.rule .callout-tag { color: var(--rule); }
+
+/* ----------------------------------------------------------------- tables */
+
+.table-wrap { overflow-x: auto; margin: 1.2rem 0; border: 1px solid var(--border); border-radius: 9px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--surface-2); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-2); font-weight: 650; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface); }
+td code { font-size: 12.2px; }
+
+/* ------------------------------------------------------------------ steps */
+
+ol.steps { list-style: none; counter-reset: step; padding-left: 0; max-width: 78ch; }
+ol.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.2rem;
+  margin: 0.9rem 0;
+}
+ol.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+ol.steps > li > p { margin: 0 0 0.5rem; }
+
+/* ------------------------------------------------------------ file blocks */
+
+.file {
+  margin: 1.6rem 0;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+.file-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.file-head h3 { margin: 0; font-size: 1rem; }
+.file-head code { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); font-size: 13px; }
+.file-meta { font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.file-purpose { margin: 0.7rem 0 0; }
+
+.change { margin-top: 1.1rem; padding-top: 0.6rem; border-top: 1px dashed var(--border); }
+.change ul, .change ol { margin-top: 0.4rem; }
+.change.why p { color: var(--text-2); }
+.related { margin-top: 1rem; font-size: 12.5px; color: var(--text-3); }
+.related code { font-size: 11.8px; }
+
+/* -------------------------------------------------------------------- api */
+
+details.api { margin-top: 1.1rem; border-top: 1px dashed var(--border); padding-top: 0.7rem; }
+details.api > summary {
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+details.api[open] > summary { margin-bottom: 0.8rem; color: var(--text-2); }
+
+.api-item { margin: 0.9rem 0; padding-left: 0.8rem; border-left: 2px solid var(--border); }
+.api-head { display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; }
+.api-head code { background: none; border: 0; padding: 0; font-size: 13px; font-weight: 600; }
+.api-heritage { font-size: 11.5px; color: var(--text-3); font-family: var(--mono); }
+.api-doc { margin: 0.3rem 0 0.4rem; font-size: 13.5px; color: var(--text-2); }
+.api-shape { font-size: 12px; margin-top: 0.4rem; }
+table.api-members { font-size: 13px; margin-top: 0.4rem; }
+table.api-members td { padding: 0.3rem 0.6rem 0.3rem 0; border-bottom: 1px solid var(--border); }
+table.api-members td:first-child { width: 46%; }
+table.api-members code { font-size: 12.1px; }
+
+.badge {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.badge-class, .badge-interface { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 22%, transparent); }
+.badge-function, .badge-fn { background: var(--rule-bg); color: var(--rule); border-color: color-mix(in srgb, var(--rule) 25%, transparent); }
+.badge-type { background: var(--note-bg); color: var(--note); border-color: color-mix(in srgb, var(--note) 25%, transparent); }
+.badge-const { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+
+/* -------------------------------------------------------------------- toc */
+
+.toc {
+  margin: 0 0 2rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.toc h2 {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.toc ul { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 1.6rem; }
+.toc li { break-inside: avoid; margin: 0.18rem 0; }
+.toc a { font-size: 13.4px; text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* ----------------------------------------------------------------- footer */
+
+.page-foot { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-3); }
+.pager { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; font-size: 13.5px; }
+.pager a { text-decoration: none; font-weight: 600; }
+.pager a:hover { text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .layout { flex-direction: column; }
+  .sidebar { position: static; width: 100%; height: auto; flex: none; border-right: 0; border-bottom: 1px solid var(--border); }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .toc ul { columns: 1; }
+  main { padding-top: 1.6rem; }
+}
+
+/* ------------------------------------------------------------ print sheet */
+
+body.print {
+  background: #fff;
+  color: #16150f;
+  font-size: 10.6pt;
+  line-height: 1.5;
+  --sx-comment: #6f6b63;
+  --sx-keyword: #8d3560;
+  --sx-string: #2f6942;
+  --sx-number: #855017;
+  --sx-fn: #295585;
+  --sx-type: #6c3f8f;
+  --sx-prop: #9e3f24;
+  --sx-op: #5e5a53;
+  --sx-var: #8f4718;
+}
+body.print .print-page { padding: 0 0 1.5rem; }
+body.print main, body.print .sidebar { all: unset; }
+body.print h1.print-h1 {
+  font-family: var(--serif);
+  font-size: 21pt;
+  margin: 0 0 0.2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid #16150f;
+}
+body.print h2 { font-size: 14pt; margin-top: 1.4rem; }
+body.print h3 { font-size: 11.6pt; }
+body.print pre { font-size: 8.4pt; background: #f6f5f3; border-color: #ddd; }
+body.print table { font-size: 9pt; }
+body.print .file { border-color: #ddd; }
+body.print table.api-members td:first-child { width: 58%; }
+body.print .api-item { break-inside: auto; }
+body.print .toc, body.print .pager, body.print .skip, body.print .filter { display: none; }
+body.print details.api { display: block; }
+body.print details.api > summary { list-style: none; }
+
+.cover {
+  min-height: 245mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4mm;
+  page-break-after: always;
+  break-after: page;
+}
+.cover h1 { font-size: 40pt; margin: 0.2rem 0 0.6rem; letter-spacing: -0.02em; }
+.cover .eyebrow { font-size: 10pt; letter-spacing: 0.14em; }
+.cover-sub { font-size: 14pt; color: #4a4842; max-width: 30ch; margin: 0 0 3rem; }
+.cover-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); gap: 1.2rem 2rem; margin: 0; border-top: 2px solid #16150f; padding-top: 1.2rem; }
+.cover-meta div { margin: 0; }
+.cover-meta dt { font-size: 8.5pt; letter-spacing: 0.09em; text-transform: uppercase; color: #6d6b64; }
+.cover-meta dd { margin: 0.15rem 0 0; font-size: 13pt; font-weight: 600; }
+
+.contents { page-break-after: always; break-after: page; }
+.print-toc { list-style: none; padding: 0; margin: 1.4rem 0 0; counter-reset: toc; }
+.print-toc li { margin: 0.55rem 0; display: grid; grid-template-columns: 2rem 1fr; gap: 0.2rem 0.6rem; align-items: baseline; }
+.print-toc .num { color: #8a887f; font-variant-numeric: tabular-nums; font-size: 10pt; }
+.print-toc a { font-size: 12.5pt; font-weight: 600; text-decoration: none; color: #16150f; }
+.print-toc .sub { grid-column: 2; font-size: 9.4pt; color: #6d6b64; }
+.print-toc .dots { display: none; }
+
+.print-page { page-break-before: always; break-before: page; }
+.print-page:first-of-type { page-break-before: avoid; break-before: avoid; }
+
+@media print {
+  body.print { background: #fff; }
+  pre, .callout, ol.steps > li, .api-item, tr { page-break-inside: avoid; break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; break-after: avoid; }
+  a { color: #16150f; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">PW</span><div><strong>Playwright UI Framework</strong><span>Documentation v1.0</span></div></div>
+    <input id="nav-filter" class="filter" type="search" placeholder="Filter sections…" aria-label="Filter sections">
+    <nav aria-label="Documentation"><ul class="nav"><li><a href="index.html">Overview</a></li><li><a href="architecture.html">Architecture</a></li><li><a href="worked-example.html" aria-current="page">Worked example</a></li><li><a href="structure.html">Project structure</a></li><li><a href="reference-root.html">Reference: configuration &amp; tooling</a></li><li><a href="reference-foundation.html">Reference: config, core &amp; types</a></li><li><a href="reference-components.html">Reference: component library</a></li><li><a href="reference-fixtures.html">Reference: fixtures, hooks, pages &amp; API</a></li><li><a href="reference-utils.html">Reference: utilities, reporters &amp; data</a></li><li><a href="reference-tests.html">Reference: tests &amp; repository docs</a></li><li><a href="playbooks.html">Playbooks</a></li><li><a href="conventions.html">Conventions</a></li><li><a href="troubleshooting.html">Troubleshooting</a></li><li><a href="api-index.html">API index</a></li><li><a href="glossary.html">Glossary</a></li></ul></nav>
+    <div class="sidebar-foot">
+      <a href="playwright-ui-framework-documentation.pdf" download>Download PDF</a>
+      <span>Generated 2026-09-01</span>
+    </div>
+  </aside>
+  <main id="main">
+    <header class="page-head">
+      <p class="eyebrow">Playwright UI Framework</p>
+      <h1>Worked example</h1>
+      <p class="subtitle">The suite against a real banking application, and the defects it found</p>
+    </header>
+    <nav class="toc" aria-label="On this page"><h2>On this page</h2><ul id="toc"><li><a href="#why-this-application">Why this application</a></li><li><a href="#how-a-test-is-put-together">How a test is put together</a></li><li><a href="#three-layers-and-what-belongs-in-each">Three layers, and what belongs in each</a></li><li><a href="#the-details-that-took-a-real-run-to-discover">The details that took a real run to discover</a></li><li><a href="#three-defects-the-suite-found">Three defects the suite found</a></li><li><a href="#and-the-planted-one">And the planted one</a></li><li><a href="#what-the-suite-covers">What the suite covers</a></li><li><a href="#pointing-this-at-your-own-application">Pointing this at your own application</a></li></ul></nav>
+    <div class="content"><p>The framework drives <strong>SecureBank</strong>, a real banking application published at <a href="https://qaplayground.com/bank/login">qaplayground.com/bank</a> for automation practice. Nothing is mocked. This page explains how the suite is built against it, what the code does, and the three defects it found.</p>
+<p>If you read one page of this document, read this one. Everything else is reference; this is the framework doing its job.</p>
+<h2 id="why-this-application">Why this application</h2>
+<div class="table-wrap"><table><thead><tr><th>Property</th><th>Why it matters</th></tr></thead><tbody><tr><td><strong>Thorough <code>data-testid</code> coverage</strong></td><td>Almost every meaningful element carries one, which is why <code>testIdAttribute: 'data-testid'</code> does so much work here. The handful that do not are the interesting cases — see below.</td></tr><tr><td><strong>State lives in <code>localStorage</code></strong></td><td>Playwright gives every test a fresh browser context, so each test starts from the seeded dataset automatically. No cleanup, no shared account, no ordering constraints — the suite is fully parallel by construction.</td></tr><tr><td><strong>Seven personas with different behaviour</strong></td><td>A locked account, a frozen account, an overdraft, a slow loader and one carrying a planted defect. Negative paths are reachable by logging in as somebody else rather than by mocking a failure.</td></tr><tr><td><strong>It publishes its own test catalogue</strong></td><td>The app lists 42 intended test cases at <code>/bank/test-cases</code>. The suite implements them and each test names the case it satisfies, so coverage is checkable against the app's own specification.</td></tr></tbody></table></div>
+<aside class="callout rule"><span class="callout-tag">Rule</span><div>The third property is the one worth stealing. Most UI suites test the happy path because the unhappy paths need a backend nobody controls. Here they are one login away.</div></aside>
+<h2 id="how-a-test-is-put-together">How a test is put together</h2>
+<figure class="code" data-lang="ts"><figcaption><span>tests/ui/transfer.spec.ts — the whole shape</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">import</span> { test, expect } <span class="tok-k">from</span> <span class="tok-s">'../../src/fixtures'</span>;
+
+<span class="tok-f">test</span>(<span class="tok-s">'TC-XFER-004 — a valid transfer completes and issues a reference @smoke'</span>, <span class="tok-k">async</span> ({ signedIn }) <span class="tok-o">=&gt;</span> {
+  <span class="tok-k">await</span> signedIn.transfer.<span class="tok-f">goto</span>();
+
+  <span class="tok-k">const</span> reference <span class="tok-o">=</span> <span class="tok-k">await</span> signedIn.transfer.<span class="tok-f">completeTransfer</span>({
+    <span class="tok-k">from</span><span class="tok-o">:</span> <span class="tok-s">'Everyday Checking'</span>,
+    <span class="tok-p">to</span><span class="tok-o">:</span> <span class="tok-s">'High-Yield Savings'</span>,
+    <span class="tok-p">amount</span><span class="tok-o">:</span> <span class="tok-s">'25.50'</span>,
+  });
+
+  <span class="tok-f">expect</span>(reference).<span class="tok-f">toMatch</span>(<span class="tok-r">/TXN-\d{8}-\d+/</span>);
+  <span class="tok-k">await</span> <span class="tok-f">expect</span>(signedIn.transfer.confirmedAmount.locator).<span class="tok-f">toContainText</span>(<span class="tok-s">'25.50'</span>);
+});</code></pre></figure>
+<div class="table-wrap"><table><thead><tr><th>Piece</th><th>What it does</th><th>Why not the obvious alternative</th></tr></thead><tbody><tr><td><code>from '../../src/fixtures'</code></td><td>Gets the framework's <code>test</code> and <code>expect</code></td><td>Importing <code>@playwright/test</code> gives you neither the page objects nor the custom matchers, and nothing warns you</td></tr><tr><td><code>{ signedIn }</code></td><td>Signs in as the standard persona and hands over every page object</td><td>A <code>beforeEach</code> would also run for the login specs, which must start signed out</td></tr><tr><td><code>completeTransfer(...)</code></td><td>Drives all three screens — form, confirmation modal, success page</td><td>A test stopping at &quot;the form submitted&quot; has not tested a transfer</td></tr><tr><td><code>SEED</code></td><td>Dataset facts in one file</td><td>Nine specs hard-coding $17,050 is nine edits when the app reseeds</td></tr></tbody></table></div>
+<h2 id="three-layers-and-what-belongs-in-each">Three layers, and what belongs in each</h2>
+<pre class="tree"><code>  tests/ui/transfer.spec.ts          WHAT should be true — assertions only
+     |
+  src/pages/bank/transfer.page.ts   WHERE things are and HOW to drive them
+     |
+  src/components/form/dropdown.ts   HOW a *kind* of widget behaves, for any app</code></pre>
+<aside class="callout rule"><span class="callout-tag">Rule</span><div>A page object returns values and never asserts business outcomes. That is what lets a negative-path test reuse it instead of fighting it, and it is why <code>fillForm()</code> and <code>completeTransfer()</code> are separate methods.</div></aside>
+<p>The component layer is where the framework earns its keep. SecureBank's dropdowns are custom listboxes, its terms checkbox is a <code>span[role=&quot;checkbox&quot;]</code>, its two-factor control is a <code>button[role=&quot;switch&quot;]</code>. The <code>Dropdown</code>, <code>Checkbox</code> and <code>Toggle</code> components already handle all three — the page object only has to say where they are.</p>
+<h2 id="the-details-that-took-a-real-run-to-discover">The details that took a real run to discover</h2>
+<p>Every item below was found by running against the application, not by reading its markup. They are the reason exploring first and writing second is worth the time.</p>
+<h3 id="1-a-closed-dropdown-leaves-its-panel-in-the-dom">1. A closed dropdown leaves its panel in the DOM</h3>
+<figure class="code" data-lang="ts"><figcaption><span>src/pages/bank/dropdown-panel.ts</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">export</span> <span class="tok-k">const</span> <span class="tok-t">VISIBLE_LISTBOX</span> <span class="tok-o">=</span> <span class="tok-s">'[role=&quot;listbox&quot;]:visible'</span>;</code></pre></figure>
+<p>On the transfer page, once &quot;From&quot; has been used there are two <code>[role=&quot;listbox&quot;]</code> elements — the closed one and the one being opened. A plain selector resolves to the first, which is hidden, and the component waits for it until it times out. The failure reads *&quot;waiting for [role=listbox] to be visible&quot;* while a perfectly good panel is open a few pixels away.</p>
+<h3 id="2-reading-state-after-the-click-instead-of-before">2. Reading state after the click instead of before</h3>
+<figure class="code" data-lang="ts"><figcaption><span>The bug, and the fix</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-c">// Broken: reads the ALREADY-CHANGED value, so the condition can never hold.</span>
+<span class="tok-k">await</span> <span class="tok-k">this</span>.themeToggle.<span class="tok-f">click</span>();
+<span class="tok-k">await</span> <span class="tok-k">this</span>.page.<span class="tok-f">waitForFunction</span>((wasDark) <span class="tok-o">=&gt;</span> <span class="tok-f">isDark</span>() <span class="tok-o">!==</span> wasDark, <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">isDarkMode</span>());
+
+<span class="tok-c">// Correct:</span>
+<span class="tok-k">const</span> wasDark <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">isDarkMode</span>();
+<span class="tok-k">await</span> <span class="tok-k">this</span>.themeToggle.<span class="tok-f">click</span>();
+<span class="tok-k">await</span> <span class="tok-k">this</span>.page.<span class="tok-f">waitForFunction</span>((previous) <span class="tok-o">=&gt;</span> <span class="tok-f">isDark</span>() <span class="tok-o">!==</span> previous, wasDark);</code></pre></figure>
+<p>Cheap mistake, expensive symptom: it looked exactly like the application failing to switch theme.</p>
+<h3 id="3-absence-is-a-state">3. Absence is a state</h3>
+<p>The unread-notification badge is <strong>removed from the DOM</strong> at zero rather than showing &quot;0&quot;. A test waiting for the text &quot;0&quot; hangs until its timeout. <code>unreadCount()</code> reads absence as zero, so no test has to know.</p>
+<h3 id="4-sr-only-is-visible-to-playwright">4. <code>sr-only</code> is visible to Playwright</h3>
+<p>The skip link is clipped to a 1x1 box rather than hidden, because a <code>display: none</code> element cannot be focused. Playwright therefore reports it as *visible* and <code>toBeHidden()</code> fails for the wrong reason. The correct assertion is about the <strong>bounding box</strong>, which is what actually distinguishes &quot;clipped&quot; from &quot;on screen&quot;.</p>
+<h3 id="5-sorting-applies-to-the-dataset-not-the-page">5. Sorting applies to the dataset, not the page</h3>
+<p>An early draft asserted that clicking sort twice produced the reverse of the first page. It failed against entirely correct behaviour: sorting covers all 18 transactions while 10 are shown, so descending page 1 holds the largest ten and ascending page 1 the smallest — two different slices. Comparing the *directions* is the assertion that actually catches a broken sort control.</p>
+<h3 id="6-read-seed-values-from-a-clean-context">6. Read seed values from a clean context</h3>
+<p><code>totalTransactions</code> was first recorded as 20, from a session that had already performed a transfer — each transfer adds a debit and a matching credit. The true figure is 18. Seed values read from an exploratory session encode whatever the explorer happened to do first.</p>
+<h3 id="7-discover-required-fields-from-the-app-s-own-messages">7. Discover required fields from the app's own messages</h3>
+<p>The add-account dialog looked like it needed a name. Submitting it produced &quot;Please select an account type&quot;, then &quot;Please enter a valid starting balance&quot; — and the balance field has no test id at all. Reading the validation messages was faster and more reliable than reading the markup.</p>
+<h2 id="three-defects-the-suite-found">Three defects the suite found</h2>
+<p>All three are in the application, verified by hand, and none of them fails the build. They are recorded with <code>test.fail()</code>, which is the right tool for a defect you do not control:</p>
+<ul><li>The expectation stays in the suite, written as it <strong>should</strong> behave.</li><li>The run stays green, so nobody learns to ignore a permanently red test.</li><li>The moment somebody fixes it, the test <strong>fails</strong> — telling us to remove the annotation.</li></ul>
+<p>A skipped test would go quiet forever; a deleted one would lose the finding entirely.</p>
+<div class="table-wrap"><table><thead><tr><th>Finding</th><th>Standard</th><th>Detail</th></tr></thead><tbody><tr><td>The skip link is unreachable by keyboard</td><td>WCAG 2.4.1</td><td>Correct markup, first in the DOM, works when focused — but the first Tab lands on the brand link, so a keyboard user can never reach it</td></tr><tr><td>The account dialog omits <code>aria-modal</code></td><td>WAI-ARIA</td><td><code>role=&quot;dialog&quot;</code> and a label are present; without <code>aria-modal=&quot;true&quot;</code> a screen reader is not told to confine the user to the dialog</td></tr><tr><td>Three transfer controls have no accessible name</td><td>WCAG 4.1.2</td><td>The memo field and both date-type radios announce as &quot;blank&quot;. axe does not flag them — precisely the class an automated scan misses</td></tr></tbody></table></div>
+<aside class="callout note"><span class="callout-tag">Note</span><div>Two further violations — <code>color-contrast</code> on four pages and <code>aria-prohibited-attr</code> on one — are <strong>baselined</strong> rather than annotated, because they recur across pages. They are excluded from the gating scans, so any *new* violation fails the build, and a never-failing test reports the backlog on every run.</div></aside>
+<h2 id="and-the-planted-one">And the planted one</h2>
+<p>The application ships a deliberate bug for <code>error_user</code>, and its own catalogue asks for it to be reproduced (TC-LOAN-004). This is the test that proves the framework can <strong>find</strong> something rather than confirm things work.</p>
+<figure class="code" data-lang="ts"><figcaption><span>tests/ui/apply-loan.spec.ts</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> displayed <span class="tok-o">=</span> <span class="tok-k">await</span> bank.applyLoan.<span class="tok-f">displayedTotal</span>();
+<span class="tok-k">const</span> expected <span class="tok-o">=</span> <span class="tok-k">await</span> bank.applyLoan.<span class="tok-f">expectedActiveTotal</span>();
+
+<span class="tok-f">expect</span>(displayed).<span class="tok-f">toBeCloseTo</span>(expected, <span class="tok-n">2</span>);</code></pre></figure>
+<div class="table-wrap"><table><thead><tr><th>Persona</th><th>Displayed total</th><th>Active + pending loans</th><th>Verdict</th></tr></thead><tbody><tr><td><code>standard_user</code></td><td>$39,300</td><td>$39,300</td><td>Correct</td></tr><tr><td><code>error_user</code></td><td>$24,300</td><td>$39,300</td><td><strong>Short by the $15,000 newest pending loan</strong></td></tr></tbody></table></div>
+<aside class="callout rule"><span class="callout-tag">Rule</span><div>A control test asserts the same comparison passes for the healthy account. Without it, a failing total could just as easily mean the assertion is wrong — the control is what makes the result trustworthy.</div></aside>
+<p>Getting that comparison right took two attempts. The total is labelled &quot;Total (Active/Pending)&quot; and the history paginates at five rows, so comparing it against the visible page is wrong twice over: it misses later pages and includes closed loans. <code>expectedActiveTotal()</code> walks the pages and filters by status.</p>
+<h2 id="what-the-suite-covers">What the suite covers</h2>
+<div class="table-wrap"><table><thead><tr><th>Spec</th><th>Tests</th><th>Covers</th></tr></thead><tbody><tr><td><code>login.spec.ts</code></td><td>11</td><td>Sign-in, refusal messages, password visibility, remember-me, the fixture-integrity check</td></tr><tr><td><code>dashboard.spec.ts</code></td><td>8</td><td>TC-DASH-001..006, stat cards, every quick action</td></tr><tr><td><code>navigation.spec.ts</code></td><td>15</td><td>Ten destinations, brand link, unread badge, responsive drawer, the skip link</td></tr><tr><td><code>accounts.spec.ts</code></td><td>12</td><td>TC-ACC-001..006 across three personas, the dialog, the detail page</td></tr><tr><td><code>transfer.spec.ts</code></td><td>12</td><td>TC-XFER-001..006, cancellation, the frozen block</td></tr><tr><td><code>transactions.spec.ts</code></td><td>11</td><td>TC-TXN-001..006, the type filter, the CSV export</td></tr><tr><td><code>money-movement.spec.ts</code></td><td>11</td><td>TC-SEND-001..006 and TC-BILL-001..006</td></tr><tr><td><code>apply-loan.spec.ts</code></td><td>9</td><td>TC-LOAN-001..006 including the planted defect</td></tr><tr><td><code>account-settings.spec.ts</code></td><td>11</td><td>Notifications and profile</td></tr><tr><td><code>bank.a11y.spec.ts</code></td><td>15</td><td>axe across ten pages and both themes</td></tr><tr><td><code>bank.visual.spec.ts</code></td><td>7</td><td>Login, stat cards, sidebar in both themes, transfer form, empty state</td></tr></tbody></table></div>
+<p><strong>110 tests, all passing.</strong> Three of them are documented defects recorded as expected failures.</p>
+<h2 id="pointing-this-at-your-own-application">Pointing this at your own application</h2>
+<ol class="steps"><li><p>Add your environment to <code>src/config/environments.ts</code> — URLs and behaviour flags only, no secrets.</p></li><li><p><strong>Explore before writing.</strong> Open the app, dump its test ids, click the widgets. Every item in the section above came from doing that, and each would have cost more to discover through a failing test.</p></li><li><p>Model shared chrome as a component, not a page object, the way <code>BankShell</code> is. It has no URL and appears everywhere.</p></li><li><p>Write a page object per page. Declare components as readonly fields; write methods that read as business actions.</p></li><li><p>Add them to the fixture so every spec can reach them without constructing anything.</p></li><li><p>Put dataset facts in one file, read from a <strong>clean</strong> session, and add a test that cross-checks them against the application.</p></li><li><p>Record defects you do not control with <code>test.fail()</code>, and baseline recurring accessibility violations. Both keep the suite green and the findings visible.</p></li></ol></div>
+    <footer class="page-foot">
+      <div class="pager">
+        <a class="prev" href="architecture.html">&larr; Architecture</a><a class="next" href="structure.html">Project structure &rarr;</a>
+      </div>
+      <p>Generated from source by <code>npm run docs</code>. 151 files documented, 331 exports extracted.</p>
+    </footer>
+  </main>
+</div>
+<script>
+document.querySelectorAll('.filter').forEach((input) => {
+  input.addEventListener('input', () => {
+    const term = input.value.toLowerCase();
+    const table = document.getElementById(input.dataset.filterTarget);
+    if (!table) return;
+    for (const row of table.tBodies[0].rows) {
+      row.hidden = term !== '' && !row.textContent.toLowerCase().includes(term);
+    }
+  });
+});
+const navFilter = document.getElementById('nav-filter');
+if (navFilter) {
+  navFilter.addEventListener('input', () => {
+    const term = navFilter.value.toLowerCase();
+    document.querySelectorAll('#toc li').forEach((li) => {
+      li.hidden = term !== '' && !li.textContent.toLowerCase().includes(term);
+    });
+  });
+}
+</script>
+</body>
+</html>

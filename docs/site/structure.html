@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project structure — Playwright UI Framework</title>
+<meta name="description" content="Every folder and file, with its purpose">
+<style>/* Documentation stylesheet: screen layout, print sheet and PDF cover. */
+
+:root {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f2;
+  --border: #e2e1dd;
+  --border-strong: #cfcec9;
+  --text: #1f1e1c;
+  --text-2: #56544f;
+  --text-3: #82807a;
+  --accent: #b0492c;
+  --accent-soft: #fdf2ee;
+  --code-bg: #f6f5f3;
+  --note: #2f6f8f;
+  --note-bg: #eef5f9;
+  --warn: #a2610a;
+  --warn-bg: #fdf4e6;
+  --rule: #4a6b3d;
+  --rule-bg: #f0f5ed;
+  --sx-comment: #8a867d;
+  --sx-keyword: #9c3f6d;
+  --sx-string: #3d7a52;
+  --sx-number: #96591b;
+  --sx-fn: #2f5f92;
+  --sx-type: #7a4a9e;
+  --sx-prop: #b0492c;
+  --sx-op: #6f6b63;
+  --sx-var: #a1531f;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sidebar-w: 268px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17171a;
+    --surface: #1e1e22;
+    --surface-2: #26262b;
+    --border: #32323a;
+    --border-strong: #43434d;
+    --text: #ecebe7;
+    --text-2: #b3b1aa;
+    --text-3: #8b8981;
+    --accent: #e8825f;
+    --accent-soft: #2c211d;
+    --code-bg: #232329;
+    --note: #7fb6d4;
+    --note-bg: #1c262c;
+    --warn: #d8a552;
+    --warn-bg: #2a2419;
+    --rule: #9dc389;
+    --rule-bg: #1f2620;
+    --sx-comment: #7d7a72;
+    --sx-keyword: #e08bb4;
+    --sx-string: #86c99a;
+    --sx-number: #dfa86a;
+    --sx-fn: #8ab6e8;
+    --sx-type: #c2a0e8;
+    --sx-prop: #e8825f;
+    --sx-op: #9a958b;
+    --sx-var: #e0a06a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  z-index: 10;
+}
+.skip:focus { left: 0; }
+
+/* ---------------------------------------------------------------- layout */
+
+.layout { display: flex; align-items: flex-start; }
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.1rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.brand { display: flex; gap: 0.7rem; align-items: center; }
+.brand-mark {
+  flex: 0 0 34px; height: 34px; border-radius: 8px;
+  background: var(--accent); color: #fff;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px; letter-spacing: 0.02em;
+}
+.brand strong { display: block; font-size: 14px; line-height: 1.25; }
+.brand span { font-size: 12px; color: var(--text-3); }
+
+.filter {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.filter:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.nav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.nav a {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+.nav a:hover { background: var(--surface-2); color: var(--text); }
+.nav a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.sidebar-foot a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.sidebar-foot a:hover { text-decoration: underline; }
+
+main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 900px;
+  padding: 2.6rem clamp(1.1rem, 4vw, 3rem) 4rem;
+}
+
+/* ------------------------------------------------------------- typography */
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 11.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 650;
+}
+
+h1 {
+  margin: 0 0 0.4rem;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.subtitle { margin: 0; color: var(--text-2); font-size: 17px; max-width: 62ch; }
+
+.page-head { padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); margin-bottom: 1.8rem; }
+
+h2 {
+  margin: 2.6rem 0 0.9rem;
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+h3 { margin: 2rem 0 0.6rem; font-size: 1.13rem; font-weight: 650; }
+h4 {
+  margin: 1.2rem 0 0.4rem;
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+
+p { margin: 0.85rem 0; max-width: 74ch; }
+ul, ol { margin: 0.85rem 0; padding-left: 1.35rem; max-width: 74ch; }
+li { margin: 0.3rem 0; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.855em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.08em 0.34em;
+  word-break: break-word;
+}
+
+pre {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 12.9px;
+  line-height: 1.55;
+}
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+figure.code { margin: 1.1rem 0; }
+figure.code figcaption {
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 0 0.35rem 0.15rem;
+  font-weight: 600;
+}
+
+pre.tree {
+  font-size: 12.4px;
+  line-height: 1.5;
+  background: var(--surface);
+}
+
+/* ------------------------------------------------------- syntax highlight */
+
+.tok-c { color: var(--sx-comment); font-style: italic; }
+.tok-k { color: var(--sx-keyword); }
+.tok-s { color: var(--sx-string); }
+.tok-r { color: var(--sx-string); }
+.tok-n { color: var(--sx-number); }
+.tok-f { color: var(--sx-fn); }
+.tok-t { color: var(--sx-type); }
+.tok-p { color: var(--sx-prop); }
+.tok-o { color: var(--sx-op); }
+.tok-v { color: var(--sx-var); }
+.tok-a { color: var(--sx-type); }
+
+figure.code figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+figure.code figcaption .lang {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+  text-transform: none;
+}
+
+/* --------------------------------------------------------------- callouts */
+
+.callout {
+  display: flex;
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  max-width: 74ch;
+}
+.callout p { margin: 0; }
+.callout-tag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding-top: 0.15rem;
+}
+.callout.note { background: var(--note-bg); border-color: color-mix(in srgb, var(--note) 30%, transparent); }
+.callout.note .callout-tag { color: var(--note); }
+.callout.warn { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+.callout.warn .callout-tag { color: var(--warn); }
+.callout.rule { background: var(--rule-bg); border-color: color-mix(in srgb, var(--rule) 32%, transparent); }
+.callout.rule .callout-tag { color: var(--rule); }
+
+/* ----------------------------------------------------------------- tables */
+
+.table-wrap { overflow-x: auto; margin: 1.2rem 0; border: 1px solid var(--border); border-radius: 9px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--surface-2); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-2); font-weight: 650; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface); }
+td code { font-size: 12.2px; }
+
+/* ------------------------------------------------------------------ steps */
+
+ol.steps { list-style: none; counter-reset: step; padding-left: 0; max-width: 78ch; }
+ol.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.2rem;
+  margin: 0.9rem 0;
+}
+ol.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+ol.steps > li > p { margin: 0 0 0.5rem; }
+
+/* ------------------------------------------------------------ file blocks */
+
+.file {
+  margin: 1.6rem 0;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+.file-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.file-head h3 { margin: 0; font-size: 1rem; }
+.file-head code { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); font-size: 13px; }
+.file-meta { font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.file-purpose { margin: 0.7rem 0 0; }
+
+.change { margin-top: 1.1rem; padding-top: 0.6rem; border-top: 1px dashed var(--border); }
+.change ul, .change ol { margin-top: 0.4rem; }
+.change.why p { color: var(--text-2); }
+.related { margin-top: 1rem; font-size: 12.5px; color: var(--text-3); }
+.related code { font-size: 11.8px; }
+
+/* -------------------------------------------------------------------- api */
+
+details.api { margin-top: 1.1rem; border-top: 1px dashed var(--border); padding-top: 0.7rem; }
+details.api > summary {
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+details.api[open] > summary { margin-bottom: 0.8rem; color: var(--text-2); }
+
+.api-item { margin: 0.9rem 0; padding-left: 0.8rem; border-left: 2px solid var(--border); }
+.api-head { display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; }
+.api-head code { background: none; border: 0; padding: 0; font-size: 13px; font-weight: 600; }
+.api-heritage { font-size: 11.5px; color: var(--text-3); font-family: var(--mono); }
+.api-doc { margin: 0.3rem 0 0.4rem; font-size: 13.5px; color: var(--text-2); }
+.api-shape { font-size: 12px; margin-top: 0.4rem; }
+table.api-members { font-size: 13px; margin-top: 0.4rem; }
+table.api-members td { padding: 0.3rem 0.6rem 0.3rem 0; border-bottom: 1px solid var(--border); }
+table.api-members td:first-child { width: 46%; }
+table.api-members code { font-size: 12.1px; }
+
+.badge {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.badge-class, .badge-interface { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 22%, transparent); }
+.badge-function, .badge-fn { background: var(--rule-bg); color: var(--rule); border-color: color-mix(in srgb, var(--rule) 25%, transparent); }
+.badge-type { background: var(--note-bg); color: var(--note); border-color: color-mix(in srgb, var(--note) 25%, transparent); }
+.badge-const { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+
+/* -------------------------------------------------------------------- toc */
+
+.toc {
+  margin: 0 0 2rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.toc h2 {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.toc ul { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 1.6rem; }
+.toc li { break-inside: avoid; margin: 0.18rem 0; }
+.toc a { font-size: 13.4px; text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* ----------------------------------------------------------------- footer */
+
+.page-foot { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-3); }
+.pager { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; font-size: 13.5px; }
+.pager a { text-decoration: none; font-weight: 600; }
+.pager a:hover { text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .layout { flex-direction: column; }
+  .sidebar { position: static; width: 100%; height: auto; flex: none; border-right: 0; border-bottom: 1px solid var(--border); }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .toc ul { columns: 1; }
+  main { padding-top: 1.6rem; }
+}
+
+/* ------------------------------------------------------------ print sheet */
+
+body.print {
+  background: #fff;
+  color: #16150f;
+  font-size: 10.6pt;
+  line-height: 1.5;
+  --sx-comment: #6f6b63;
+  --sx-keyword: #8d3560;
+  --sx-string: #2f6942;
+  --sx-number: #855017;
+  --sx-fn: #295585;
+  --sx-type: #6c3f8f;
+  --sx-prop: #9e3f24;
+  --sx-op: #5e5a53;
+  --sx-var: #8f4718;
+}
+body.print .print-page { padding: 0 0 1.5rem; }
+body.print main, body.print .sidebar { all: unset; }
+body.print h1.print-h1 {
+  font-family: var(--serif);
+  font-size: 21pt;
+  margin: 0 0 0.2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid #16150f;
+}
+body.print h2 { font-size: 14pt; margin-top: 1.4rem; }
+body.print h3 { font-size: 11.6pt; }
+body.print pre { font-size: 8.4pt; background: #f6f5f3; border-color: #ddd; }
+body.print table { font-size: 9pt; }
+body.print .file { border-color: #ddd; }
+body.print table.api-members td:first-child { width: 58%; }
+body.print .api-item { break-inside: auto; }
+body.print .toc, body.print .pager, body.print .skip, body.print .filter { display: none; }
+body.print details.api { display: block; }
+body.print details.api > summary { list-style: none; }
+
+.cover {
+  min-height: 245mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4mm;
+  page-break-after: always;
+  break-after: page;
+}
+.cover h1 { font-size: 40pt; margin: 0.2rem 0 0.6rem; letter-spacing: -0.02em; }
+.cover .eyebrow { font-size: 10pt; letter-spacing: 0.14em; }
+.cover-sub { font-size: 14pt; color: #4a4842; max-width: 30ch; margin: 0 0 3rem; }
+.cover-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); gap: 1.2rem 2rem; margin: 0; border-top: 2px solid #16150f; padding-top: 1.2rem; }
+.cover-meta div { margin: 0; }
+.cover-meta dt { font-size: 8.5pt; letter-spacing: 0.09em; text-transform: uppercase; color: #6d6b64; }
+.cover-meta dd { margin: 0.15rem 0 0; font-size: 13pt; font-weight: 600; }
+
+.contents { page-break-after: always; break-after: page; }
+.print-toc { list-style: none; padding: 0; margin: 1.4rem 0 0; counter-reset: toc; }
+.print-toc li { margin: 0.55rem 0; display: grid; grid-template-columns: 2rem 1fr; gap: 0.2rem 0.6rem; align-items: baseline; }
+.print-toc .num { color: #8a887f; font-variant-numeric: tabular-nums; font-size: 10pt; }
+.print-toc a { font-size: 12.5pt; font-weight: 600; text-decoration: none; color: #16150f; }
+.print-toc .sub { grid-column: 2; font-size: 9.4pt; color: #6d6b64; }
+.print-toc .dots { display: none; }
+
+.print-page { page-break-before: always; break-before: page; }
+.print-page:first-of-type { page-break-before: avoid; break-before: avoid; }
+
+@media print {
+  body.print { background: #fff; }
+  pre, .callout, ol.steps > li, .api-item, tr { page-break-inside: avoid; break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; break-after: avoid; }
+  a { color: #16150f; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">PW</span><div><strong>Playwright UI Framework</strong><span>Documentation v1.0</span></div></div>
+    <input id="nav-filter" class="filter" type="search" placeholder="Filter sections…" aria-label="Filter sections">
+    <nav aria-label="Documentation"><ul class="nav"><li><a href="index.html">Overview</a></li><li><a href="architecture.html">Architecture</a></li><li><a href="worked-example.html">Worked example</a></li><li><a href="structure.html" aria-current="page">Project structure</a></li><li><a href="reference-root.html">Reference: configuration &amp; tooling</a></li><li><a href="reference-foundation.html">Reference: config, core &amp; types</a></li><li><a href="reference-components.html">Reference: component library</a></li><li><a href="reference-fixtures.html">Reference: fixtures, hooks, pages &amp; API</a></li><li><a href="reference-utils.html">Reference: utilities, reporters &amp; data</a></li><li><a href="reference-tests.html">Reference: tests &amp; repository docs</a></li><li><a href="playbooks.html">Playbooks</a></li><li><a href="conventions.html">Conventions</a></li><li><a href="troubleshooting.html">Troubleshooting</a></li><li><a href="api-index.html">API index</a></li><li><a href="glossary.html">Glossary</a></li></ul></nav>
+    <div class="sidebar-foot">
+      <a href="playwright-ui-framework-documentation.pdf" download>Download PDF</a>
+      <span>Generated 2026-09-01</span>
+    </div>
+  </aside>
+  <main id="main">
+    <header class="page-head">
+      <p class="eyebrow">Playwright UI Framework</p>
+      <h1>Project structure</h1>
+      <p class="subtitle">Every folder and file, with its purpose</p>
+    </header>
+    <nav class="toc" aria-label="On this page"><h2>On this page</h2><ul id="toc"><li><a href="#root-configuration">Root configuration</a></li><li><a href="#ci-containers-and-editor-tooling">CI, containers and editor tooling</a></li><li><a href="#documentation-tooling">Documentation tooling</a></li><li><a href="#configuration-src-config">Configuration (src/config)</a></li><li><a href="#core-src-core">Core (src/core)</a></li><li><a href="#types-src-types">Types (src/types)</a></li><li><a href="#component-library-entry-points">Component library entry points</a></li><li><a href="#form-controls">Form controls</a></li><li><a href="#data-display">Data display</a></li><li><a href="#navigation">Navigation</a></li><li><a href="#feedback">Feedback</a></li><li><a href="#media">Media</a></li><li><a href="#advanced-interactions">Advanced interactions</a></li><li><a href="#fixtures-src-fixtures">Fixtures (src/fixtures)</a></li><li><a href="#hooks-src-hooks">Hooks (src/hooks)</a></li><li><a href="#page-objects-src-pages">Page objects (src/pages)</a></li><li><a href="#api-client-src-api">API client (src/api)</a></li><li><a href="#reporters-src-reporters">Reporters (src/reporters)</a></li><li><a href="#utilities-src-utils">Utilities (src/utils)</a></li><li><a href="#test-data-src-data">Test data (src/data)</a></li><li><a href="#tests-folder">Tests folder</a></li><li><a href="#repository-documentation">Repository documentation</a></li></ul></nav>
+    <div class="content"><p>Every file in the repository, grouped by role. Each entry links to its full reference — purpose, when and how to change it, and why the change belongs there.</p>
+<pre class="tree"><code>playwright-ui-framework/
+├── playwright.config.ts        Projects, reporters, timeouts, artifacts
+├── tsconfig.json               Strict TypeScript + path aliases
+├── eslint.config.mjs           Type-aware linting
+├── package.json                Dependencies and every command
+├── .env.example                Documented environment template
+├── Dockerfile / docker-compose.yml   CI-identical local runs
+├── Makefile                    Discoverable task shortcuts
+├── .github/workflows/          Sharded CI with merged reports
+├── .vscode/                    Shared editor behaviour
+├── docs/                       This documentation (site + PDF + markdown)
+├── scripts/docs/               The documentation generator
+├── src/
+│   ├── config/                 Validated environment resolution
+│   ├── core/                   BaseComponent, BasePage, locator resolution
+│   ├── components/             The component library
+│   │   ├── form/               17 form controls
+│   │   ├── data/               Tables, grids, lists, trees, pagination, cards
+│   │   ├── navigation/         Links, tabs, accordions, menus, breadcrumbs, steppers
+│   │   ├── feedback/           Modals, alerts, tooltips, progress, loaders
+│   │   ├── media/              Images, players, canvas, frames, carousels
+│   │   └── advanced/           Drag-drop, shadow DOM, editors, infinite scroll, charts
+│   ├── fixtures/               The test and expect that specs import
+│   ├── hooks/                  Global setup/teardown, auth session capture
+│   ├── pages/                  Page objects
+│   ├── api/                    HTTP client for seeding data
+│   ├── utils/                  Logging, waits, network, files, a11y, visual
+│   ├── reporters/              Custom run summary
+│   ├── data/                   Static test data
+│   └── types/                  Shared type definitions
+└── tests/                      ui/ · visual/ · a11y/</code></pre>
+<h2 id="root-configuration">Root configuration</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-root.html#f-editorconfig"><code>.editorconfig</code></a></td><td>Charset, indentation, final newline and trailing-whitespace rules that apply in any editor, including ones without Prettier installed.</td></tr><tr><td><a href="reference-root.html#f-env"><code>.env</code></a></td><td>Your machine-local configuration, created by copying <code>.env.example</code>.</td></tr><tr><td><a href="reference-root.html#f-env-example"><code>.env.example</code></a></td><td>The documented list of every variable the framework understands, with safe defaults and no real values.</td></tr><tr><td><a href="reference-root.html#f-gitignore"><code>.gitignore</code></a></td><td>Keeps dependencies, run artifacts, saved sessions and secrets out of the repository: <code>node_modules</code>, <code>test-results</code>, <code>reports</code>, <code>blob-report</code>, <code>playwright/.cache</code>, <code>storage/*.json</code>, and every <code>.env</code> file except <code>.env.example</code>.</td></tr><tr><td><a href="reference-root.html#f-nvmrc"><code>.nvmrc</code></a></td><td>Pins Node 22 (LTS).</td></tr><tr><td><a href="reference-root.html#f-prettierignore"><code>.prettierignore</code></a></td><td>Keeps Prettier away from generated and vendored output: <code>node_modules</code>, <code>dist</code>, <code>reports</code>, <code>test-results</code>, <code>playwright-report</code>, <code>blob-report</code>, <code>package-lock.json</code> and screenshot snapshot folders.</td></tr><tr><td><a href="reference-root.html#f-prettierrc-json"><code>.prettierrc.json</code></a></td><td>Formatting rules: 100-character lines, single quotes, trailing commas, two-space indentation, LF endings.</td></tr><tr><td><a href="reference-root.html#f-eslint-config-mjs"><code>eslint.config.mjs</code></a></td><td>Type-aware linting for the whole repository.</td></tr><tr><td><a href="reference-root.html#f-package-json"><code>package.json</code></a></td><td>Declares dependencies, the Node engine range, the lint-staged rules and every command the team runs.</td></tr><tr><td><a href="reference-root.html#f-playwright-config-ts"><code>playwright.config.ts</code></a></td><td>The single entry point Playwright reads before anything else runs.</td></tr><tr><td><a href="reference-root.html#f-tsconfig-json"><code>tsconfig.json</code></a></td><td>Compiler settings and path aliases for the whole repository.</td></tr></tbody></table></div>
+<h2 id="ci-containers-and-editor-tooling">CI, containers and editor tooling</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-root.html#f-github-workflows-playwright-yml"><code>.github/workflows/playwright.yml</code></a></td><td>The GitHub Actions pipeline: a lint gate, a sharded three-browser test matrix, separate accessibility and visual jobs, and a final job that merges every shard into one HTML report.</td></tr><tr><td><a href="reference-root.html#f-vscode-extensions-json"><code>.vscode/extensions.json</code></a></td><td>Prompts new contributors to install the Playwright test runner, ESLint, Prettier and EditorConfig extensions.</td></tr><tr><td><a href="reference-root.html#f-vscode-settings-json"><code>.vscode/settings.json</code></a></td><td>Format on save with Prettier, ESLint auto-fix on save, the workspace TypeScript version, non-relative import suggestions (so the aliases are offered), Playwright browser reuse, and noise folders hidden from search.</td></tr><tr><td><a href="reference-root.html#f-docker-compose-yml"><code>docker-compose.yml</code></a></td><td>Wraps the image with the environment variables, volume mounts and shared-memory settings a browser needs.</td></tr><tr><td><a href="reference-root.html#f-dockerfile"><code>Dockerfile</code></a></td><td>Builds a test image from the official Playwright base image pinned to the same version as <code>@playwright/test</code>, with browsers, system libraries and fonts already present.</td></tr><tr><td><a href="reference-root.html#f-makefile"><code>Makefile</code></a></td><td>A discoverable front door for the npm scripts.</td></tr></tbody></table></div>
+<h2 id="documentation-tooling">Documentation tooling</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-root.html#f-docs-readme-md"><code>docs/README.md</code></a></td><td>Explains what each documentation output is, how to regenerate them, and how to add an entry for a new file.</td></tr><tr><td><a href="reference-root.html#f-scripts-docs-artifact-css"><code>scripts/docs/artifact.css</code></a></td><td>The stylesheet for the hosted single-page manual, which has its own visual identity: IBM Plex Sans and Mono with Archivo for display, a cool slate ground and one ultramarine signal colour, plus full light, dark and system theme handling.</td></tr><tr><td><a href="reference-root.html#f-scripts-docs-build-docs-mjs"><code>scripts/docs/build-docs.mjs</code></a></td><td>Merges the authored content modules with <code>docs/generated/api.json</code> and writes the HTML documentation site into <code>docs/site/</code>, including the single-page <code>print.html</code> used to produce the PDF and <code>artifact.html</code> used for the hosted version.</td></tr><tr><td><a href="reference-root.html#f-scripts-docs-build-pdf-mjs"><code>scripts/docs/build-pdf.mjs</code></a></td><td>Opens <code>docs/site/print.html</code> in the Chromium that ships with Playwright and prints it to <code>docs/playwright-ui-framework-documentation.pdf</code> with A4 pages, margins, and a header and footer carrying the document title and page numbers.</td></tr><tr><td><a href="reference-root.html#f-scripts-docs-content"><code>scripts/docs/content/</code></a></td><td>The prose source of this documentation, split into modules by area: <code>guides.mjs</code> for the long-form pages, and <code>files.*.mjs</code> for the per-file reference.</td></tr><tr><td><a href="reference-root.html#f-scripts-docs-docs-css"><code>scripts/docs/docs.css</code></a></td><td>The single stylesheet for all three outputs: the screen layout (sidebar, tables, callouts, API blocks), the light and dark palettes, and the print sheet including the PDF cover page and page-break rules.</td></tr><tr><td><a href="reference-root.html#f-scripts-docs-extract-api-mjs"><code>scripts/docs/extract-api.mjs</code></a></td><td>Walks the repository and parses every TypeScript file with the TypeScript compiler API, recording exported classes, functions, interfaces, types, constants and re-exports along with their JSDoc summaries and public member signatures.</td></tr><tr><td><a href="reference-root.html#f-scripts-docs-highlight-mjs"><code>scripts/docs/highlight.mjs</code></a></td><td>Colours every code snippet at build time.</td></tr><tr><td><a href="reference-root.html#f-scripts-docs-render-mjs"><code>scripts/docs/render.mjs</code></a></td><td>Turns the structured content blocks (paragraphs, lists, tables, code, callouts, step lists, trees) and the extracted API data into HTML.</td></tr></tbody></table></div>
+<h2 id="configuration-src-config">Configuration (src/config)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-foundation.html#f-src-config-env-config-ts"><code>src/config/env.config.ts</code></a></td><td>The only file in the framework permitted to read <code>process.env</code>.</td></tr><tr><td><a href="reference-foundation.html#f-src-config-environments-ts"><code>src/config/environments.ts</code></a></td><td>Static, non-secret settings for each environment — base URL, API URL, default retries and workers, and whether to ignore HTTPS errors.</td></tr><tr><td><a href="reference-foundation.html#f-src-config-index-ts"><code>src/config/index.ts</code></a></td><td>Re-exports <code>config</code>, <code>getUser</code>, <code>ENVIRONMENTS</code>, <code>getEnvironment</code> and <code>TIMEOUTS</code> so consumers import from <code>@config/index</code> rather than reaching into individual files.</td></tr><tr><td><a href="reference-foundation.html#f-src-config-timeouts-ts"><code>src/config/timeouts.ts</code></a></td><td>Every wait in the framework references one of these named budgets — <code>INSTANT</code>, <code>SHORT</code>, <code>MEDIUM</code>, <code>LONG</code>, <code>EXTRA_LONG</code>, <code>TEST</code>, <code>HOOK</code>, <code>EXPECT</code>, <code>POLL_INTERVAL</code>, <code>DEBOUNCE</code>, <code>ANIMATION</code> — so tuning flakiness is a single-file change instead of a repo-wide hunt for magic numbers.</td></tr></tbody></table></div>
+<h2 id="core-src-core">Core (src/core)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-foundation.html#f-src-core-base-component-ts"><code>src/core/base.component.ts</code></a></td><td>The most important file in the framework.</td></tr><tr><td><a href="reference-foundation.html#f-src-core-base-page-ts"><code>src/core/base.page.ts</code></a></td><td>Base class for page objects.</td></tr><tr><td><a href="reference-foundation.html#f-src-core-index-ts"><code>src/core/index.ts</code></a></td><td>Re-exports <code>BaseComponent</code>, <code>BasePage</code>, <code>by</code>, <code>resolveLocator</code> and the <code>Scope</code> type.</td></tr><tr><td><a href="reference-foundation.html#f-src-core-locator-factory-ts"><code>src/core/locator.factory.ts</code></a></td><td>Resolves any <code>SelectorLike</code> — a CSS or XPath string, an existing <code>Locator</code>, or a function that derives one from a scope — into a real Locator, applying the iframe and shadow-DOM options a component declares.</td></tr></tbody></table></div>
+<h2 id="types-src-types">Types (src/types)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-foundation.html#f-src-types-index-ts"><code>src/types/index.ts</code></a></td><td>Every cross-cutting type in one place: environment names and shape, user roles, component options, <code>SelectorLike</code>, <code>ElementState</code>, click and fill options, table and sorting types, network mocking and capture shapes, accessibility and visual options, and the retry policy.</td></tr><tr><td><a href="reference-foundation.html#f-src-types-xlsx-populate-d-ts"><code>src/types/xlsx-populate.d.ts</code></a></td><td>Minimal type declarations for the <code>xlsx-populate</code> package, which ships none.</td></tr></tbody></table></div>
+<h2 id="component-library-entry-points">Component library entry points</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-components.html#f-src-components-component-factory-ts"><code>src/components/component.factory.ts</code></a></td><td>An ergonomic factory bound to a scope — a page, an iframe or a container locator.</td></tr><tr><td><a href="reference-components.html#f-src-components-index-ts"><code>src/components/index.ts</code></a></td><td>Re-exports every component class and its options type, plus the <code>ui</code> factory.</td></tr></tbody></table></div>
+<h2 id="form-controls">Form controls</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-components.html#f-src-components-form-autocomplete-ts"><code>src/components/form/autocomplete.ts</code></a></td><td>Typeahead fields that fetch suggestions asynchronously.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-button-ts"><code>src/components/form/button.ts</code></a></td><td>Any clickable control: a real <code>&lt;button&gt;</code>, an <code>&lt;input type=&quot;submit&quot;&gt;</code>, an anchor with <code>role=&quot;button&quot;</code>, or a div a framework decided to treat as a button.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-checkbox-ts"><code>src/components/form/checkbox.ts</code></a></td><td>Native checkboxes and ARIA checkboxes, including the tri-state <code>indeterminate</code> case used by &quot;select all&quot; controls.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-color-picker-ts"><code>src/components/form/color-picker.ts</code></a></td><td>Native <code>&lt;input type=&quot;color&quot;&gt;</code> and custom swatch pickers: setting a hex value with the events frameworks expect, reading the value, picking a named swatch, and reading the rendered colour.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-date-picker-ts"><code>src/components/form/date-picker.ts</code></a></td><td>Covers both interaction paths: typing into the input, and navigating the calendar popup month by month.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-dropdown-ts"><code>src/components/form/dropdown.ts</code></a></td><td>Non-native dropdowns, comboboxes and listboxes from React-Select, MUI, Ant Design, Kendo and similar libraries.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-file-upload-ts"><code>src/components/form/file-upload.ts</code></a></td><td>Uploads in all three flavours: a plain <code>&lt;input type=&quot;file&quot;&gt;</code>, a hidden input behind a styled button (via the file chooser event), and a drag-and-drop zone (via a synthetic <code>DataTransfer</code> drop).</td></tr><tr><td><a href="reference-components.html#f-src-components-form-form-ts"><code>src/components/form/form.ts</code></a></td><td>Treats a whole <code>&lt;form&gt;</code> as one component.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-multi-select-ts"><code>src/components/form/multi-select.ts</code></a></td><td>Extends <code>Dropdown</code> for controls that hold several values at once, usually rendered as removable chips.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-radio-group-ts"><code>src/components/form/radio-group.ts</code></a></td><td>A set of mutually exclusive options addressed by value, label or index.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-rating-ts"><code>src/components/form/rating.ts</code></a></td><td>Star and heart rating controls: rating by position, reading the current and maximum rating, hover preview, read-only detection and clearing.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-select-ts"><code>src/components/form/select.ts</code></a></td><td>Native <code>&lt;select&gt;</code> elements.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-slider-ts"><code>src/components/form/slider.ts</code></a></td><td>Range inputs and <code>role=&quot;slider&quot;</code> controls, with three strategies because custom sliders rarely honour all of them: setting the value through the native setter (firing the events frameworks listen for), dragging the handle proportionally, and stepping with arrow keys.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-text-area-ts"><code>src/components/form/text-area.ts</code></a></td><td>Multi-line fields.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-text-input-ts"><code>src/components/form/text-input.ts</code></a></td><td>Single-line inputs of every flavour — text, email, password, number, tel, url, search — plus <code>contenteditable</code> fields.</td></tr><tr><td><a href="reference-components.html#f-src-components-form-toggle-ts"><code>src/components/form/toggle.ts</code></a></td><td>Switches: <code>role=&quot;switch&quot;</code>, styled checkboxes, or a pair of divs.</td></tr></tbody></table></div>
+<h2 id="data-display">Data display</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-components.html#f-src-components-data-card-ts"><code>src/components/data/card.ts</code></a></td><td>Cards and tiles — product cards, dashboard widgets, search results.</td></tr><tr><td><a href="reference-components.html#f-src-components-data-data-grid-ts"><code>src/components/data/data-grid.ts</code></a></td><td>Extends <code>Table</code> for enterprise grids — AG Grid, MUI DataGrid, Kendo, PrimeNG — which differ in three ways that matter: rows are <code>role=&quot;row&quot;</code> divs, data loads asynchronously, and only the visible window exists in the DOM.</td></tr><tr><td><a href="reference-components.html#f-src-components-data-list-ts"><code>src/components/data/list.ts</code></a></td><td>Ordered and unordered lists, <code>role=&quot;list&quot;</code> and card collections: reading items, clicking by text or index, membership checks, index lookup and order verification.</td></tr><tr><td><a href="reference-components.html#f-src-components-data-pagination-ts"><code>src/components/data/pagination.ts</code></a></td><td>Page controls: next, previous, first, last, a specific page, current page, total pages (from info text or the highest page link), page size, enabled state of the arrows, and <code>forEachPage()</code> for walking the whole set.</td></tr><tr><td><a href="reference-components.html#f-src-components-data-table-ts"><code>src/components/data/table.ts</code></a></td><td>HTML tables, with everything addressable by column name rather than index: reading all rows as objects, single cells, whole columns, finding rows by criteria, clicking a control inside a matching row, sorting, verifying sort order, and row selection.</td></tr><tr><td><a href="reference-components.html#f-src-components-data-tree-ts"><code>src/components/data/tree.ts</code></a></td><td>Tree views and file explorers: expanding and collapsing, walking a path of ancestors to a leaf, selection state, nesting level from <code>aria-level</code>, listing visible nodes and children.</td></tr></tbody></table></div>
+<h2 id="navigation">Navigation</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-components.html#f-src-components-navigation-accordion-ts"><code>src/components/navigation/accordion.ts</code></a></td><td>Collapsible sections: expand, collapse, toggle, expansion state (via <code>aria-expanded</code>, the <code>open</code> attribute on <code>details</code>, or class names), section content, expand-all and collapse-all, and counting expanded sections to verify single-open behaviour.</td></tr><tr><td><a href="reference-components.html#f-src-components-navigation-breadcrumb-ts"><code>src/components/navigation/breadcrumb.ts</code></a></td><td>Breadcrumb trails: reading the trail, the current page, navigating to an ancestor, going up a number of levels, and depth.</td></tr><tr><td><a href="reference-components.html#f-src-components-navigation-link-ts"><code>src/components/navigation/link.ts</code></a></td><td>Anchors, including the awkward parts: reading <code>href</code> and <code>target</code>, clicking and waiting for navigation, opening and returning a new tab, cheap reachability checking with a HEAD request, and internal-versus-external detection.</td></tr><tr><td><a href="reference-components.html#f-src-components-navigation-menu-ts"><code>src/components/navigation/menu.ts</code></a></td><td>Navigation menus, menubars and context menus, including nested submenus.</td></tr><tr><td><a href="reference-components.html#f-src-components-navigation-stepper-ts"><code>src/components/navigation/stepper.ts</code></a></td><td>Multi-step wizards: next, back, finish, jumping to a step, current step number and name, all step names, completion and disabled state, and whether you are on the last step.</td></tr><tr><td><a href="reference-components.html#f-src-components-navigation-tabs-ts"><code>src/components/navigation/tabs.ts</code></a></td><td>Tab strips and their panels: selecting by name or index, reading the active tab and all tab names, disabled state, resolving the panel bound to a tab through <code>aria-controls</code>, and arrow-key navigation per the WAI-ARIA pattern.</td></tr></tbody></table></div>
+<h2 id="feedback">Feedback</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-components.html#f-src-components-feedback-alert-ts"><code>src/components/feedback/alert.ts</code></a></td><td>Toasts, snackbars and inline alerts.</td></tr><tr><td><a href="reference-components.html#f-src-components-feedback-modal-ts"><code>src/components/feedback/modal.ts</code></a></td><td>Dialogs, drawers and confirmations: waiting for open and close, title and body text, confirm, cancel, close, Escape, overlay click, arbitrary buttons by name — plus the two things modals routinely get wrong, focus trapping and ARIA semantics.</td></tr><tr><td><a href="reference-components.html#f-src-components-feedback-progress-ts"><code>src/components/feedback/progress.ts</code></a></td><td>Two related components in one file.</td></tr><tr><td><a href="reference-components.html#f-src-components-feedback-tooltip-ts"><code>src/components/feedback/tooltip.ts</code></a></td><td>Tooltips and popovers.</td></tr></tbody></table></div>
+<h2 id="media">Media</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-components.html#f-src-components-media-canvas-ts"><code>src/components/media/canvas.ts</code></a></td><td>Canvas elements — signature pads, drawing tools, charts and games.</td></tr><tr><td><a href="reference-components.html#f-src-components-media-carousel-ts"><code>src/components/media/carousel.ts</code></a></td><td>Image and content carousels: next, previous, going to a slide by indicator or by stepping, current slide index and text, slide count, verifying autoplay advances, and swiping for the mobile path.</td></tr><tr><td><a href="reference-components.html#f-src-components-media-frame-ts"><code>src/components/media/frame.ts</code></a></td><td>An iframe wrapper.</td></tr><tr><td><a href="reference-components.html#f-src-components-media-image-ts"><code>src/components/media/image.ts</code></a></td><td>Images, including the cases that matter: whether the bitmap actually decoded (<code>complete</code> plus non-zero <code>naturalWidth</code>, not merely &quot;element visible&quot;), intrinsic dimensions, broken detection, lazy-loading, <code>srcset</code> entries and accessible alt-text rules.</td></tr><tr><td><a href="reference-components.html#f-src-components-media-media-player-ts"><code>src/components/media/media-player.ts</code></a></td><td>Video and audio driven through the media element’s own DOM API rather than custom player chrome, so the same component works for any skin: play, pause, seek, volume, mute, playback rate, readiness, playback progress, ended state, current source and text tracks.</td></tr></tbody></table></div>
+<h2 id="advanced-interactions">Advanced interactions</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-components.html#f-src-components-advanced-chart-ts"><code>src/components/advanced/chart.ts</code></a></td><td>SVG charts from D3, Highcharts, Chart.js in SVG mode or Recharts.</td></tr><tr><td><a href="reference-components.html#f-src-components-advanced-drag-drop-ts"><code>src/components/advanced/drag-drop.ts</code></a></td><td>Drag and drop with three strategies deliberately, because no single approach works across every library: Playwright’s built-in <code>dragTo</code> for standard HTML5 drag, <code>dragManually()</code> with explicit mouse steps for react-dnd, dnd-kit and Sortable, and <code>dragWithDataTransfer()</code> dispatching synthetic events for custom handlers.</td></tr><tr><td><a href="reference-components.html#f-src-components-advanced-infinite-scroll-ts"><code>src/components/advanced/infinite-scroll.ts</code></a></td><td>Infinite-scroll and lazy-loaded lists.</td></tr><tr><td><a href="reference-components.html#f-src-components-advanced-rich-text-editor-ts"><code>src/components/advanced/rich-text-editor.ts</code></a></td><td>WYSIWYG editors — Quill, TinyMCE, CKEditor, ProseMirror, Slate.</td></tr><tr><td><a href="reference-components.html#f-src-components-advanced-shadow-dom-ts"><code>src/components/advanced/shadow-dom.ts</code></a></td><td>Web components with a shadow root.</td></tr></tbody></table></div>
+<h2 id="fixtures-src-fixtures">Fixtures (src/fixtures)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-fixtures.html#f-src-fixtures-auth-fixture-ts"><code>src/fixtures/auth.fixture.ts</code></a></td><td>Extends the base fixtures with authenticated browsing: <code>authenticatedContext</code> and <code>authenticatedPage</code> for the standard user, and <code>pageAs(role)</code> for signing in as any role on demand.</td></tr><tr><td><a href="reference-fixtures.html#f-src-fixtures-bank-fixture-ts"><code>src/fixtures/bank.fixture.ts</code></a></td><td>Provides every page object ready-made, plus <code>signedIn</code> and <code>signInAs</code> for tests that need an authenticated session.</td></tr><tr><td><a href="reference-fixtures.html#f-src-fixtures-base-fixture-ts"><code>src/fixtures/base.fixture.ts</code></a></td><td>Composes the <code>test</code> object every spec uses.</td></tr><tr><td><a href="reference-fixtures.html#f-src-fixtures-custom-matchers-ts"><code>src/fixtures/custom-matchers.ts</code></a></td><td>Domain-specific matchers that extend Playwright’s <code>expect</code>: <code>toBeAccessible</code>, <code>toBeInteractive</code>, <code>toHaveNormalizedText</code>, <code>toHaveValidationError</code>, <code>toBeInViewport</code> and <code>toBeSorted</code>.</td></tr><tr><td><a href="reference-fixtures.html#f-src-fixtures-index-ts"><code>src/fixtures/index.ts</code></a></td><td>Re-exports the composed <code>test</code> and the extended <code>expect</code>.</td></tr></tbody></table></div>
+<h2 id="hooks-src-hooks">Hooks (src/hooks)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-fixtures.html#f-src-hooks-auth-setup-ts"><code>src/hooks/auth.setup.ts</code></a></td><td>Runs as the <code>setup</code> project before every other project.</td></tr><tr><td><a href="reference-fixtures.html#f-src-hooks-global-setup-ts"><code>src/hooks/global.setup.ts</code></a></td><td>Runs once before the entire suite, in the parent process: creates the report, results, storage and download directories, removes the previous HTML report so a stale one cannot be mistaken for the current run, logs the resolved run configuration, and records the start time.</td></tr><tr><td><a href="reference-fixtures.html#f-src-hooks-global-teardown-ts"><code>src/hooks/global.teardown.ts</code></a></td><td>Runs once after the entire suite: removes the temporary scratch directory and logs total duration and where reports were written.</td></tr></tbody></table></div>
+<h2 id="page-objects-src-pages">Page objects (src/pages)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-fixtures.html#f-src-pages-bank-account-detail-page-ts"><code>src/pages/bank/account-detail.page.ts</code></a></td><td>A single account: its balance and a filterable, sortable transaction table.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-accounts-page-ts"><code>src/pages/bank/accounts.page.ts</code></a></td><td>The account list and the add/edit dialog it opens.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-apply-loan-page-ts"><code>src/pages/bank/apply-loan.page.ts</code></a></td><td>Loan applications and their history — including the page that carries the application's planted defect.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-bank-shell-ts"><code>src/pages/bank/bank-shell.ts</code></a></td><td>The application chrome — top bar and sidebar — modelled once as a component and composed into every page object.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-bill-pay-page-ts"><code>src/pages/bank/bill-pay.page.ts</code></a></td><td>Bill payment: a biller search, an amount, a date and a memo.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-dashboard-page-ts"><code>src/pages/bank/dashboard.page.ts</code></a></td><td>The landing page: net-worth cards, quick-action tiles and the recent-activity widget.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-dropdown-panel-ts"><code>src/pages/bank/dropdown-panel.ts</code></a></td><td>The <code>VISIBLE_LISTBOX</code> selector every custom dropdown in the application shares.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-index-ts"><code>src/pages/bank/index.ts</code></a></td><td>Barrel for the SecureBank page objects.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-login-page-ts"><code>src/pages/bank/login.page.ts</code></a></td><td>The sign-in page — the only page reachable without authenticating, and therefore the entry point for every other page object.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-notifications-page-ts"><code>src/pages/bank/notifications.page.ts</code></a></td><td>The notification centre and the unread badges it drives.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-profile-page-ts"><code>src/pages/bank/profile.page.ts</code></a></td><td>Profile, password change and security settings.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-send-money-page-ts"><code>src/pages/bank/send-money.page.ts</code></a></td><td>External payments to a saved payee, and the add-payee dialog.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-transactions-page-ts"><code>src/pages/bank/transactions.page.ts</code></a></td><td>All activity across every account: search, account filter, type filter, three sortable columns, pagination and CSV export.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-bank-transfer-page-ts"><code>src/pages/bank/transfer.page.ts</code></a></td><td>Internal transfers.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-index-ts"><code>src/pages/index.ts</code></a></td><td>Exports every page object so tests and fixtures have one import path, and so a <code>pages</code> fixture can construct them all in one place if you add one.</td></tr><tr><td><a href="reference-fixtures.html#f-src-pages-template-page-ts"><code>src/pages/template.page.ts</code></a></td><td>A copy-me starting point that encodes the four page-object conventions: declare <code>path</code> and <code>readyIndicator</code>; build components once as readonly fields; expose business actions rather than selector wrappers; keep business assertions out.</td></tr></tbody></table></div>
+<h2 id="api-client-src-api">API client (src/api)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-fixtures.html#f-src-api-api-client-ts"><code>src/api/api.client.ts</code></a></td><td>A thin HTTP client for test setup, not for testing the API itself.</td></tr><tr><td><a href="reference-fixtures.html#f-src-api-endpoints-ts"><code>src/api/endpoints.ts</code></a></td><td>Every API path the suite touches, in one place, with functions for parameterised paths.</td></tr></tbody></table></div>
+<h2 id="reporters-src-reporters">Reporters (src/reporters)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-utils.html#f-src-reporters-index-ts"><code>src/reporters/index.ts</code></a></td><td>Re-exports the summary reporter for programmatic use.</td></tr><tr><td><a href="reference-utils.html#f-src-reporters-summary-reporter-ts"><code>src/reporters/summary.reporter.ts</code></a></td><td>A custom Playwright reporter that prints a compact end-of-run summary and writes <code>reports/summary.json</code> containing totals, every failure with its first error line, flaky tests, the five slowest tests and the full test list with tags and durations.</td></tr></tbody></table></div>
+<h2 id="utilities-src-utils">Utilities (src/utils)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-utils.html#f-src-utils-a11y-utils-ts"><code>src/utils/a11y.utils.ts</code></a></td><td>Runs axe-core against a page or a subtree, attaches both a JSON and an HTML report to the test result, formats violations into a readable failure message, and fails the test by default when violations are found.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-browser-utils-ts"><code>src/utils/browser.utils.ts</code></a></td><td>Everything that happens around the page rather than inside it: opening and switching tabs, handling native dialogs, downloading files, clipboard access, geolocation, freezing the clock, emulating colour scheme and print media, capturing console and page errors, and reading or clearing local storage and cookies.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-data-utils-ts"><code>src/utils/data.utils.ts</code></a></td><td>Faker-based generation: <code>generateUser()</code> for a complete person, <code>uniqueId()</code> for collision-proof markers, random strings, integers and choices, <code>seedFaker()</code> for reproducibility, and <code>EDGE_CASE_STRINGS</code> — a catalogue of inputs that historically break forms.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-date-utils-ts"><code>src/utils/date.utils.ts</code></a></td><td>Dependency-free, locale-independent date handling: ISO formatting, shifting by day/week/month/year, relative dates, token formatting (<code>YYYY-MM-DD</code>, <code>DD/MM/YYYY</code>, <code>MMMM YYYY</code>), same-day comparison and human-readable durations.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-file-utils-ts"><code>src/utils/file.utils.ts</code></a></td><td>Reading JSON, CSV and Excel test data; resolving paths against the data directory; creating temporary and exact-size files for upload tests; checking existence; waiting for a download to stabilise; deleting; listing; and writing JSON.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-index-ts"><code>src/utils/index.ts</code></a></td><td>Re-exports every utility so consumers import from <code>@utils/index</code> rather than reaching into individual files.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-logger-ts"><code>src/utils/logger.ts</code></a></td><td>Structured logging with console and file output, deliberately dependency-free.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-network-utils-ts"><code>src/utils/network.utils.ts</code></a></td><td>The network control surface for a page or context: <code>mock</code> a response, <code>modifyResponse</code> to rewrite a real one, <code>abort</code> to simulate failure, <code>delay</code> to exercise loading states, block heavy assets or third-party trackers, capture and search requests, wait for a specific response, and toggle offline.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-retry-utils-ts"><code>src/utils/retry.utils.ts</code></a></td><td><code>sleep</code>, <code>retry</code> with exponential backoff and a selective <code>retryOn</code> predicate, <code>waitUntil</code> for polling a condition, and <code>withTimeout</code> for bounding any promise.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-string-utils-ts"><code>src/utils/string.utils.ts</code></a></td><td><code>normalizeText</code> (collapse whitespace — DOM text is messy), <code>extractNumber</code> and <code>extractNumbers</code> (parse &quot;$1,234.50&quot;), case-insensitive contains, kebab-case, truncate, regex escaping, secret masking for logs, and currency stripping.</td></tr><tr><td><a href="reference-utils.html#f-src-utils-visual-utils-ts"><code>src/utils/visual.utils.ts</code></a></td><td><code>stabilizePage</code> (disable animations and transitions, hide the caret, wait for fonts), <code>comparePage</code>, <code>compareElement</code> and <code>compareResponsive</code> across several widths, plus <code>DEFAULT_MASK_SELECTORS</code> for regions that legitimately change between runs.</td></tr></tbody></table></div>
+<h2 id="test-data-src-data">Test data (src/data)</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-utils.html#f-src-data-files-sample-txt"><code>src/data/files/sample.txt</code></a></td><td>A tiny payload for exercising the <code>FileUpload</code> component without committing binaries.</td></tr><tr><td><a href="reference-utils.html#f-src-data-personas-ts"><code>src/data/personas.ts</code></a></td><td>The seven SecureBank accounts and the facts about the seeded dataset that tests assert against.</td></tr><tr><td><a href="reference-utils.html#f-src-data-readme-md"><code>src/data/README.md</code></a></td><td>Explains what belongs in the data directory: static fixtures only, with anything unique per run generated at runtime so parallel workers never collide.</td></tr><tr><td><a href="reference-utils.html#f-src-data-sample-users-csv"><code>src/data/sample-users.csv</code></a></td><td>A small example of the CSV shape <code>readCsv()</code> returns, so the data-driven pattern is demonstrable immediately.</td></tr><tr><td><a href="reference-utils.html#f-src-data-users-json"><code>src/data/users.json</code></a></td><td>Role display names and expected permissions — reference data for authorisation assertions.</td></tr></tbody></table></div>
+<h2 id="tests-folder">Tests folder</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-tests.html#f-tests-a11y-gitkeep"><code>tests/a11y/.gitkeep</code></a></td><td>Placeholder for the <code>accessibility</code> project’s specs — axe scans across key pages and states.</td></tr><tr><td><a href="reference-tests.html#f-tests-a11y-bank-a11y-spec-ts"><code>tests/a11y/bank.a11y.spec.ts</code></a></td><td>Automated axe scans across all ten pages and both themes, with the application's existing violations baselined.</td></tr><tr><td><a href="reference-tests.html#f-tests-readme-md"><code>tests/README.md</code></a></td><td>The rules for writing specs: import from <code>@fixtures/index</code>, tag every test, one behaviour per test, no selectors in specs, seed state through the API, and never use <code>waitForTimeout</code>.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-gitkeep"><code>tests/ui/.gitkeep</code></a></td><td>Placeholder keeping <code>tests/ui/</code> in version control.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-account-settings-spec-ts"><code>tests/ui/account-settings.spec.ts</code></a></td><td>Notifications and profile — the two pages the application's catalogue does not cover.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-accounts-spec-ts"><code>tests/ui/accounts.spec.ts</code></a></td><td>Covers TC-ACC-001..006 across three personas, plus the add dialog and the detail page.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-apply-loan-spec-ts"><code>tests/ui/apply-loan.spec.ts</code></a></td><td>Covers TC-LOAN-001..006 — including reproducing the application's planted defect.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-dashboard-spec-ts"><code>tests/ui/dashboard.spec.ts</code></a></td><td>Covers the application's own TC-DASH-001..006, plus the stat cards and every quick action.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-login-spec-ts"><code>tests/ui/login.spec.ts</code></a></td><td>Authentication: the happy path, a wrong password, a suspended account, password visibility, remember-me, and a fixture-integrity check.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-money-movement-spec-ts"><code>tests/ui/money-movement.spec.ts</code></a></td><td>Covers TC-SEND-001..006 and TC-BILL-001..006 — the two external payment flows.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-navigation-spec-ts"><code>tests/ui/navigation.spec.ts</code></a></td><td>The application shell: every sidebar destination, the brand link, the unread badge, responsive behaviour and the skip link.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-transactions-spec-ts"><code>tests/ui/transactions.spec.ts</code></a></td><td>Covers TC-TXN-001..006: loading, search, empty state, account filter, sorting, pagination, the type filter and the CSV export.</td></tr><tr><td><a href="reference-tests.html#f-tests-ui-transfer-spec-ts"><code>tests/ui/transfer.spec.ts</code></a></td><td>Covers TC-XFER-001..006: form loading, validation, the confirmation step, the success page, and the resulting balances.</td></tr><tr><td><a href="reference-tests.html#f-tests-visual-gitkeep"><code>tests/visual/.gitkeep</code></a></td><td>Placeholder for the <code>visual</code> project’s specs.</td></tr><tr><td><a href="reference-tests.html#f-tests-visual-bank-visual-spec-ts"><code>tests/visual/bank.visual.spec.ts</code></a></td><td>Visual regression on the login page, the dashboard cards, the sidebar in both themes, the transfer form and the empty transactions state.</td></tr></tbody></table></div>
+<h2 id="repository-documentation">Repository documentation</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><a href="reference-tests.html#f-docs-architecture-md"><code>docs/ARCHITECTURE.md</code></a></td><td>The concise markdown version of the design rationale, for reading on GitHub without building the documentation site.</td></tr><tr><td><a href="reference-tests.html#f-docs-components-md"><code>docs/COMPONENTS.md</code></a></td><td>The markdown summary of every component and its key methods, for quick lookup in an editor or on GitHub.</td></tr><tr><td><a href="reference-tests.html#f-readme-md"><code>README.md</code></a></td><td>The front door: quick start, the folder map, how a test looks, the command table, environment handling, reporting outputs and links to the deeper documentation.</td></tr></tbody></table></div></div>
+    <footer class="page-foot">
+      <div class="pager">
+        <a class="prev" href="worked-example.html">&larr; Worked example</a><a class="next" href="reference-root.html">Reference: configuration &amp; tooling &rarr;</a>
+      </div>
+      <p>Generated from source by <code>npm run docs</code>. 151 files documented, 331 exports extracted.</p>
+    </footer>
+  </main>
+</div>
+<script>
+document.querySelectorAll('.filter').forEach((input) => {
+  input.addEventListener('input', () => {
+    const term = input.value.toLowerCase();
+    const table = document.getElementById(input.dataset.filterTarget);
+    if (!table) return;
+    for (const row of table.tBodies[0].rows) {
+      row.hidden = term !== '' && !row.textContent.toLowerCase().includes(term);
+    }
+  });
+});
+const navFilter = document.getElementById('nav-filter');
+if (navFilter) {
+  navFilter.addEventListener('input', () => {
+    const term = navFilter.value.toLowerCase();
+    document.querySelectorAll('#toc li').forEach((li) => {
+      li.hidden = term !== '' && !li.textContent.toLowerCase().includes(term);
+    });
+  });
+}
+</script>
+</body>
+</html>

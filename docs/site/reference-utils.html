@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference: utilities, reporters &amp; data — Playwright UI Framework</title>
+<meta name="description" content="Cross-cutting helpers and outputs">
+<style>/* Documentation stylesheet: screen layout, print sheet and PDF cover. */
+
+:root {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f2;
+  --border: #e2e1dd;
+  --border-strong: #cfcec9;
+  --text: #1f1e1c;
+  --text-2: #56544f;
+  --text-3: #82807a;
+  --accent: #b0492c;
+  --accent-soft: #fdf2ee;
+  --code-bg: #f6f5f3;
+  --note: #2f6f8f;
+  --note-bg: #eef5f9;
+  --warn: #a2610a;
+  --warn-bg: #fdf4e6;
+  --rule: #4a6b3d;
+  --rule-bg: #f0f5ed;
+  --sx-comment: #8a867d;
+  --sx-keyword: #9c3f6d;
+  --sx-string: #3d7a52;
+  --sx-number: #96591b;
+  --sx-fn: #2f5f92;
+  --sx-type: #7a4a9e;
+  --sx-prop: #b0492c;
+  --sx-op: #6f6b63;
+  --sx-var: #a1531f;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sidebar-w: 268px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17171a;
+    --surface: #1e1e22;
+    --surface-2: #26262b;
+    --border: #32323a;
+    --border-strong: #43434d;
+    --text: #ecebe7;
+    --text-2: #b3b1aa;
+    --text-3: #8b8981;
+    --accent: #e8825f;
+    --accent-soft: #2c211d;
+    --code-bg: #232329;
+    --note: #7fb6d4;
+    --note-bg: #1c262c;
+    --warn: #d8a552;
+    --warn-bg: #2a2419;
+    --rule: #9dc389;
+    --rule-bg: #1f2620;
+    --sx-comment: #7d7a72;
+    --sx-keyword: #e08bb4;
+    --sx-string: #86c99a;
+    --sx-number: #dfa86a;
+    --sx-fn: #8ab6e8;
+    --sx-type: #c2a0e8;
+    --sx-prop: #e8825f;
+    --sx-op: #9a958b;
+    --sx-var: #e0a06a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  z-index: 10;
+}
+.skip:focus { left: 0; }
+
+/* ---------------------------------------------------------------- layout */
+
+.layout { display: flex; align-items: flex-start; }
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.1rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.brand { display: flex; gap: 0.7rem; align-items: center; }
+.brand-mark {
+  flex: 0 0 34px; height: 34px; border-radius: 8px;
+  background: var(--accent); color: #fff;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px; letter-spacing: 0.02em;
+}
+.brand strong { display: block; font-size: 14px; line-height: 1.25; }
+.brand span { font-size: 12px; color: var(--text-3); }
+
+.filter {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.filter:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.nav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.nav a {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+.nav a:hover { background: var(--surface-2); color: var(--text); }
+.nav a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.sidebar-foot a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.sidebar-foot a:hover { text-decoration: underline; }
+
+main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 900px;
+  padding: 2.6rem clamp(1.1rem, 4vw, 3rem) 4rem;
+}
+
+/* ------------------------------------------------------------- typography */
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 11.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 650;
+}
+
+h1 {
+  margin: 0 0 0.4rem;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.subtitle { margin: 0; color: var(--text-2); font-size: 17px; max-width: 62ch; }
+
+.page-head { padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); margin-bottom: 1.8rem; }
+
+h2 {
+  margin: 2.6rem 0 0.9rem;
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+h3 { margin: 2rem 0 0.6rem; font-size: 1.13rem; font-weight: 650; }
+h4 {
+  margin: 1.2rem 0 0.4rem;
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+
+p { margin: 0.85rem 0; max-width: 74ch; }
+ul, ol { margin: 0.85rem 0; padding-left: 1.35rem; max-width: 74ch; }
+li { margin: 0.3rem 0; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.855em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.08em 0.34em;
+  word-break: break-word;
+}
+
+pre {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 12.9px;
+  line-height: 1.55;
+}
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+figure.code { margin: 1.1rem 0; }
+figure.code figcaption {
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 0 0.35rem 0.15rem;
+  font-weight: 600;
+}
+
+pre.tree {
+  font-size: 12.4px;
+  line-height: 1.5;
+  background: var(--surface);
+}
+
+/* ------------------------------------------------------- syntax highlight */
+
+.tok-c { color: var(--sx-comment); font-style: italic; }
+.tok-k { color: var(--sx-keyword); }
+.tok-s { color: var(--sx-string); }
+.tok-r { color: var(--sx-string); }
+.tok-n { color: var(--sx-number); }
+.tok-f { color: var(--sx-fn); }
+.tok-t { color: var(--sx-type); }
+.tok-p { color: var(--sx-prop); }
+.tok-o { color: var(--sx-op); }
+.tok-v { color: var(--sx-var); }
+.tok-a { color: var(--sx-type); }
+
+figure.code figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+figure.code figcaption .lang {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+  text-transform: none;
+}
+
+/* --------------------------------------------------------------- callouts */
+
+.callout {
+  display: flex;
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  max-width: 74ch;
+}
+.callout p { margin: 0; }
+.callout-tag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding-top: 0.15rem;
+}
+.callout.note { background: var(--note-bg); border-color: color-mix(in srgb, var(--note) 30%, transparent); }
+.callout.note .callout-tag { color: var(--note); }
+.callout.warn { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+.callout.warn .callout-tag { color: var(--warn); }
+.callout.rule { background: var(--rule-bg); border-color: color-mix(in srgb, var(--rule) 32%, transparent); }
+.callout.rule .callout-tag { color: var(--rule); }
+
+/* ----------------------------------------------------------------- tables */
+
+.table-wrap { overflow-x: auto; margin: 1.2rem 0; border: 1px solid var(--border); border-radius: 9px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--surface-2); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-2); font-weight: 650; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface); }
+td code { font-size: 12.2px; }
+
+/* ------------------------------------------------------------------ steps */
+
+ol.steps { list-style: none; counter-reset: step; padding-left: 0; max-width: 78ch; }
+ol.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.2rem;
+  margin: 0.9rem 0;
+}
+ol.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+ol.steps > li > p { margin: 0 0 0.5rem; }
+
+/* ------------------------------------------------------------ file blocks */
+
+.file {
+  margin: 1.6rem 0;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+.file-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.file-head h3 { margin: 0; font-size: 1rem; }
+.file-head code { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); font-size: 13px; }
+.file-meta { font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.file-purpose { margin: 0.7rem 0 0; }
+
+.change { margin-top: 1.1rem; padding-top: 0.6rem; border-top: 1px dashed var(--border); }
+.change ul, .change ol { margin-top: 0.4rem; }
+.change.why p { color: var(--text-2); }
+.related { margin-top: 1rem; font-size: 12.5px; color: var(--text-3); }
+.related code { font-size: 11.8px; }
+
+/* -------------------------------------------------------------------- api */
+
+details.api { margin-top: 1.1rem; border-top: 1px dashed var(--border); padding-top: 0.7rem; }
+details.api > summary {
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+details.api[open] > summary { margin-bottom: 0.8rem; color: var(--text-2); }
+
+.api-item { margin: 0.9rem 0; padding-left: 0.8rem; border-left: 2px solid var(--border); }
+.api-head { display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; }
+.api-head code { background: none; border: 0; padding: 0; font-size: 13px; font-weight: 600; }
+.api-heritage { font-size: 11.5px; color: var(--text-3); font-family: var(--mono); }
+.api-doc { margin: 0.3rem 0 0.4rem; font-size: 13.5px; color: var(--text-2); }
+.api-shape { font-size: 12px; margin-top: 0.4rem; }
+table.api-members { font-size: 13px; margin-top: 0.4rem; }
+table.api-members td { padding: 0.3rem 0.6rem 0.3rem 0; border-bottom: 1px solid var(--border); }
+table.api-members td:first-child { width: 46%; }
+table.api-members code { font-size: 12.1px; }
+
+.badge {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.badge-class, .badge-interface { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 22%, transparent); }
+.badge-function, .badge-fn { background: var(--rule-bg); color: var(--rule); border-color: color-mix(in srgb, var(--rule) 25%, transparent); }
+.badge-type { background: var(--note-bg); color: var(--note); border-color: color-mix(in srgb, var(--note) 25%, transparent); }
+.badge-const { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+
+/* -------------------------------------------------------------------- toc */
+
+.toc {
+  margin: 0 0 2rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.toc h2 {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.toc ul { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 1.6rem; }
+.toc li { break-inside: avoid; margin: 0.18rem 0; }
+.toc a { font-size: 13.4px; text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* ----------------------------------------------------------------- footer */
+
+.page-foot { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-3); }
+.pager { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; font-size: 13.5px; }
+.pager a { text-decoration: none; font-weight: 600; }
+.pager a:hover { text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .layout { flex-direction: column; }
+  .sidebar { position: static; width: 100%; height: auto; flex: none; border-right: 0; border-bottom: 1px solid var(--border); }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .toc ul { columns: 1; }
+  main { padding-top: 1.6rem; }
+}
+
+/* ------------------------------------------------------------ print sheet */
+
+body.print {
+  background: #fff;
+  color: #16150f;
+  font-size: 10.6pt;
+  line-height: 1.5;
+  --sx-comment: #6f6b63;
+  --sx-keyword: #8d3560;
+  --sx-string: #2f6942;
+  --sx-number: #855017;
+  --sx-fn: #295585;
+  --sx-type: #6c3f8f;
+  --sx-prop: #9e3f24;
+  --sx-op: #5e5a53;
+  --sx-var: #8f4718;
+}
+body.print .print-page { padding: 0 0 1.5rem; }
+body.print main, body.print .sidebar { all: unset; }
+body.print h1.print-h1 {
+  font-family: var(--serif);
+  font-size: 21pt;
+  margin: 0 0 0.2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid #16150f;
+}
+body.print h2 { font-size: 14pt; margin-top: 1.4rem; }
+body.print h3 { font-size: 11.6pt; }
+body.print pre { font-size: 8.4pt; background: #f6f5f3; border-color: #ddd; }
+body.print table { font-size: 9pt; }
+body.print .file { border-color: #ddd; }
+body.print table.api-members td:first-child { width: 58%; }
+body.print .api-item { break-inside: auto; }
+body.print .toc, body.print .pager, body.print .skip, body.print .filter { display: none; }
+body.print details.api { display: block; }
+body.print details.api > summary { list-style: none; }
+
+.cover {
+  min-height: 245mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4mm;
+  page-break-after: always;
+  break-after: page;
+}
+.cover h1 { font-size: 40pt; margin: 0.2rem 0 0.6rem; letter-spacing: -0.02em; }
+.cover .eyebrow { font-size: 10pt; letter-spacing: 0.14em; }
+.cover-sub { font-size: 14pt; color: #4a4842; max-width: 30ch; margin: 0 0 3rem; }
+.cover-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); gap: 1.2rem 2rem; margin: 0; border-top: 2px solid #16150f; padding-top: 1.2rem; }
+.cover-meta div { margin: 0; }
+.cover-meta dt { font-size: 8.5pt; letter-spacing: 0.09em; text-transform: uppercase; color: #6d6b64; }
+.cover-meta dd { margin: 0.15rem 0 0; font-size: 13pt; font-weight: 600; }
+
+.contents { page-break-after: always; break-after: page; }
+.print-toc { list-style: none; padding: 0; margin: 1.4rem 0 0; counter-reset: toc; }
+.print-toc li { margin: 0.55rem 0; display: grid; grid-template-columns: 2rem 1fr; gap: 0.2rem 0.6rem; align-items: baseline; }
+.print-toc .num { color: #8a887f; font-variant-numeric: tabular-nums; font-size: 10pt; }
+.print-toc a { font-size: 12.5pt; font-weight: 600; text-decoration: none; color: #16150f; }
+.print-toc .sub { grid-column: 2; font-size: 9.4pt; color: #6d6b64; }
+.print-toc .dots { display: none; }
+
+.print-page { page-break-before: always; break-before: page; }
+.print-page:first-of-type { page-break-before: avoid; break-before: avoid; }
+
+@media print {
+  body.print { background: #fff; }
+  pre, .callout, ol.steps > li, .api-item, tr { page-break-inside: avoid; break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; break-after: avoid; }
+  a { color: #16150f; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">PW</span><div><strong>Playwright UI Framework</strong><span>Documentation v1.0</span></div></div>
+    <input id="nav-filter" class="filter" type="search" placeholder="Filter sections…" aria-label="Filter sections">
+    <nav aria-label="Documentation"><ul class="nav"><li><a href="index.html">Overview</a></li><li><a href="architecture.html">Architecture</a></li><li><a href="worked-example.html">Worked example</a></li><li><a href="structure.html">Project structure</a></li><li><a href="reference-root.html">Reference: configuration &amp; tooling</a></li><li><a href="reference-foundation.html">Reference: config, core &amp; types</a></li><li><a href="reference-components.html">Reference: component library</a></li><li><a href="reference-fixtures.html">Reference: fixtures, hooks, pages &amp; API</a></li><li><a href="reference-utils.html" aria-current="page">Reference: utilities, reporters &amp; data</a></li><li><a href="reference-tests.html">Reference: tests &amp; repository docs</a></li><li><a href="playbooks.html">Playbooks</a></li><li><a href="conventions.html">Conventions</a></li><li><a href="troubleshooting.html">Troubleshooting</a></li><li><a href="api-index.html">API index</a></li><li><a href="glossary.html">Glossary</a></li></ul></nav>
+    <div class="sidebar-foot">
+      <a href="playwright-ui-framework-documentation.pdf" download>Download PDF</a>
+      <span>Generated 2026-09-01</span>
+    </div>
+  </aside>
+  <main id="main">
+    <header class="page-head">
+      <p class="eyebrow">Playwright UI Framework</p>
+      <h1>Reference: utilities, reporters &amp; data</h1>
+      <p class="subtitle">Cross-cutting helpers and outputs</p>
+    </header>
+    <nav class="toc" aria-label="On this page"><h2>On this page</h2><ul id="toc"><li><a href="#utilities-src-utils">Utilities (src/utils)</a></li><li><a href="#reporters-src-reporters">Reporters (src/reporters)</a></li><li><a href="#test-data-src-data">Test data (src/data)</a></li></ul></nav>
+    <div class="content"><h2 id="utilities-src-utils">Utilities (src/utils)</h2>
+
+<section class="file" id="f-src-utils-a11y-utils-ts">
+  <header class="file-head">
+    <h3><code>src/utils/a11y.utils.ts</code></h3>
+    <span class="file-meta">111 lines &middot; 4 exports</span>
+  </header>
+  <p class="file-purpose">Runs axe-core against a page or a subtree, attaches both a JSON and an HTML report to the test result, formats violations into a readable failure message, and fails the test by default when violations are found.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Scoping a scan</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">await</span> <span class="tok-f">scanAccessibility</span>(page, {
+  <span class="tok-p">include</span><span class="tok-o">:</span> [<span class="tok-s">'main'</span>],
+  <span class="tok-p">exclude</span><span class="tok-o">:</span> [<span class="tok-s">'#third-party-widget'</span>],
+  <span class="tok-p">tags</span><span class="tok-o">:</span> [<span class="tok-s">'wcag2a'</span>, <span class="tok-s">'wcag2aa'</span>],
+  <span class="tok-p">disableRules</span><span class="tok-o">:</span> [<span class="tok-s">'color-contrast'</span>],   <span class="tok-c">// temporary, with a ticket</span>
+});</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You change the WCAG level you hold yourself to, need to exclude a third-party region, or want a different report format.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Change <code>DEFAULT_WCAG_TAGS</code> to raise or lower the bar for the whole suite.</p><pre><code><span class="tok-k">export</span> <span class="tok-k">const</span> <span class="tok-t">DEFAULT_WCAG_TAGS</span><span class="tok-o">:</span> <span class="tok-t">WcagTag</span>[] <span class="tok-o">=</span> [<span class="tok-s">'wcag2a'</span>, <span class="tok-s">'wcag2aa'</span>, <span class="tok-s">'wcag21a'</span>, <span class="tok-s">'wcag21aa'</span>, <span class="tok-s">'wcag22aa'</span>];</code></pre></li><li><p>Disable a rule only with a linked ticket and a date, so the exception is temporary by construction.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p><code>failOnViolation</code> defaults to true on purpose: accessibility regressions should break the build, not accumulate in a report nobody opens.</p></div>
+  
+  <p class="related">Related: <code>src/fixtures/custom-matchers.ts</code> &middot; <code>src/core/base.page.ts</code></p>
+  <details class="api"><summary>API surface (4 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>DEFAULT_WCAG_TAGS</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>A11yReport</code></div><pre class="api-shape"><code><span class="tok-p">violations</span><span class="tok-o">:</span> <span class="tok-t">Result</span>[];
+<span class="tok-p">passes</span><span class="tok-o">:</span> <span class="tok-t">number</span>;
+<span class="tok-p">incomplete</span><span class="tok-o">:</span> <span class="tok-t">number</span>;
+<span class="tok-p">summary</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">url</span><span class="tok-o">:</span> <span class="tok-t">string</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">scanAccessibility</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">options</span><span class="tok-o">:</span> <span class="tok-t">A11yScanOptions</span> <span class="tok-o">=</span> {}, testInfo<span class="tok-o">?:</span> <span class="tok-t">TestInfo</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">A11yReport</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Runs an axe-core scan against the current page (or a subtree of it) and attaches a readable report to the test result. <code>failOnViolation</code> defaults to true: accessibility regressions should break the build, not sit in a report nobody opens.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">formatViolations</span>(<span class="tok-p">violations</span><span class="tok-o">:</span> <span class="tok-t">Result</span>[])<span class="tok-o">:</span> <span class="tok-t">string</span></code></div><p class="api-doc">Compact, reviewable rendering of axe violations for the failure message.</p></div></details>
+</section>
+
+<section class="file" id="f-src-utils-browser-utils-ts">
+  <header class="file-head">
+    <h3><code>src/utils/browser.utils.ts</code></h3>
+    <span class="file-meta">235 lines &middot; 22 exports</span>
+  </header>
+  <p class="file-purpose">Everything that happens around the page rather than inside it: opening and switching tabs, handling native dialogs, downloading files, clipboard access, geolocation, freezing the clock, emulating colour scheme and print media, capturing console and page errors, and reading or clearing local storage and cookies.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>The awkward parts, made ordinary</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> popup    <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-f">openNewTab</span>(context, () <span class="tok-o">=&gt;</span> page.<span class="tok-f">click</span>(<span class="tok-s">'#open-report'</span>));
+<span class="tok-k">const</span> dialog   <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-f">handleNextDialog</span>(page, <span class="tok-s">'accept'</span>);       <span class="tok-c">// register BEFORE the action</span>
+<span class="tok-k">const</span> download <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-f">downloadFile</span>(page, () <span class="tok-o">=&gt;</span> page.<span class="tok-f">click</span>(<span class="tok-s">'#export'</span>));
+<span class="tok-k">await</span> <span class="tok-f">freezeTime</span>(page, <span class="tok-k">new</span> <span class="tok-f">Date</span>(<span class="tok-s">'2026-01-15T09:00:00Z'</span>));
+<span class="tok-k">await</span> <span class="tok-f">emulateMedia</span>(page, { <span class="tok-p">colorScheme</span><span class="tok-o">:</span> <span class="tok-s">'dark'</span>, <span class="tok-p">reducedMotion</span><span class="tok-o">:</span> <span class="tok-s">'reduce'</span> });</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You need another browser-level capability — permissions, service workers, HAR recording, CDP access.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the helper here and export it from <code>src/utils/index.ts</code>. If every test needs it, promote it to a fixture instead.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Playwright auto-dismisses dialogs unless a handler is registered first, which is why <code>handleNextDialog</code> must be called before the action that opens one. Encoding that ordering in a helper prevents a subtle and common mistake.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li><code>captureConsole(page, into)</code> records into an existing container — that is how the <code>consoleErrors</code> fixture avoids depending on <code>page</code>.</li></ul></div>
+  <p class="related">Related: <code>src/fixtures/base.fixture.ts</code> &middot; <code>src/components/navigation/link.ts</code></p>
+  <details class="api"><summary>API surface (22 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">openNewTab</span>(<span class="tok-p">context</span><span class="tok-o">:</span> <span class="tok-t">BrowserContext</span>, <span class="tok-p">trigger</span><span class="tok-o">:</span> () <span class="tok-o">=&gt;</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span>, timeout <span class="tok-o">=</span> <span class="tok-t">TIMEOUTS</span>.<span class="tok-t">LONG</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">Page</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Runs <code>trigger</code> and returns the tab/window it opens. Use for <code>target=&quot;_blank&quot;</code> links, OAuth popups and print previews.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">closeOtherTabs</span>(<span class="tok-p">context</span><span class="tok-o">:</span> <span class="tok-t">BrowserContext</span>, <span class="tok-p">keep</span><span class="tok-o">:</span> <span class="tok-t">Page</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">getTabByTitle</span>(<span class="tok-p">context</span><span class="tok-o">:</span> <span class="tok-t">BrowserContext</span>, <span class="tok-p">title</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">Page</span> <span class="tok-o">|</span> <span class="tok-k">undefined</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">switchToTab</span>(<span class="tok-p">context</span><span class="tok-o">:</span> <span class="tok-t">BrowserContext</span>, <span class="tok-p">index</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">Page</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>DialogResult</code></div><pre class="api-shape"><code><span class="tok-k">type</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">message</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">defaultValue</span><span class="tok-o">:</span> <span class="tok-t">string</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">handleNextDialog</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">action</span><span class="tok-o">:</span> <span class="tok-s">'accept'</span> <span class="tok-o">|</span> <span class="tok-s">'dismiss'</span> <span class="tok-o">=</span> <span class="tok-s">'accept'</span>, promptText<span class="tok-o">?:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">DialogResult</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Handles the next native dialog (alert/confirm/prompt/beforeunload) and returns what it said. Playwright auto-dismisses dialogs unless handled, so register this *before* the action that opens one.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">autoHandleDialogs</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">action</span><span class="tok-o">:</span> <span class="tok-s">'accept'</span> <span class="tok-o">|</span> <span class="tok-s">'dismiss'</span> <span class="tok-o">=</span> <span class="tok-s">'accept'</span>)<span class="tok-o">:</span> <span class="tok-k">void</span></code></div><p class="api-doc">Installs a standing handler so dialogs never block a long-running suite.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>DownloadedFile</code></div><pre class="api-shape"><code><span class="tok-p">fileName</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">download</span><span class="tok-o">:</span> <span class="tok-t">Download</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">downloadFile</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">trigger</span><span class="tok-o">:</span> () <span class="tok-o">=&gt;</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span>, timeout <span class="tok-o">=</span> <span class="tok-t">TIMEOUTS</span>.<span class="tok-t">EXTRA_LONG</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">DownloadedFile</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Runs <code>trigger</code>, waits for the download and saves it under test-results.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">grantClipboardAccess</span>(<span class="tok-p">context</span><span class="tok-o">:</span> <span class="tok-t">BrowserContext</span>, origin<span class="tok-o">?:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">readClipboard</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">writeClipboard</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">text</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">setGeolocation</span>(<span class="tok-p">context</span><span class="tok-o">:</span> <span class="tok-t">BrowserContext</span>, <span class="tok-p">latitude</span><span class="tok-o">:</span> <span class="tok-t">number</span>, <span class="tok-p">longitude</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">freezeTime</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">date</span><span class="tok-o">:</span> <span class="tok-t">Date</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Freezes the page clock so time-dependent UI is deterministic.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">emulateMedia</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">options</span><span class="tok-o">:</span> {
+    colorScheme<span class="tok-o">?:</span> <span class="tok-s">'light'</span> <span class="tok-o">|</span> <span class="tok-s">'dark'</span>;
+    reducedMotion<span class="tok-o">?:</span> <span class="tok-s">'reduce'</span> <span class="tok-o">|</span> <span class="tok-s">'no-preference'</span>;
+    media<span class="tok-o">?:</span> <span class="tok-s">'screen'</span> <span class="tok-o">|</span> <span class="tok-s">'print'</span>;
+  })<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>ConsoleCapture</code></div><pre class="api-shape"><code><span class="tok-p">errors</span><span class="tok-o">:</span> <span class="tok-t">string</span>[];
+<span class="tok-p">warnings</span><span class="tok-o">:</span> <span class="tok-t">string</span>[];
+<span class="tok-p">pageErrors</span><span class="tok-o">:</span> <span class="tok-t">string</span>[];
+<span class="tok-p">failedRequests</span><span class="tok-o">:</span> <span class="tok-t">string</span>[];</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">createConsoleCapture</span>()<span class="tok-o">:</span> <span class="tok-t">ConsoleCapture</span></code></div><p class="api-doc">An empty capture container, to be attached to a page later.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">captureConsole</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, into<span class="tok-o">?:</span> <span class="tok-t">ConsoleCapture</span>)<span class="tok-o">:</span> <span class="tok-t">ConsoleCapture</span></code></div><p class="api-doc">Starts recording console errors, uncaught exceptions and failed requests. The returned object mutates as the test runs — assert on it at the end. Pass an existing <code>capture</code> to record into a container created earlier; this is what lets a fixture own the container without depending on the page.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">setLocalStorage</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">key</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">getLocalStorage</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">key</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">null</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">clearBrowserStorage</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">setCookie</span>(<span class="tok-p">context</span><span class="tok-o">:</span> <span class="tok-t">BrowserContext</span>, <span class="tok-p">cookie</span><span class="tok-o">:</span> { <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span>; domain<span class="tok-o">?:</span> <span class="tok-t">string</span>; path<span class="tok-o">?:</span> <span class="tok-t">string</span>; url<span class="tok-o">?:</span> <span class="tok-t">string</span> })<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div></details>
+</section>
+
+<section class="file" id="f-src-utils-data-utils-ts">
+  <header class="file-head">
+    <h3><code>src/utils/data.utils.ts</code></h3>
+    <span class="file-meta">97 lines &middot; 9 exports</span>
+  </header>
+  <p class="file-purpose">Faker-based generation: <code>generateUser()</code> for a complete person, <code>uniqueId()</code> for collision-proof markers, random strings, integers and choices, <code>seedFaker()</code> for reproducibility, and <code>EDGE_CASE_STRINGS</code> — a catalogue of inputs that historically break forms.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Boundary coverage without inventing strings</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">import</span> { <span class="tok-t">EDGE_CASE_STRINGS</span> } <span class="tok-k">from</span> <span class="tok-s">'@utils/data.utils'</span>;
+
+<span class="tok-k">for</span> (<span class="tok-k">const</span> [name, value] <span class="tok-k">of</span> <span class="tok-t">Object</span>.<span class="tok-f">entries</span>(<span class="tok-t">EDGE_CASE_STRINGS</span>)) {
+  <span class="tok-f">test</span>(<span class="tok-s">`name field rejects </span><span class="tok-o">${</span>name<span class="tok-o">}</span><span class="tok-s">`</span>, <span class="tok-k">async</span> ({ ui }) <span class="tok-o">=&gt;</span> { <span class="tok-c">/* ... */</span> });
+}</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>Your domain needs generators (an account number with a checksum, a valid VAT id), or you find a new input that breaks things.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the generator here so every test uses the same valid shape.</p><pre><code><span class="tok-k">export</span> <span class="tok-k">function</span> <span class="tok-f">generateIban</span>(country <span class="tok-o">=</span> <span class="tok-s">'GB'</span>)<span class="tok-o">:</span> <span class="tok-t">string</span> {
+  <span class="tok-k">return</span> <span class="tok-s">`</span><span class="tok-o">${</span>country<span class="tok-o">}</span><span class="tok-s"></span><span class="tok-o">${</span>faker.<span class="tok-t">string</span>.<span class="tok-f">numeric</span>(<span class="tok-n">2</span>)<span class="tok-o">}</span><span class="tok-s">${faker.string.alpha({ length: 4, casing: 'upper' })}</span><span class="tok-o">${</span>faker.<span class="tok-t">string</span>.<span class="tok-f">numeric</span>(<span class="tok-n">14</span>)<span class="tok-o">}</span><span class="tok-s">`</span>;
+}</code></pre></li><li><p>Add new edge cases to <code>EDGE_CASE_STRINGS</code> so every form test inherits the coverage.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Generated data with unique markers is what lets parallel workers run the same test without colliding on a shared record — the most common cause of &quot;passes alone, fails in parallel&quot;.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>The <code>testData</code> fixture seeds faker from the test title, so within a test the sequence is deterministic and reproducible on retry.</li></ul></div>
+  <p class="related">Related: <code>src/fixtures/base.fixture.ts</code></p>
+  <details class="api"><summary>API surface (9 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>GeneratedUser</code></div><pre class="api-shape"><code><span class="tok-p">firstName</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">lastName</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">fullName</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">email</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">username</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">password</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">phone</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">company</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">jobTitle</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">dateOfBirth</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">address</span><span class="tok-o">:</span> { <span class="tok-p">street</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">city</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">state</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">zipCode</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">country</span><span class="tok-o">:</span> <span class="tok-t">string</span>; };</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">seedFaker</span>(<span class="tok-p">seed</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-k">void</span></code></div><p class="api-doc">Seeds faker so a failing run can be reproduced exactly.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">generateUser</span>(<span class="tok-p">overrides</span><span class="tok-o">:</span> <span class="tok-f">Partial</span><span class="tok-o">&lt;</span><span class="tok-t">GeneratedUser</span><span class="tok-o">&gt;</span> <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-t">GeneratedUser</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">uniqueId</span>(prefix <span class="tok-o">=</span> <span class="tok-s">'e2e'</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div><p class="api-doc">Unique, human-readable id — safe to use as a test-data marker.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">randomString</span>(length <span class="tok-o">=</span> <span class="tok-n">10</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">randomInt</span>(<span class="tok-p">min</span><span class="tok-o">:</span> <span class="tok-t">number</span>, <span class="tok-p">max</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-t">number</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">randomFrom</span>(<span class="tok-p">items</span><span class="tok-o">:</span> <span class="tok-k">readonly</span> <span class="tok-t">T</span>[])<span class="tok-o">:</span> <span class="tok-t">T</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>EDGE_CASE_STRINGS</code></div><p class="api-doc">Strings that historically break form inputs — for boundary/negative coverage.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>faker</code><span class="api-heritage">from </span></div></div></details>
+</section>
+
+<section class="file" id="f-src-utils-date-utils-ts">
+  <header class="file-head">
+    <h3><code>src/utils/date.utils.ts</code></h3>
+    <span class="file-meta">91 lines &middot; 8 exports</span>
+  </header>
+  <p class="file-purpose">Dependency-free, locale-independent date handling: ISO formatting, shifting by day/week/month/year, relative dates, token formatting (<code>YYYY-MM-DD</code>, <code>DD/MM/YYYY</code>, <code>MMMM YYYY</code>), same-day comparison and human-readable durations.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You need a token the formatter does not support, or timezone-aware handling.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the token to the replacement map and to the regular expression in <code>format</code>. For timezone-sensitive assertions, freeze the clock instead of computing offsets.</p><pre><code><span class="tok-k">await</span> <span class="tok-f">freezeTime</span>(page, <span class="tok-k">new</span> <span class="tok-f">Date</span>(<span class="tok-s">'2026-01-15T09:00:00Z'</span>));</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Tests that compute &quot;today&quot; against a live clock fail at midnight and on daylight-saving boundaries. Freezing the page clock makes date-dependent UI deterministic.</p></div>
+  
+  <p class="related">Related: <code>src/components/form/date-picker.ts</code> &middot; <code>src/utils/browser.utils.ts</code></p>
+  <details class="api"><summary>API surface (8 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>DateUnit</code></div><pre class="api-shape"><code><span class="tok-s">'day'</span> <span class="tok-o">|</span> <span class="tok-s">'week'</span> <span class="tok-o">|</span> <span class="tok-s">'month'</span> <span class="tok-o">|</span> <span class="tok-s">'year'</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">toIsoDate</span>(<span class="tok-p">date</span><span class="tok-o">:</span> <span class="tok-t">Date</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div><p class="api-doc">ISO date portion only: 2026-08-31</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">today</span>()<span class="tok-o">:</span> <span class="tok-t">Date</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">shift</span>(<span class="tok-p">date</span><span class="tok-o">:</span> <span class="tok-t">Date</span>, <span class="tok-p">amount</span><span class="tok-o">:</span> <span class="tok-t">number</span>, <span class="tok-p">unit</span><span class="tok-o">:</span> <span class="tok-t">DateUnit</span>)<span class="tok-o">:</span> <span class="tok-t">Date</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">daysFromNow</span>(<span class="tok-p">days</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-t">Date</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">format</span>(<span class="tok-p">date</span><span class="tok-o">:</span> <span class="tok-t">Date</span>, pattern <span class="tok-o">=</span> <span class="tok-s">'YYYY-MM-DD'</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div><p class="api-doc">Formats a date with a token string: YYYY, MM, DD, HH, mm, ss, MMM, MMMM, D, M. Deliberately dependency-free and locale-independent.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">isSameDay</span>(<span class="tok-p">a</span><span class="tok-o">:</span> <span class="tok-t">Date</span>, <span class="tok-p">b</span><span class="tok-o">:</span> <span class="tok-t">Date</span>)<span class="tok-o">:</span> <span class="tok-t">boolean</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">humanizeDuration</span>(<span class="tok-p">ms</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div><p class="api-doc">Human-readable elapsed time, for logs and reports.</p></div></details>
+</section>
+
+<section class="file" id="f-src-utils-file-utils-ts">
+  <header class="file-head">
+    <h3><code>src/utils/file.utils.ts</code></h3>
+    <span class="file-meta">130 lines &middot; 14 exports</span>
+  </header>
+  <p class="file-purpose">Reading JSON, CSV and Excel test data; resolving paths against the data directory; creating temporary and exact-size files for upload tests; checking existence; waiting for a download to stabilise; deleting; listing; and writing JSON.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Data-driven from a spreadsheet the business maintains</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> cases <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-f">readExcel</span><span class="tok-o">&lt;</span>{ <span class="tok-p">input</span><span class="tok-o">:</span> <span class="tok-t">string</span>; <span class="tok-p">expected</span><span class="tok-o">:</span> <span class="tok-t">string</span> }<span class="tok-o">&gt;</span>(<span class="tok-s">'pricing-cases.xlsx'</span>);
+<span class="tok-k">for</span> (<span class="tok-k">const</span> row <span class="tok-k">of</span> cases) {
+  <span class="tok-f">test</span>(<span class="tok-s">`prices </span><span class="tok-o">${</span>row.input<span class="tok-o">}</span><span class="tok-s">`</span>, <span class="tok-k">async</span> () <span class="tok-o">=&gt;</span> { <span class="tok-c">/* ... */</span> });
+}</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a data format, or need a new file-based helper.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the reader beside the others and route it through <code>resolveDataPath</code> so callers can pass a name relative to <code>src/data</code>.</p></li><li><p>For size-boundary upload tests, generate the file rather than committing a large binary.</p><pre><code><span class="tok-k">const</span> oversize <span class="tok-o">=</span> <span class="tok-k">await</span> <span class="tok-f">createFileOfSize</span>(<span class="tok-s">'over-limit.pdf'</span>, <span class="tok-n">11</span> <span class="tok-o">*</span> <span class="tok-n">1024</span> <span class="tok-o">*</span> <span class="tok-n">1024</span>);</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p><code>waitForStableFile</code> waits until a file exists and stops growing, which is the only reliable definition of &quot;the download finished&quot; — file existence alone races the writer.</p></div>
+  
+  <p class="related">Related: <code>src/components/form/file-upload.ts</code> &middot; <code>src/types/xlsx-populate.d.ts</code></p>
+  <details class="api"><summary>API surface (14 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">ensureDir</span>(<span class="tok-p">dir</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">resolveDataPath</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div><p class="api-doc">Resolves a path against the test-data directory when it is not absolute.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">readJson</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">writeJson</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">data</span><span class="tok-o">:</span> <span class="tok-t">unknown</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">readCsv</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span>[]<span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">readExcel</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">sheet</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">number</span> <span class="tok-o">=</span> <span class="tok-n">0</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span>[]<span class="tok-o">&gt;</span></code></div><p class="api-doc">Reads a spreadsheet into row objects keyed by the header row. Business teams hand over test cases as .xlsx far more often than as JSON.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">readText</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">createTempFile</span>(<span class="tok-p">fileName</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">content</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">Buffer</span> <span class="tok-o">=</span> <span class="tok-s">'playwright upload test'</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Creates a throwaway file for upload testing and returns its absolute path.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">createFileOfSize</span>(<span class="tok-p">fileName</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">bytes</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Creates a file of an exact size — for max-upload-size boundary checks.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">fileExists</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">waitForStableFile</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>, timeout <span class="tok-o">=</span> <span class="tok-n">30_000</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Waits for a file to appear and stop growing — i.e. a download that finished.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">deleteIfExists</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">getFileSize</span>(<span class="tok-p">filePath</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">number</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">listFiles</span>(<span class="tok-p">dir</span><span class="tok-o">:</span> <span class="tok-t">string</span>, extension<span class="tok-o">?:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>[]<span class="tok-o">&gt;</span></code></div></div></details>
+</section>
+
+<section class="file" id="f-src-utils-index-ts">
+  <header class="file-head">
+    <h3><code>src/utils/index.ts</code></h3>
+    <span class="file-meta">88 lines &middot; 10 exports</span>
+  </header>
+  <p class="file-purpose">Re-exports every utility so consumers import from <code>@utils/index</code> rather than reaching into individual files.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a utility or a new utility module.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the named export. Keep internal helpers unexported so the public surface stays intentional.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>One import path keeps utilities discoverable through editor autocomplete instead of requiring people to know the file layout.</p></div>
+  
+  <p class="related">Related: <code>src/utils/logger.ts</code></p>
+  <details class="api"><summary>API surface (10 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>logger, createLogger, Logger</code><span class="api-heritage">from './logger'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>retry, sleep, waitUntil, withTimeout</code><span class="api-heritage">from './retry.utils'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>faker, seedFaker, generateUser, uniqueId, randomString, randomInt, randomFrom, EDGE_CASE_STRINGS, GeneratedUser</code><span class="api-heritage">from './data.utils'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>ensureDir, readJson, writeJson, readCsv, readExcel, readText, resolveDataPath, createTempFile, createFileOfSize, fileExists, waitForStableFile, deleteIfExists, getFileSize, listFiles</code><span class="api-heritage">from './file.utils'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>normalizeText, extractNumber, extractNumbers, containsIgnoreCase, toKebabCase, truncate, escapeRegExp, mask, stripCurrency</code><span class="api-heritage">from './string.utils'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>toIsoDate, today, shift, daysFromNow, format, isSameDay, humanizeDuration</code><span class="api-heritage">from './date.utils'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>NetworkHelper, DEFAULT_BLOCKED_HOSTS</code><span class="api-heritage">from './network.utils'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>openNewTab, closeOtherTabs, getTabByTitle, switchToTab, handleNextDialog, autoHandleDialogs, downloadFile, grantClipboardAccess, readClipboard, writeClipboard, setGeolocation, freezeTime, emulateMedia, captureConsole, createConsoleCapture, setLocalStorage, getLocalStorage, clearBrowserStorage, setCookie, ConsoleCapture, DialogResult, DownloadedFile</code><span class="api-heritage">from './browser.utils'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>scanAccessibility, formatViolations, DEFAULT_WCAG_TAGS, A11yReport</code><span class="api-heritage">from './a11y.utils'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>stabilizePage, comparePage, compareElement, compareResponsive, DEFAULT_MASK_SELECTORS</code><span class="api-heritage">from './visual.utils'</span></div></div></details>
+</section>
+
+<section class="file" id="f-src-utils-logger-ts">
+  <header class="file-head">
+    <h3><code>src/utils/logger.ts</code></h3>
+    <span class="file-meta">138 lines &middot; 3 exports</span>
+  </header>
+  <p class="file-purpose">Structured logging with console and file output, deliberately dependency-free. Five levels (<code>error</code>, <code>warn</code>, <code>info</code>, <code>debug</code>, <code>trace</code>), nested scopes, colour when attached to a terminal, and JSON-lines files at <code>test-results/logs/test-run.log</code> and <code>errors.log</code>.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Scoped logging</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> log <span class="tok-o">=</span> <span class="tok-f">createLogger</span>(<span class="tok-s">'CheckoutPage'</span>);
+log.<span class="tok-f">info</span>(<span class="tok-s">'Applying discount'</span>, { <span class="tok-p">code</span><span class="tok-o">:</span> <span class="tok-s">'SAVE20'</span> });
+log.<span class="tok-f">child</span>(<span class="tok-s">'promo'</span>).<span class="tok-f">debug</span>(<span class="tok-s">'Server responded'</span>, { <span class="tok-p">status</span><span class="tok-o">:</span> <span class="tok-n">200</span> });   <span class="tok-c">// scope: CheckoutPage:promo</span></code></pre></figure>
+<aside class="callout note"><span class="callout-tag">Note</span><div>Errors and warnings go to stderr; everything else to stdout, so CI error streams stay signal-only.</div></aside>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You need a new destination (a log aggregator), a different format, or an extra field on every line.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add a sink and write to it in <code>emit</code>. Keep every write inside a guard — logging must never be the reason a test fails.</p><pre><code><span class="tok-k">class</span> <span class="tok-t">HttpSink</span> {
+  <span class="tok-f">write</span>(<span class="tok-p">line</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-k">void</span> {
+    <span class="tok-k">void</span> <span class="tok-f">fetch</span>(process.env.<span class="tok-t">LOG_ENDPOINT</span><span class="tok-o">!</span>, { <span class="tok-p">method</span><span class="tok-o">:</span> <span class="tok-s">'POST'</span>, <span class="tok-p">body</span><span class="tok-o">:</span> line }).<span class="tok-k">catch</span>(() <span class="tok-o">=&gt;</span> <span class="tok-k">undefined</span>);
+  }
+}</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>General-purpose logging libraries pull in stream polyfills that break across Node releases; a test framework cannot afford a logger that fails to load. Everything needed here is a few dozen lines.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Workers are separate processes, so log lines from parallel tests interleave. The <code>pid</code> field on every record is how you separate them.</li></ul></div>
+  <p class="related">Related: <code>src/config/env.config.ts</code> &middot; <code>src/fixtures/base.fixture.ts</code></p>
+  <details class="api"><summary>API surface (3 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>Logger</code></div><pre class="api-shape"><code><span class="tok-f">error</span>(<span class="tok-p">message</span><span class="tok-o">:</span> <span class="tok-t">string</span>, meta<span class="tok-o">?:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">unknown</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-k">void</span>;
+<span class="tok-f">warn</span>(<span class="tok-p">message</span><span class="tok-o">:</span> <span class="tok-t">string</span>, meta<span class="tok-o">?:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">unknown</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-k">void</span>;
+<span class="tok-f">info</span>(<span class="tok-p">message</span><span class="tok-o">:</span> <span class="tok-t">string</span>, meta<span class="tok-o">?:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">unknown</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-k">void</span>;
+<span class="tok-f">debug</span>(<span class="tok-p">message</span><span class="tok-o">:</span> <span class="tok-t">string</span>, meta<span class="tok-o">?:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">unknown</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-k">void</span>;
+<span class="tok-f">trace</span>(<span class="tok-p">message</span><span class="tok-o">:</span> <span class="tok-t">string</span>, meta<span class="tok-o">?:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">unknown</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-k">void</span>;
+<span class="tok-f">child</span>(<span class="tok-p">scope</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">Logger</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>logger</code></div><p class="api-doc">Framework-wide logger. Prefer <code>createLogger('Scope')</code> inside components.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">createLogger</span>(<span class="tok-p">scope</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">Logger</span></code></div></div></details>
+</section>
+
+<section class="file" id="f-src-utils-network-utils-ts">
+  <header class="file-head">
+    <h3><code>src/utils/network.utils.ts</code></h3>
+    <span class="file-meta">155 lines &middot; 2 exports</span>
+  </header>
+  <p class="file-purpose">The network control surface for a page or context: <code>mock</code> a response, <code>modifyResponse</code> to rewrite a real one, <code>abort</code> to simulate failure, <code>delay</code> to exercise loading states, block heavy assets or third-party trackers, capture and search requests, wait for a specific response, and toggle offline.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Testing states that are hard to reproduce for real</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">await</span> network.<span class="tok-f">mock</span>(<span class="tok-s">'**/api/cart'</span>, { <span class="tok-p">status</span><span class="tok-o">:</span> <span class="tok-n">500</span>, <span class="tok-p">body</span><span class="tok-o">:</span> { <span class="tok-p">message</span><span class="tok-o">:</span> <span class="tok-s">'Server error'</span> } });
+<span class="tok-k">await</span> network.<span class="tok-f">delay</span>(<span class="tok-s">'**/api/search*'</span>, <span class="tok-n">3000</span>);        <span class="tok-c">// prove the spinner appears</span>
+<span class="tok-k">await</span> network.<span class="tok-f">abort</span>(<span class="tok-s">'**/api/recommendations'</span>);      <span class="tok-c">// prove the page survives a dead widget</span>
+<span class="tok-k">await</span> network.<span class="tok-f">setOffline</span>(<span class="tok-k">true</span>);                     <span class="tok-c">// offline banner</span></code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You need a new interception pattern — conditional mocking, recording to a fixture file, replaying a HAR.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the method to the class so it is available through the <code>network</code> fixture everywhere.</p><pre><code><span class="tok-k">async</span> <span class="tok-f">mockOnce</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>, <span class="tok-p">response</span><span class="tok-o">:</span> <span class="tok-f">MockResponse</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span> {
+  <span class="tok-k">await</span> <span class="tok-k">this</span>.target.<span class="tok-f">route</span>(pattern, <span class="tok-k">async</span> (route) <span class="tok-o">=&gt;</span> {
+    <span class="tok-k">await</span> route.<span class="tok-f">fulfill</span>({ <span class="tok-p">status</span><span class="tok-o">:</span> response.status <span class="tok-o">??</span> <span class="tok-n">200</span>, <span class="tok-p">body</span><span class="tok-o">:</span> <span class="tok-t">JSON</span>.<span class="tok-f">stringify</span>(response.body) });
+    <span class="tok-k">await</span> <span class="tok-k">this</span>.target.<span class="tok-f">unroute</span>(pattern);
+  });
+}</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Error states, slow responses and third-party outages are extremely hard to reproduce against a real backend and trivial to reproduce here — which is what makes those paths testable at all.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>The <code>network</code> fixture resets routes after each test, so a mock cannot leak into the next one.</li><li>Blocking third parties speeds runs and removes a large source of flakiness, but do not block them in tests whose purpose is the integration.</li></ul></div>
+  <p class="related">Related: <code>src/fixtures/base.fixture.ts</code> &middot; <code>src/types/index.ts</code></p>
+  <details class="api"><summary>API surface (2 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>NetworkHelper</code></div><p class="api-doc">Network control surface for a page or context: stub responses, simulate failures and latency, and record traffic for assertions.</p><table class="api-members"><tbody><tr><td><code><span class="tok-f">mock</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">UrlMatcher</span>, <span class="tok-p">response</span><span class="tok-o">:</span> <span class="tok-f">MockResponse</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Replaces matching requests with a canned response.</td></tr><tr><td><code><span class="tok-f">modifyResponse</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">UrlMatcher</span>, <span class="tok-p">transform</span><span class="tok-o">:</span> (<span class="tok-p">body</span><span class="tok-o">:</span> <span class="tok-t">T</span>, <span class="tok-p">response</span><span class="tok-o">:</span> <span class="tok-t">APIResponse</span>) <span class="tok-o">=&gt;</span> <span class="tok-t">T</span> <span class="tok-o">|</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Lets the request hit the server, then rewrites the response body.</td></tr><tr><td><code><span class="tok-f">abort</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">UrlMatcher</span>, <span class="tok-p">errorCode</span><span class="tok-o">:</span> <span class="tok-f">Parameters</span><span class="tok-o">&lt;</span><span class="tok-t">Route</span>[<span class="tok-s">'abort'</span>]<span class="tok-o">&gt;</span>[<span class="tok-n">0</span>] <span class="tok-o">=</span> <span class="tok-s">'failed'</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Aborts matching requests — offline behaviour, dead CDN, blocked analytics.</td></tr><tr><td><code><span class="tok-f">delay</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">UrlMatcher</span>, <span class="tok-p">ms</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Adds latency without changing the payload — for spinner/skeleton coverage.</td></tr><tr><td><code><span class="tok-f">blockHeavyAssets</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Blocks images/fonts/media to speed up non-visual runs.</td></tr><tr><td><code><span class="tok-f">blockThirdParty</span>(<span class="tok-p">hosts</span><span class="tok-o">:</span> <span class="tok-t">string</span>[] <span class="tok-o">=</span> <span class="tok-t">DEFAULT_BLOCKED_HOSTS</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Blocks common third-party trackers that add noise and flakiness.</td></tr><tr><td><code><span class="tok-f">startCapture</span>(filter<span class="tok-o">?:</span> <span class="tok-t">UrlMatcher</span>)<span class="tok-o">:</span> <span class="tok-k">void</span></code></td><td>Starts recording every request for later assertion.</td></tr><tr><td><code><span class="tok-k">get</span> <span class="tok-p">requests</span><span class="tok-o">:</span> <span class="tok-k">readonly</span> <span class="tok-t">CapturedRequest</span>[]</code></td><td></td></tr><tr><td><code><span class="tok-f">findRequests</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">UrlMatcher</span>)<span class="tok-o">:</span> <span class="tok-t">CapturedRequest</span>[]</code></td><td></td></tr><tr><td><code><span class="tok-f">clearCapture</span>()<span class="tok-o">:</span> <span class="tok-k">void</span></code></td><td></td></tr><tr><td><code><span class="tok-f">reset</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Removes every route handler installed on the target.</td></tr><tr><td><code><span class="tok-f">waitForResponse</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">UrlMatcher</span>, <span class="tok-p">options</span><span class="tok-o">:</span> { timeout<span class="tok-o">?:</span> <span class="tok-t">number</span>; status<span class="tok-o">?:</span> <span class="tok-t">number</span> } <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">Response</span><span class="tok-o">&gt;</span></code></td><td>Waits for the response of a specific call — e.g. the save that a click triggers.</td></tr><tr><td><code><span class="tok-f">setOffline</span>(<span class="tok-p">offline</span><span class="tok-o">:</span> <span class="tok-t">boolean</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Simulates going offline (context-level only).</td></tr></tbody></table></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>DEFAULT_BLOCKED_HOSTS</code></div></div></details>
+</section>
+
+<section class="file" id="f-src-utils-retry-utils-ts">
+  <header class="file-head">
+    <h3><code>src/utils/retry.utils.ts</code></h3>
+    <span class="file-meta">87 lines &middot; 4 exports</span>
+  </header>
+  <p class="file-purpose"><code>sleep</code>, <code>retry</code> with exponential backoff and a selective <code>retryOn</code> predicate, <code>waitUntil</code> for polling a condition, and <code>withTimeout</code> for bounding any promise.</p>
+  <aside class="callout warn"><span class="callout-tag">Careful</span><div>These are for genuinely flaky boundaries — a third-party widget, a download that occasionally 502s. They are not a substitute for a web-first assertion; prefer Playwright’s auto-waiting and <code>expect.poll</code> first.</div></aside>
+<figure class="code" data-lang="ts"><figcaption><span>Selective retry</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">await</span> <span class="tok-f">retry</span>(
+  () <span class="tok-o">=&gt;</span> api.<span class="tok-f">post</span>(<span class="tok-s">'/reports'</span>, { <span class="tok-k">type</span><span class="tok-o">:</span> <span class="tok-s">'monthly'</span> }),
+  { <span class="tok-p">attempts</span><span class="tok-o">:</span> <span class="tok-n">3</span>, <span class="tok-p">delayMs</span><span class="tok-o">:</span> <span class="tok-n">500</span>, <span class="tok-p">retryOn</span><span class="tok-o">:</span> (error) <span class="tok-o">=&gt;</span> error.message.<span class="tok-f">includes</span>(<span class="tok-s">'503'</span>) },
+  <span class="tok-s">'monthly report generation'</span>,
+);</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You need a different backoff strategy, jitter, or a shared default policy.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Extend <code>RetryPolicy</code> in <code>src/types/index.ts</code> and honour the new field in <code>retry</code>.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A retry that wraps every failure hides real bugs; <code>retryOn</code> is what keeps retrying honest by failing fast on errors that will never succeed.</p></div>
+  
+  <p class="related">Related: <code>src/types/index.ts</code></p>
+  <details class="api"><summary>API surface (4 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">sleep</span>(<span class="tok-p">ms</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">retry</span>(<span class="tok-p">operation</span><span class="tok-o">:</span> () <span class="tok-o">=&gt;</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span>, <span class="tok-p">policy</span><span class="tok-o">:</span> <span class="tok-f">Partial</span><span class="tok-o">&lt;</span><span class="tok-t">RetryPolicy</span><span class="tok-o">&gt;</span> <span class="tok-o">=</span> {}, description <span class="tok-o">=</span> <span class="tok-s">'operation'</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Retries an operation with exponential backoff. Intended for genuinely flaky boundaries — a third-party widget that needs a second click, a download that occasionally 502s. It is NOT a substitute for a proper web-first assertion; prefer <code>expect.poll</code> / auto-waiting first.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">waitUntil</span>(<span class="tok-p">condition</span><span class="tok-o">:</span> () <span class="tok-o">=&gt;</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span> <span class="tok-o">|</span> <span class="tok-t">boolean</span>, <span class="tok-p">options</span><span class="tok-o">:</span> { timeout<span class="tok-o">?:</span> <span class="tok-t">number</span>; interval<span class="tok-o">?:</span> <span class="tok-t">number</span>; message<span class="tok-o">?:</span> <span class="tok-t">string</span> } <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Polls <code>condition</code> until it returns true or the timeout elapses.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">withTimeout</span>(<span class="tok-p">promise</span><span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span>, <span class="tok-p">timeout</span><span class="tok-o">:</span> <span class="tok-t">number</span>, message <span class="tok-o">=</span> <span class="tok-s">'Operation timed out'</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">T</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Rejects if the promise has not settled within <code>timeout</code>.</p></div></details>
+</section>
+
+<section class="file" id="f-src-utils-string-utils-ts">
+  <header class="file-head">
+    <h3><code>src/utils/string.utils.ts</code></h3>
+    <span class="file-meta">47 lines &middot; 9 exports</span>
+  </header>
+  <p class="file-purpose"><code>normalizeText</code> (collapse whitespace — DOM text is messy), <code>extractNumber</code> and <code>extractNumbers</code> (parse &quot;$1,234.50&quot;), case-insensitive contains, kebab-case, truncate, regex escaping, secret masking for logs, and currency stripping.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>Your application formats values in a way the parsers do not handle — a different decimal separator, a suffix like &quot;1.2k&quot;.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Extend the parser here rather than in the assertion, so every test parses the same way.</p><pre><code><span class="tok-k">export</span> <span class="tok-k">function</span> <span class="tok-f">parseCompactNumber</span>(<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">number</span> {
+  <span class="tok-k">const</span> match <span class="tok-o">=</span> <span class="tok-r">/^([\d.]+)([km])$/i</span>.<span class="tok-f">exec</span>(value.<span class="tok-f">trim</span>());
+  <span class="tok-k">if</span> (<span class="tok-o">!</span>match) <span class="tok-k">return</span> <span class="tok-f">extractNumber</span>(value);
+  <span class="tok-k">return</span> <span class="tok-f">Number</span>(match[<span class="tok-n">1</span>]) <span class="tok-o">*</span> (match[<span class="tok-n">2</span>].<span class="tok-f">toLowerCase</span>() <span class="tok-o">===</span> <span class="tok-s">'k'</span> <span class="tok-o">?</span> <span class="tok-n">1_000</span> <span class="tok-o">:</span> <span class="tok-n">1_000_000</span>);
+}</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Rendered text carries non-breaking spaces, line breaks and indentation. Normalising once removes an entire class of confusing string-comparison failures.</p></div>
+  
+  <p class="related">Related: <code>src/core/base.component.ts</code> &middot; <code>src/fixtures/custom-matchers.ts</code></p>
+  <details class="api"><summary>API surface (9 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">normalizeText</span>(<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">null</span> <span class="tok-o">|</span> <span class="tok-k">undefined</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div><p class="api-doc">Collapses all whitespace runs to single spaces and trims — DOM text is messy.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">extractNumber</span>(<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">null</span> <span class="tok-o">|</span> <span class="tok-k">undefined</span>)<span class="tok-o">:</span> <span class="tok-t">number</span></code></div><p class="api-doc">Strips everything but digits, dot and minus, then parses. Handles &quot;$1,234.50&quot;.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">extractNumbers</span>(<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">null</span> <span class="tok-o">|</span> <span class="tok-k">undefined</span>)<span class="tok-o">:</span> <span class="tok-t">number</span>[]</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">containsIgnoreCase</span>(<span class="tok-p">haystack</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">needle</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">boolean</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">toKebabCase</span>(<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">truncate</span>(<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span>, maxLength <span class="tok-o">=</span> <span class="tok-n">80</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">escapeRegExp</span>(<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div><p class="api-doc">Escapes a string for safe use inside a regular expression.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">mask</span>(<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span>, visible <span class="tok-o">=</span> <span class="tok-n">2</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div><p class="api-doc">Masks a secret for logging: &quot;supersecret&quot; -&gt; &quot;su*******et&quot;.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">stripCurrency</span>(<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">string</span></code></div></div></details>
+</section>
+
+<section class="file" id="f-src-utils-visual-utils-ts">
+  <header class="file-head">
+    <h3><code>src/utils/visual.utils.ts</code></h3>
+    <span class="file-meta">82 lines &middot; 5 exports</span>
+  </header>
+  <p class="file-purpose"><code>stabilizePage</code> (disable animations and transitions, hide the caret, wait for fonts), <code>comparePage</code>, <code>compareElement</code> and <code>compareResponsive</code> across several widths, plus <code>DEFAULT_MASK_SELECTORS</code> for regions that legitimately change between runs.</p>
+  <aside class="callout note"><span class="callout-tag">Note</span><div>Prefer <code>compareElement</code> over <code>comparePage</code>. Component-level baselines fail for one reason; full-page baselines fail for any reason.</div></aside>
+<figure class="code" data-lang="ts"><figcaption><span>Masking dynamic regions</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">export</span> <span class="tok-k">const</span> <span class="tok-t">DEFAULT_MASK_SELECTORS</span> <span class="tok-o">=</span> [
+  <span class="tok-s">'[data-testid=&quot;timestamp&quot;]'</span>,
+  <span class="tok-s">'[data-visual-ignore]'</span>,
+  <span class="tok-s">'.dynamic-date'</span>,
+  <span class="tok-s">'video'</span>,
+];</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>A new dynamic region causes false diffs, or the tolerance needs adjusting.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the selector to <code>DEFAULT_MASK_SELECTORS</code>, or ask for <code>data-visual-ignore</code> on the element — that attribute is already masked everywhere.</p></li><li><p>Update baselines deliberately, and review the images in the pull request.</p><pre><code><span class="tok-f">npm</span> run test:visual:update</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Baselines are OS- and browser-specific, which is why the <code>visual</code> project is pinned to one browser and viewport and the CI job to one runner image. Changing either invalidates every screenshot.</p></div>
+  
+  <p class="related">Related: <code>playwright.config.ts</code> &middot; <code>.github/workflows/playwright.yml</code></p>
+  <details class="api"><summary>API surface (5 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>DEFAULT_MASK_SELECTORS</code></div><p class="api-doc">Elements that are expected to differ between runs and must be masked out of every screenshot comparison. Extend per application.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">stabilizePage</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Stops CSS animations/transitions and hides caret so shots are deterministic.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">comparePage</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">options</span><span class="tok-o">:</span> <span class="tok-t">VisualCompareOptions</span> <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Full-page visual baseline check with sane, shared defaults.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">compareElement</span>(<span class="tok-p">locator</span><span class="tok-o">:</span> <span class="tok-t">Locator</span>, <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">options</span><span class="tok-o">:</span> <span class="tok-t">VisualCompareOptions</span> <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Component-level baseline — far less brittle than full-page shots.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">compareResponsive</span>(<span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span>, <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">widths</span><span class="tok-o">:</span> <span class="tok-t">number</span>[] <span class="tok-o">=</span> [<span class="tok-n">375</span>, <span class="tok-n">768</span>, <span class="tok-n">1280</span>, <span class="tok-n">1920</span>])<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></div><p class="api-doc">Captures the same view at several widths — responsive regression coverage.</p></div></details>
+</section>
+<h2 id="reporters-src-reporters">Reporters (src/reporters)</h2>
+
+<section class="file" id="f-src-reporters-index-ts">
+  <header class="file-head">
+    <h3><code>src/reporters/index.ts</code></h3>
+    <span class="file-meta">2 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">Re-exports the summary reporter for programmatic use.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a reporter.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the export, and register the reporter by path in <code>playwright.config.ts</code> — Playwright loads reporters by file path, not by import.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Keeps the reporter list discoverable next to the code that implements it.</p></div>
+  
+  <p class="related">Related: <code>src/reporters/summary.reporter.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>SummaryReporter</code><span class="api-heritage">from './summary.reporter'</span></div></div></details>
+</section>
+
+<section class="file" id="f-src-reporters-summary-reporter-ts">
+  <header class="file-head">
+    <h3><code>src/reporters/summary.reporter.ts</code></h3>
+    <span class="file-meta">152 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">A custom Playwright reporter that prints a compact end-of-run summary and writes <code>reports/summary.json</code> containing totals, every failure with its first error line, flaky tests, the five slowest tests and the full test list with tags and durations.</p>
+  <h3 id="expected-failures-are-passes">Expected failures are passes</h3>
+<figure class="code" data-lang="ts"><figcaption><span>The outcome, not the raw status</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> met <span class="tok-o">=</span> result.status <span class="tok-o">===</span> test.expectedStatus;
+<span class="tok-k">const</span> outcome <span class="tok-o">=</span>
+  met <span class="tok-o">&amp;&amp;</span> result.status <span class="tok-o">===</span> <span class="tok-s">'failed'</span> <span class="tok-o">?</span> <span class="tok-s">'passed'</span>
+  <span class="tok-o">:</span> <span class="tok-o">!</span>met <span class="tok-o">&amp;&amp;</span> result.status <span class="tok-o">===</span> <span class="tok-s">'passed'</span> <span class="tok-o">?</span> <span class="tok-s">'failed'</span>
+  <span class="tok-o">:</span> result.status;</code></pre></figure>
+<p>A test annotated <code>test.fail()</code> is <strong>expected</strong> to fail, and Playwright records that in <code>test.expectedStatus</code>. Its raw <code>result.status</code> is still <code>failed</code>, so counting that directly reports a green run as red — which is exactly what happened once the suite began recording known defects this way.</p>
+<p>The stored status is therefore the *outcome*: whether the result matched what was expected. An expected failure is a pass; an unexpectedly <strong>passing</strong> <code>test.fail()</code> is a failure — which is the whole point of the annotation, because it means the defect has been fixed and the annotation should be removed.</p>
+<aside class="callout note"><span class="callout-tag">Note</span><div><code>expectedFailure</code> is recorded per test, so a pipeline can report &quot;111 passed, 4 of them documented defects&quot; rather than hiding the distinction.</div></aside>
+<figure class="code" data-lang="ts"><figcaption><span>Consuming the summary in CI</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> summary <span class="tok-o">=</span> <span class="tok-t">JSON</span>.<span class="tok-f">parse</span>(fs.<span class="tok-f">readFileSync</span>(<span class="tok-s">'reports/summary.json'</span>, <span class="tok-s">'utf8'</span>));
+<span class="tok-k">if</span> (summary.totals.flaky <span class="tok-o">&gt;</span> <span class="tok-n">0</span>) core.<span class="tok-f">warning</span>(<span class="tok-s">`</span><span class="tok-o">${</span>summary.totals.flaky<span class="tok-o">}</span><span class="tok-s"> flaky tests`</span>);
+<span class="tok-k">for</span> (<span class="tok-k">const</span> failure <span class="tok-k">of</span> summary.failures) core.<span class="tok-f">error</span>(<span class="tok-s">`</span><span class="tok-o">${</span>failure.title<span class="tok-o">}</span><span class="tok-s">: </span><span class="tok-o">${</span>failure.error<span class="tok-o">}</span><span class="tok-s">`</span>);</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>A dashboard, Slack notification or PR comment needs another field — ownership, suite name, retry count, browser.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the field in <code>onTestEnd</code> where the test result is available, then include it in the <code>summary</code> object in <code>onEnd</code>.</p><pre><code><span class="tok-k">this</span>.tests.<span class="tok-f">push</span>({
+  <span class="tok-c">// ...</span>
+  <span class="tok-p">annotations</span><span class="tok-o">:</span> test.annotations.<span class="tok-f">map</span>((a) <span class="tok-o">=&gt;</span> a.<span class="tok-k">type</span>),
+  <span class="tok-p">browser</span><span class="tok-o">:</span> test.parent.<span class="tok-f">project</span>()<span class="tok-o">?</span>.use.browserName <span class="tok-o">??</span> <span class="tok-s">'unknown'</span>,
+});</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>CI needs machine-readable results. Answering &quot;what broke and how slow are we&quot; from a JSON file is far cheaper than downloading and unzipping an HTML report.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Passing <code>--reporter=...</code> on the command line replaces the configured reporters, so this one does not run on those invocations.</li></ul></div>
+  <p class="related">Related: <code>playwright.config.ts</code> &middot; <code>src/reporters/index.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>SummaryReporter</code><span class="api-heritage">implements Reporter</span></div><p class="api-doc">Console summary plus a machine-readable <code>summary.json</code>. Exists so CI can answer &quot;what broke and how slow are we&quot; without unzipping the HTML report: the JSON is what dashboards and PR comments consume.</p><table class="api-members"><tbody><tr><td><code><span class="tok-f">onBegin</span>(<span class="tok-p">config</span><span class="tok-o">:</span> <span class="tok-t">FullConfig</span>, <span class="tok-p">suite</span><span class="tok-o">:</span> <span class="tok-t">Suite</span>)<span class="tok-o">:</span> <span class="tok-k">void</span></code></td><td></td></tr><tr><td><code><span class="tok-f">onTestEnd</span>(<span class="tok-p">test</span><span class="tok-o">:</span> <span class="tok-t">TestCase</span>, <span class="tok-p">result</span><span class="tok-o">:</span> <span class="tok-t">TestResult</span>)<span class="tok-o">:</span> <span class="tok-k">void</span></code></td><td></td></tr><tr><td><code><span class="tok-f">onEnd</span>(<span class="tok-p">result</span><span class="tok-o">:</span> <span class="tok-t">FullResult</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">printsToStdio</span>()<span class="tok-o">:</span> <span class="tok-t">boolean</span></code></td><td></td></tr></tbody></table></div></details>
+</section>
+<h2 id="test-data-src-data">Test data (src/data)</h2>
+
+<section class="file" id="f-src-data-files-sample-txt">
+  <header class="file-head">
+    <h3><code>src/data/files/sample.txt</code></h3>
+    <span class="file-meta">2 lines</span>
+  </header>
+  <p class="file-purpose">A tiny payload for exercising the <code>FileUpload</code> component without committing binaries.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You need a fixture of a specific type — a PDF, an image, a spreadsheet.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add small real files here; generate large ones at runtime with <code>createFileOfSize()</code> instead of committing them.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Large binaries in a test repository slow every clone and every CI checkout, forever.</p></div>
+  
+  <p class="related">Related: <code>src/components/form/file-upload.ts</code></p>
+  
+</section>
+
+<section class="file" id="f-src-data-personas-ts">
+  <header class="file-head">
+    <h3><code>src/data/personas.ts</code></h3>
+    <span class="file-meta">144 lines &middot; 6 exports</span>
+  </header>
+  <p class="file-purpose">The seven SecureBank accounts and the facts about the seeded dataset that tests assert against.</p>
+  <h3 id="why-credentials-are-in-the-repository">Why credentials are in the repository</h3>
+<p>The framework's rule is that credentials never enter version control, and it is not being bent here. These are <strong>published on the application's own login page</strong>, in a table headed &quot;Test credentials&quot;, for anyone to read. They authenticate nothing and protect nothing.</p>
+<p>Treating them as secrets would mean handing every developer a <code>.env</code> before they could run a single test against a public practice app — ceremony with no security benefit. <code>getUser()</code> in <code>env.config.ts</code> remains the only route for credentials in every other environment.</p>
+<h3 id="the-personas-are-the-point">The personas are the point</h3>
+<div class="table-wrap"><table><thead><tr><th>Persona</th><th>Behaviour</th><th>What it makes testable</th></tr></thead><tbody><tr><td><code>standard</code></td><td>Full access</td><td>Every happy path</td></tr><tr><td><code>locked</code></td><td>Sign-in refused as suspended</td><td>A distinct message from a wrong password</td></tr><tr><td><code>frozen</code></td><td>Signs in; money movement disabled</td><td>Transfer, send and bill-pay all blocked</td></tr><tr><td><code>overdraft</code></td><td>Negative balance</td><td>The overdraft indicator</td></tr><tr><td><code>slow</code></td><td>Slow loading</td><td>Real loading states</td></tr><tr><td><code>buggy</code> (<code>error_user</code>)</td><td><strong>A planted defect</strong> in the loan total</td><td>Proving the suite can find a bug</td></tr><tr><td><code>admin</code></td><td>Additional view</td><td>Role-dependent chrome</td></tr></tbody></table></div>
+<p>Negative paths and degraded states are reachable by <strong>logging in as somebody else</strong>, rather than by mocking a failure and hoping the mock resembles reality. That is unusual and worth exploiting.</p>
+<h3 id="seed-dataset-facts-read-from-the-running-app">SEED — dataset facts, read from the running app</h3>
+<aside class="callout note"><span class="callout-tag">Note</span><div>Every value in <code>SEED</code> was read from the application, not from its documentation. One of them was originally wrong: <code>totalTransactions</code> was recorded as 20 from a session that had already performed a transfer — each completed transfer adds a debit and a matching credit. The true figure in a fresh context is 18. <strong>Seed values must be read from a clean context</strong>, or they encode whatever the person exploring happened to do first.</div></aside>
+  <div class="change"><h4>When you need to change it</h4><ul><li>The application reseeds.</li><li>A persona is added or changes behaviour.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Update the constant. Nine specs read from <code>SEED</code>, so one edit covers all of them.</p></li><li><p>Run the fixture-integrity test, which reads the app's own credentials table and compares it with this file.</p><pre><code><span class="tok-f">npx</span> playwright test <span class="tok-a">-g</span> <span class="tok-s">&quot;personas fixture matches&quot;</span></code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A hand-written copy of a table the application renders itself will drift. Keeping the copy in one file, and testing it against the source, is what stops that drift being silent.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Read seed values from a fresh browser context. State lives in <code>localStorage</code>, so an exploratory session pollutes them.</li></ul></div>
+  <p class="related">Related: <code>tests/ui/login.spec.ts</code> &middot; <code>src/fixtures/bank.fixture.ts</code></p>
+  <details class="api"><summary>API surface (6 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>PersonaTrait</code></div><p class="api-doc">The behaviours the application deliberately exhibits per account.</p><pre class="api-shape"><code><span class="tok-o">|</span> <span class="tok-s">'full-access'</span> <span class="tok-c">/** Login is refused with a suspension message. */</span> <span class="tok-o">|</span> <span class="tok-s">'locked'</span> <span class="tok-c">/** Signs in, but every money-movement control is disabled. */</span> <span class="tok-o">|</span> <span class="tok-s">'frozen'</span> <span class="tok-c">/** Signs in with a negative balance and an overdraft indicator. */</span> <span class="tok-o">|</span> <span class="tok-s">'overdraft'</span> <span class="tok-c">/** Signs in slowly — the loading states are real and worth asserting on. */</span> <span class="tok-o">|</span> <span class="tok-s">'slow'</span> <span class="tok-c">/** Carries a planted defect: the loan history total omits the newest loan. */</span> <span class="tok-o">|</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>Persona</code></div><pre class="api-shape"><code><span class="tok-k">readonly</span> <span class="tok-p">username</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">password</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">trait</span><span class="tok-o">:</span> <span class="tok-t">PersonaTrait</span>;
+<span class="tok-k">readonly</span> <span class="tok-p">description</span><span class="tok-o">:</span> <span class="tok-t">string</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>PERSONAS</code></div><p class="api-doc">Keyed by trait rather than by username, so a test reads as an intention — <code>personas.frozen</code> — instead of as a lookup somebody has to decode.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>PersonaName</code></div><pre class="api-shape"><code><span class="tok-k">keyof</span> <span class="tok-k">typeof</span> <span class="tok-t">PERSONAS</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>ALL_PERSONAS</code></div><p class="api-doc">Every persona, for the test that cross-checks this file against the app.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>SEED</code></div><p class="api-doc">Facts about the seeded dataset that tests assert against. Kept here rather than inline so that when the application reseeds, one file changes instead of nine specs. Every value was read from the running application, not from its documentation.</p></div></details>
+</section>
+
+<section class="file" id="f-src-data-readme-md">
+  <header class="file-head">
+    <h3><code>src/data/README.md</code></h3>
+    <span class="file-meta">14 lines</span>
+  </header>
+  <p class="file-purpose">Explains what belongs in the data directory: static fixtures only, with anything unique per run generated at runtime so parallel workers never collide. Also records the rule that credentials and production data never live here.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a data file or change the data conventions.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the file to the table with a one-line purpose so the directory stays self-describing.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A data directory without rules becomes a graveyard of stale records that quietly couple unrelated tests to each other.</p></div>
+  
+  <p class="related">Related: <code>src/utils/file.utils.ts</code> &middot; <code>src/utils/data.utils.ts</code></p>
+  
+</section>
+
+<section class="file" id="f-src-data-sample-users-csv">
+  <header class="file-head">
+    <h3><code>src/data/sample-users.csv</code></h3>
+    <span class="file-meta">4 lines</span>
+  </header>
+  <p class="file-purpose">A small example of the CSV shape <code>readCsv()</code> returns, so the data-driven pattern is demonstrable immediately.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You replace it with real case data, or delete it once you have your own.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Keep the header row — <code>readCsv</code> uses it as the object keys.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A working example removes the first friction point for anyone writing a data-driven test.</p></div>
+  
+  <p class="related">Related: <code>src/utils/file.utils.ts</code></p>
+  
+</section>
+
+<section class="file" id="f-src-data-users-json">
+  <header class="file-head">
+    <h3><code>src/data/users.json</code></h3>
+    <span class="file-meta">8 lines</span>
+  </header>
+  <p class="file-purpose">Role display names and expected permissions — reference data for authorisation assertions. Deliberately contains no credentials.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>A role gains or loses a permission, or a new role appears.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Update the entry, and update <code>UserRole</code> in <code>src/types/index.ts</code> if the set of roles changed.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Keeping expected permissions as data lets one parameterised test cover the whole authorisation matrix.</p></div>
+  
+  <p class="related">Related: <code>src/types/index.ts</code> &middot; <code>src/config/env.config.ts</code></p>
+  
+</section></div>
+    <footer class="page-foot">
+      <div class="pager">
+        <a class="prev" href="reference-fixtures.html">&larr; Reference: fixtures, hooks, pages &amp; API</a><a class="next" href="reference-tests.html">Reference: tests &amp; repository docs &rarr;</a>
+      </div>
+      <p>Generated from source by <code>npm run docs</code>. 151 files documented, 331 exports extracted.</p>
+    </footer>
+  </main>
+</div>
+<script>
+document.querySelectorAll('.filter').forEach((input) => {
+  input.addEventListener('input', () => {
+    const term = input.value.toLowerCase();
+    const table = document.getElementById(input.dataset.filterTarget);
+    if (!table) return;
+    for (const row of table.tBodies[0].rows) {
+      row.hidden = term !== '' && !row.textContent.toLowerCase().includes(term);
+    }
+  });
+});
+const navFilter = document.getElementById('nav-filter');
+if (navFilter) {
+  navFilter.addEventListener('input', () => {
+    const term = navFilter.value.toLowerCase();
+    document.querySelectorAll('#toc li').forEach((li) => {
+      li.hidden = term !== '' && !li.textContent.toLowerCase().includes(term);
+    });
+  });
+}
+</script>
+</body>
+</html>

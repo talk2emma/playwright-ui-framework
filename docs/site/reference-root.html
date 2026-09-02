@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference: configuration &amp; tooling — Playwright UI Framework</title>
+<meta name="description" content="Root config, CI, containers, editor and docs tooling">
+<style>/* Documentation stylesheet: screen layout, print sheet and PDF cover. */
+
+:root {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f2;
+  --border: #e2e1dd;
+  --border-strong: #cfcec9;
+  --text: #1f1e1c;
+  --text-2: #56544f;
+  --text-3: #82807a;
+  --accent: #b0492c;
+  --accent-soft: #fdf2ee;
+  --code-bg: #f6f5f3;
+  --note: #2f6f8f;
+  --note-bg: #eef5f9;
+  --warn: #a2610a;
+  --warn-bg: #fdf4e6;
+  --rule: #4a6b3d;
+  --rule-bg: #f0f5ed;
+  --sx-comment: #8a867d;
+  --sx-keyword: #9c3f6d;
+  --sx-string: #3d7a52;
+  --sx-number: #96591b;
+  --sx-fn: #2f5f92;
+  --sx-type: #7a4a9e;
+  --sx-prop: #b0492c;
+  --sx-op: #6f6b63;
+  --sx-var: #a1531f;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sidebar-w: 268px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17171a;
+    --surface: #1e1e22;
+    --surface-2: #26262b;
+    --border: #32323a;
+    --border-strong: #43434d;
+    --text: #ecebe7;
+    --text-2: #b3b1aa;
+    --text-3: #8b8981;
+    --accent: #e8825f;
+    --accent-soft: #2c211d;
+    --code-bg: #232329;
+    --note: #7fb6d4;
+    --note-bg: #1c262c;
+    --warn: #d8a552;
+    --warn-bg: #2a2419;
+    --rule: #9dc389;
+    --rule-bg: #1f2620;
+    --sx-comment: #7d7a72;
+    --sx-keyword: #e08bb4;
+    --sx-string: #86c99a;
+    --sx-number: #dfa86a;
+    --sx-fn: #8ab6e8;
+    --sx-type: #c2a0e8;
+    --sx-prop: #e8825f;
+    --sx-op: #9a958b;
+    --sx-var: #e0a06a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  z-index: 10;
+}
+.skip:focus { left: 0; }
+
+/* ---------------------------------------------------------------- layout */
+
+.layout { display: flex; align-items: flex-start; }
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.1rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.brand { display: flex; gap: 0.7rem; align-items: center; }
+.brand-mark {
+  flex: 0 0 34px; height: 34px; border-radius: 8px;
+  background: var(--accent); color: #fff;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px; letter-spacing: 0.02em;
+}
+.brand strong { display: block; font-size: 14px; line-height: 1.25; }
+.brand span { font-size: 12px; color: var(--text-3); }
+
+.filter {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.filter:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.nav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.nav a {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+.nav a:hover { background: var(--surface-2); color: var(--text); }
+.nav a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.sidebar-foot a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.sidebar-foot a:hover { text-decoration: underline; }
+
+main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 900px;
+  padding: 2.6rem clamp(1.1rem, 4vw, 3rem) 4rem;
+}
+
+/* ------------------------------------------------------------- typography */
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 11.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 650;
+}
+
+h1 {
+  margin: 0 0 0.4rem;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.subtitle { margin: 0; color: var(--text-2); font-size: 17px; max-width: 62ch; }
+
+.page-head { padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); margin-bottom: 1.8rem; }
+
+h2 {
+  margin: 2.6rem 0 0.9rem;
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+h3 { margin: 2rem 0 0.6rem; font-size: 1.13rem; font-weight: 650; }
+h4 {
+  margin: 1.2rem 0 0.4rem;
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+
+p { margin: 0.85rem 0; max-width: 74ch; }
+ul, ol { margin: 0.85rem 0; padding-left: 1.35rem; max-width: 74ch; }
+li { margin: 0.3rem 0; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.855em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.08em 0.34em;
+  word-break: break-word;
+}
+
+pre {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 12.9px;
+  line-height: 1.55;
+}
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+figure.code { margin: 1.1rem 0; }
+figure.code figcaption {
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 0 0.35rem 0.15rem;
+  font-weight: 600;
+}
+
+pre.tree {
+  font-size: 12.4px;
+  line-height: 1.5;
+  background: var(--surface);
+}
+
+/* ------------------------------------------------------- syntax highlight */
+
+.tok-c { color: var(--sx-comment); font-style: italic; }
+.tok-k { color: var(--sx-keyword); }
+.tok-s { color: var(--sx-string); }
+.tok-r { color: var(--sx-string); }
+.tok-n { color: var(--sx-number); }
+.tok-f { color: var(--sx-fn); }
+.tok-t { color: var(--sx-type); }
+.tok-p { color: var(--sx-prop); }
+.tok-o { color: var(--sx-op); }
+.tok-v { color: var(--sx-var); }
+.tok-a { color: var(--sx-type); }
+
+figure.code figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+figure.code figcaption .lang {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+  text-transform: none;
+}
+
+/* --------------------------------------------------------------- callouts */
+
+.callout {
+  display: flex;
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  max-width: 74ch;
+}
+.callout p { margin: 0; }
+.callout-tag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding-top: 0.15rem;
+}
+.callout.note { background: var(--note-bg); border-color: color-mix(in srgb, var(--note) 30%, transparent); }
+.callout.note .callout-tag { color: var(--note); }
+.callout.warn { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+.callout.warn .callout-tag { color: var(--warn); }
+.callout.rule { background: var(--rule-bg); border-color: color-mix(in srgb, var(--rule) 32%, transparent); }
+.callout.rule .callout-tag { color: var(--rule); }
+
+/* ----------------------------------------------------------------- tables */
+
+.table-wrap { overflow-x: auto; margin: 1.2rem 0; border: 1px solid var(--border); border-radius: 9px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--surface-2); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-2); font-weight: 650; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface); }
+td code { font-size: 12.2px; }
+
+/* ------------------------------------------------------------------ steps */
+
+ol.steps { list-style: none; counter-reset: step; padding-left: 0; max-width: 78ch; }
+ol.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.2rem;
+  margin: 0.9rem 0;
+}
+ol.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+ol.steps > li > p { margin: 0 0 0.5rem; }
+
+/* ------------------------------------------------------------ file blocks */
+
+.file {
+  margin: 1.6rem 0;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+.file-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.file-head h3 { margin: 0; font-size: 1rem; }
+.file-head code { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); font-size: 13px; }
+.file-meta { font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.file-purpose { margin: 0.7rem 0 0; }
+
+.change { margin-top: 1.1rem; padding-top: 0.6rem; border-top: 1px dashed var(--border); }
+.change ul, .change ol { margin-top: 0.4rem; }
+.change.why p { color: var(--text-2); }
+.related { margin-top: 1rem; font-size: 12.5px; color: var(--text-3); }
+.related code { font-size: 11.8px; }
+
+/* -------------------------------------------------------------------- api */
+
+details.api { margin-top: 1.1rem; border-top: 1px dashed var(--border); padding-top: 0.7rem; }
+details.api > summary {
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+details.api[open] > summary { margin-bottom: 0.8rem; color: var(--text-2); }
+
+.api-item { margin: 0.9rem 0; padding-left: 0.8rem; border-left: 2px solid var(--border); }
+.api-head { display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; }
+.api-head code { background: none; border: 0; padding: 0; font-size: 13px; font-weight: 600; }
+.api-heritage { font-size: 11.5px; color: var(--text-3); font-family: var(--mono); }
+.api-doc { margin: 0.3rem 0 0.4rem; font-size: 13.5px; color: var(--text-2); }
+.api-shape { font-size: 12px; margin-top: 0.4rem; }
+table.api-members { font-size: 13px; margin-top: 0.4rem; }
+table.api-members td { padding: 0.3rem 0.6rem 0.3rem 0; border-bottom: 1px solid var(--border); }
+table.api-members td:first-child { width: 46%; }
+table.api-members code { font-size: 12.1px; }
+
+.badge {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.badge-class, .badge-interface { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 22%, transparent); }
+.badge-function, .badge-fn { background: var(--rule-bg); color: var(--rule); border-color: color-mix(in srgb, var(--rule) 25%, transparent); }
+.badge-type { background: var(--note-bg); color: var(--note); border-color: color-mix(in srgb, var(--note) 25%, transparent); }
+.badge-const { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+
+/* -------------------------------------------------------------------- toc */
+
+.toc {
+  margin: 0 0 2rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.toc h2 {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.toc ul { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 1.6rem; }
+.toc li { break-inside: avoid; margin: 0.18rem 0; }
+.toc a { font-size: 13.4px; text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* ----------------------------------------------------------------- footer */
+
+.page-foot { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-3); }
+.pager { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; font-size: 13.5px; }
+.pager a { text-decoration: none; font-weight: 600; }
+.pager a:hover { text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .layout { flex-direction: column; }
+  .sidebar { position: static; width: 100%; height: auto; flex: none; border-right: 0; border-bottom: 1px solid var(--border); }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .toc ul { columns: 1; }
+  main { padding-top: 1.6rem; }
+}
+
+/* ------------------------------------------------------------ print sheet */
+
+body.print {
+  background: #fff;
+  color: #16150f;
+  font-size: 10.6pt;
+  line-height: 1.5;
+  --sx-comment: #6f6b63;
+  --sx-keyword: #8d3560;
+  --sx-string: #2f6942;
+  --sx-number: #855017;
+  --sx-fn: #295585;
+  --sx-type: #6c3f8f;
+  --sx-prop: #9e3f24;
+  --sx-op: #5e5a53;
+  --sx-var: #8f4718;
+}
+body.print .print-page { padding: 0 0 1.5rem; }
+body.print main, body.print .sidebar { all: unset; }
+body.print h1.print-h1 {
+  font-family: var(--serif);
+  font-size: 21pt;
+  margin: 0 0 0.2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid #16150f;
+}
+body.print h2 { font-size: 14pt; margin-top: 1.4rem; }
+body.print h3 { font-size: 11.6pt; }
+body.print pre { font-size: 8.4pt; background: #f6f5f3; border-color: #ddd; }
+body.print table { font-size: 9pt; }
+body.print .file { border-color: #ddd; }
+body.print table.api-members td:first-child { width: 58%; }
+body.print .api-item { break-inside: auto; }
+body.print .toc, body.print .pager, body.print .skip, body.print .filter { display: none; }
+body.print details.api { display: block; }
+body.print details.api > summary { list-style: none; }
+
+.cover {
+  min-height: 245mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4mm;
+  page-break-after: always;
+  break-after: page;
+}
+.cover h1 { font-size: 40pt; margin: 0.2rem 0 0.6rem; letter-spacing: -0.02em; }
+.cover .eyebrow { font-size: 10pt; letter-spacing: 0.14em; }
+.cover-sub { font-size: 14pt; color: #4a4842; max-width: 30ch; margin: 0 0 3rem; }
+.cover-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); gap: 1.2rem 2rem; margin: 0; border-top: 2px solid #16150f; padding-top: 1.2rem; }
+.cover-meta div { margin: 0; }
+.cover-meta dt { font-size: 8.5pt; letter-spacing: 0.09em; text-transform: uppercase; color: #6d6b64; }
+.cover-meta dd { margin: 0.15rem 0 0; font-size: 13pt; font-weight: 600; }
+
+.contents { page-break-after: always; break-after: page; }
+.print-toc { list-style: none; padding: 0; margin: 1.4rem 0 0; counter-reset: toc; }
+.print-toc li { margin: 0.55rem 0; display: grid; grid-template-columns: 2rem 1fr; gap: 0.2rem 0.6rem; align-items: baseline; }
+.print-toc .num { color: #8a887f; font-variant-numeric: tabular-nums; font-size: 10pt; }
+.print-toc a { font-size: 12.5pt; font-weight: 600; text-decoration: none; color: #16150f; }
+.print-toc .sub { grid-column: 2; font-size: 9.4pt; color: #6d6b64; }
+.print-toc .dots { display: none; }
+
+.print-page { page-break-before: always; break-before: page; }
+.print-page:first-of-type { page-break-before: avoid; break-before: avoid; }
+
+@media print {
+  body.print { background: #fff; }
+  pre, .callout, ol.steps > li, .api-item, tr { page-break-inside: avoid; break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; break-after: avoid; }
+  a { color: #16150f; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">PW</span><div><strong>Playwright UI Framework</strong><span>Documentation v1.0</span></div></div>
+    <input id="nav-filter" class="filter" type="search" placeholder="Filter sections…" aria-label="Filter sections">
+    <nav aria-label="Documentation"><ul class="nav"><li><a href="index.html">Overview</a></li><li><a href="architecture.html">Architecture</a></li><li><a href="worked-example.html">Worked example</a></li><li><a href="structure.html">Project structure</a></li><li><a href="reference-root.html" aria-current="page">Reference: configuration &amp; tooling</a></li><li><a href="reference-foundation.html">Reference: config, core &amp; types</a></li><li><a href="reference-components.html">Reference: component library</a></li><li><a href="reference-fixtures.html">Reference: fixtures, hooks, pages &amp; API</a></li><li><a href="reference-utils.html">Reference: utilities, reporters &amp; data</a></li><li><a href="reference-tests.html">Reference: tests &amp; repository docs</a></li><li><a href="playbooks.html">Playbooks</a></li><li><a href="conventions.html">Conventions</a></li><li><a href="troubleshooting.html">Troubleshooting</a></li><li><a href="api-index.html">API index</a></li><li><a href="glossary.html">Glossary</a></li></ul></nav>
+    <div class="sidebar-foot">
+      <a href="playwright-ui-framework-documentation.pdf" download>Download PDF</a>
+      <span>Generated 2026-09-01</span>
+    </div>
+  </aside>
+  <main id="main">
+    <header class="page-head">
+      <p class="eyebrow">Playwright UI Framework</p>
+      <h1>Reference: configuration &amp; tooling</h1>
+      <p class="subtitle">Root config, CI, containers, editor and docs tooling</p>
+    </header>
+    <nav class="toc" aria-label="On this page"><h2>On this page</h2><ul id="toc"><li><a href="#root-configuration">Root configuration</a></li><li><a href="#ci-containers-and-editor-tooling">CI, containers and editor tooling</a></li><li><a href="#documentation-tooling">Documentation tooling</a></li></ul></nav>
+    <div class="content"><h2 id="root-configuration">Root configuration</h2>
+
+<section class="file" id="f-editorconfig">
+  <header class="file-head">
+    <h3><code>.editorconfig</code></h3>
+    
+  </header>
+  <p class="file-purpose">Charset, indentation, final newline and trailing-whitespace rules that apply in any editor, including ones without Prettier installed.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You change indentation or line endings in Prettier and want editors to agree before formatting runs.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Keep this file and <code>.prettierrc.json</code> consistent; if they disagree, files churn between contributors.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>It is the lowest-common-denominator agreement that works for everyone on the team regardless of tooling.</p></div>
+  
+  <p class="related">Related: <code>.prettierrc.json</code></p>
+  
+</section>
+
+<section class="file" id="f-env">
+  <header class="file-head">
+    <h3><code>.env</code></h3>
+    
+  </header>
+  <p class="file-purpose">Your machine-local configuration, created by copying <code>.env.example</code>. It is git-ignored. <code>env.config.ts</code> loads it first, then <code>.env.&lt;TEST_ENV&gt;</code> on top, and real process variables win over both so CI secrets are never overwritten.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You point your machine at a different environment, enable debugging, or set local credentials.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Copy the template and edit. For a one-off run, prefer an inline variable so your file stays clean.</p><pre><code><span class="tok-f">cp</span> .env.example .env
+<span class="tok-p">BASE_URL</span>=https://pr-451.preview.example.com npm run test:smoke</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Keeping machine-specific values out of the repository is what lets ten engineers point the same suite at ten different environments without conflict.</p></div>
+  
+  <p class="related">Related: <code>.env.example</code> &middot; <code>src/config/env.config.ts</code></p>
+  
+</section>
+
+<section class="file" id="f-env-example">
+  <header class="file-head">
+    <h3><code>.env.example</code></h3>
+    
+  </header>
+  <p class="file-purpose">The documented list of every variable the framework understands, with safe defaults and no real values. Copy it to <code>.env</code> to configure a local run.</p>
+  <div class="table-wrap"><table><thead><tr><th>Variable</th><th>Default</th><th>Effect</th></tr></thead><tbody><tr><td><code>TEST_ENV</code></td><td><code>dev</code></td><td>Selects an entry from <code>src/config/environments.ts</code>.</td></tr><tr><td><code>BASE_URL</code></td><td>environment default</td><td>Overrides the target URL — use for preview deployments.</td></tr><tr><td><code>HEADLESS</code></td><td><code>true</code></td><td>Forced to true in CI regardless of this value.</td></tr><tr><td><code>SLOW_MO</code></td><td><code>0</code></td><td>Milliseconds of delay per action, for demos and debugging.</td></tr><tr><td><code>WORKERS</code> / <code>RETRIES</code></td><td>environment default</td><td>Override parallelism and retry policy.</td></tr><tr><td><code>TIMEOUT_ACTION/NAVIGATION/EXPECT/TEST</code></td><td>see <code>timeouts.ts</code></td><td>Timeout budgets in milliseconds.</td></tr><tr><td><code>TRACE</code> / <code>VIDEO</code> / <code>SCREENSHOT</code></td><td><code>retain-on-failure</code></td><td>Artifact capture policy.</td></tr><tr><td><code>VIEWPORT_WIDTH</code> / <code>VIEWPORT_HEIGHT</code></td><td>1920 x 1080</td><td>Default viewport.</td></tr><tr><td><code>LOG_LEVEL</code></td><td><code>info</code></td><td><code>error</code> | <code>warn</code> | <code>info</code> | <code>debug</code> | <code>trace</code>.</td></tr><tr><td><code>*_USER</code> / <code>*_PASSWORD</code></td><td>empty</td><td>Credentials per role, read through <code>getUser(role)</code>.</td></tr><tr><td><code>API_BASE_URL</code> / <code>API_TOKEN</code></td><td>environment default</td><td>Used by the API client for seeding data.</td></tr><tr><td><code>ALLURE_ENABLED</code></td><td><code>false</code></td><td>Adds the Allure reporter to the run.</td></tr></tbody></table></div>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a variable to the zod schema in <code>env.config.ts</code>. The two must always be updated together.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the variable to the schema first, then document it here with a safe placeholder value and a comment describing its effect.</p><pre><code><span class="tok-c"># Feature flag overrides applied before every test</span>
+<span class="tok-p">FEATURE_FLAGS</span><span class="tok-o">=</span></code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>This file is the only discoverable inventory of what the framework can be configured with. An undocumented variable is one that nobody outside its author can use.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Never put a real credential here — the file is committed.</li></ul></div>
+  <p class="related">Related: <code>src/config/env.config.ts</code> &middot; <code>.env</code></p>
+  
+</section>
+
+<section class="file" id="f-gitignore">
+  <header class="file-head">
+    <h3><code>.gitignore</code></h3>
+    
+  </header>
+  <p class="file-purpose">Keeps dependencies, run artifacts, saved sessions and secrets out of the repository: <code>node_modules</code>, <code>test-results</code>, <code>reports</code>, <code>blob-report</code>, <code>playwright/.cache</code>, <code>storage/*.json</code>, and every <code>.env</code> file except <code>.env.example</code>.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a new artifact directory, or a new secret-bearing file.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the pattern, and if the file was already committed, remove it from the index explicitly.</p><pre><code><span class="tok-f">git</span> rm <span class="tok-a">--cached</span> path/to/file</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Saved storage states in <code>storage/</code> are live session cookies. Committing one is equivalent to committing a password.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li><code>.env.example</code> is deliberately un-ignored — it is the template that documents every supported variable.</li></ul></div>
+  <p class="related">Related: <code>.env.example</code> &middot; <code>src/config/env.config.ts</code></p>
+  
+</section>
+
+<section class="file" id="f-nvmrc">
+  <header class="file-head">
+    <h3><code>.nvmrc</code></h3>
+    
+  </header>
+  <p class="file-purpose">Pins Node 22 (LTS). <code>nvm use</code> reads it locally and the CI workflow reads it through <code>node-version-file</code>, so local and CI runtimes match.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>The project moves to a new Node LTS release.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Change the version, run a full suite locally, then let CI confirm. Update the <code>engines</code> range in <code>package.json</code> in the same commit.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Playwright supports LTS releases. Odd-numbered Node releases regularly break tooling that depends on module-resolution behaviour, and a version pin turns that class of surprise into a deliberate upgrade.</p></div>
+  
+  <p class="related">Related: <code>package.json</code> &middot; <code>.github/workflows/playwright.yml</code></p>
+  
+</section>
+
+<section class="file" id="f-prettierignore">
+  <header class="file-head">
+    <h3><code>.prettierignore</code></h3>
+    
+  </header>
+  <p class="file-purpose">Keeps Prettier away from generated and vendored output: <code>node_modules</code>, <code>dist</code>, <code>reports</code>, <code>test-results</code>, <code>playwright-report</code>, <code>blob-report</code>, <code>package-lock.json</code> and screenshot snapshot folders.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a folder of generated artifacts.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Append the folder. Mirror the entry in <code>.gitignore</code> if the output should also stay out of version control.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Formatting generated files creates noisy diffs and can corrupt binary snapshots.</p></div>
+  
+  <p class="related">Related: <code>.gitignore</code></p>
+  
+</section>
+
+<section class="file" id="f-prettierrc-json">
+  <header class="file-head">
+    <h3><code>.prettierrc.json</code></h3>
+    <span class="file-meta">12 lines</span>
+  </header>
+  <p class="file-purpose">Formatting rules: 100-character lines, single quotes, trailing commas, two-space indentation, LF endings. Applied by <code>npm run format</code>, by the editor on save, and by the pre-commit hook.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>The team agrees on a different house style. This is a taste decision, so change it once and reformat the whole repo in a single commit.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Edit the option, then reformat everything so no future diff mixes style churn with real changes.</p><pre><code>npm run format <span class="tok-o">&amp;&amp;</span> git commit <span class="tok-o">-</span>am <span class="tok-s">&quot;chore: reformat with new Prettier settings&quot;</span></code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Formatting arguments waste review time. One config, applied mechanically, ends them.</p></div>
+  
+  <p class="related">Related: <code>.prettierignore</code> &middot; <code>eslint.config.mjs</code></p>
+  
+</section>
+
+<section class="file" id="f-eslint-config-mjs">
+  <header class="file-head">
+    <h3><code>eslint.config.mjs</code></h3>
+    <span class="file-meta">97 lines</span>
+  </header>
+  <p class="file-purpose">Type-aware linting for the whole repository. It layers the JavaScript recommended rules, <code>typescript-eslint</code> type-checked rules, Playwright-specific rules for test files, and Prettier last so formatting never fights the linter.</p>
+  <ul><li><code>no-floating-promises</code> and <code>no-misused-promises</code> are errors — an un-awaited Playwright call is the single most common source of phantom passes.</li><li><code>consistent-type-imports</code> keeps type-only imports out of the runtime bundle.</li><li><code>explicit-function-return-type</code> is a warning, and <code>--max-warnings=0</code> in the <code>lint</code> script promotes it to a build failure.</li><li>Test files additionally get <code>eslint-plugin-playwright</code>; <code>expect-expect</code> is disabled because assertions often live inside page objects and components.</li><li><code>.mjs</code> and <code>.js</code> files opt out of type-aware rules, since they are not part of the TypeScript program.</li></ul>
+  <div class="change"><h4>When you need to change it</h4><ul><li>A rule produces repeated false positives across the codebase.</li><li>You add a new file category that needs different rules (for example a scripts folder that may use <code>console</code>).</li><li>You adopt a new plugin.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add a scoped block rather than weakening a rule globally. Order matters — later blocks win, and <code>prettier</code> must stay last.</p><pre><code>{
+  <span class="tok-p">files</span><span class="tok-o">:</span> [<span class="tok-s">'src/reporters/**/*.ts'</span>, <span class="tok-s">'scripts/**/*.ts'</span>],
+  <span class="tok-p">rules</span><span class="tok-o">:</span> { <span class="tok-s">'no-console'</span><span class="tok-o">:</span> <span class="tok-s">'off'</span> },
+},</code></pre></li><li><p>For a one-off exception, disable on the line and say why. An undocumented disable comment will be copied by the next person.</p><pre><code><span class="tok-c">// React tracks the native setter, so a direct assignment is ignored.</span>
+<span class="tok-c">// eslint-disable-next-line @typescript-eslint/unbound-method</span>
+<span class="tok-k">const</span> setter <span class="tok-o">=</span> <span class="tok-t">Object</span>.<span class="tok-f">getOwnPropertyDescriptor</span>(window.<span class="tok-t">HTMLInputElement</span>.prototype, <span class="tok-s">'value'</span>)<span class="tok-o">?</span>.<span class="tok-k">set</span>;</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Lint rules encode the review comments you would otherwise write by hand every sprint. Putting the exception next to the code — with a reason — keeps the global standard strict.</p></div>
+  
+  <p class="related">Related: <code>.prettierrc.json</code> &middot; <code>package.json</code></p>
+  
+</section>
+
+<section class="file" id="f-package-json">
+  <header class="file-head">
+    <h3><code>package.json</code></h3>
+    <span class="file-meta">82 lines</span>
+  </header>
+  <p class="file-purpose">Declares dependencies, the Node engine range, the lint-staged rules and every command the team runs. The scripts are the documented interface to the framework: if a task is worth doing twice, it belongs here rather than in someone’s shell history.</p>
+  <div class="table-wrap"><table><thead><tr><th>Script group</th><th>Scripts</th><th>Purpose</th></tr></thead><tbody><tr><td>Run</td><td><code>test</code>, <code>test:headed</code>, <code>test:ui</code>, <code>test:debug</code></td><td>Everyday execution and debugging.</td></tr><tr><td>Slice</td><td><code>test:chromium</code>, <code>test:firefox</code>, <code>test:webkit</code>, <code>test:mobile</code>, <code>test:smoke</code>, <code>test:regression</code>, <code>test:failed</code></td><td>Run a subset by browser or tag.</td></tr><tr><td>Specialised</td><td><code>test:a11y</code>, <code>test:visual</code>, <code>test:visual:update</code></td><td>Accessibility and screenshot suites.</td></tr><tr><td>Report</td><td><code>report</code>, <code>report:allure</code></td><td>Open generated reports.</td></tr><tr><td>Quality</td><td><code>typecheck</code>, <code>lint</code>, <code>lint:fix</code>, <code>format</code>, <code>format:check</code>, <code>validate</code></td><td>Everything CI enforces, runnable locally.</td></tr><tr><td>Housekeeping</td><td><code>clean</code>, <code>install:browsers</code>, <code>codegen</code>, <code>prepare</code></td><td>Environment maintenance.</td></tr><tr><td>Docs</td><td><code>docs</code>, <code>docs:api</code>, <code>docs:html</code>, <code>docs:pdf</code></td><td>Regenerate this documentation.</td></tr></tbody></table></div>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a dependency, or remove one that is no longer imported anywhere.</li><li>A team workflow needs a name (a new tag suite, a new environment shortcut).</li><li>The supported Node range changes.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add a script named after the intent, not the flags, so it reads well in CI logs and in <code>make help</code>.</p><pre><code><span class="tok-p">&quot;test:checkout&quot;</span><span class="tok-o">:</span> <span class="tok-s">&quot;playwright test tests/ui/checkout --project=chromium&quot;</span><span class="tok-o">,</span>
+<span class="tok-p">&quot;test:staging&quot;</span><span class="tok-o">:</span> <span class="tok-s">&quot;cross-env TEST_ENV=staging playwright test&quot;</span></code></pre></li><li><p>Install dependencies as devDependencies. Nothing here ships to production, and a stray runtime dependency confuses vulnerability scanners.</p><pre><code><span class="tok-f">npm</span> install <span class="tok-a">--save-dev</span> &lt;package<span class="tok-o">&gt;</span></code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Scripts are the contract between humans, the Makefile and CI. The GitHub workflow calls the same commands you run locally, so a green local <code>npm run validate</code> means a green CI lint job.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li><code>zod</code> is pinned to v3 on purpose: v4’s CommonJS build fails to initialise under the transform Playwright applies to config files.</li><li>There is no <code>&quot;type&quot;: &quot;module&quot;</code> field. Playwright transpiles TypeScript to CommonJS, which keeps every CommonJS-only dependency interoperable.</li></ul></div>
+  <p class="related">Related: <code>Makefile</code> &middot; <code>.github/workflows/playwright.yml</code></p>
+  
+</section>
+
+<section class="file" id="f-playwright-config-ts">
+  <header class="file-head">
+    <h3><code>playwright.config.ts</code></h3>
+    <span class="file-meta">199 lines</span>
+  </header>
+  <p class="file-purpose">The single entry point Playwright reads before anything else runs. It declares the browser projects, timeouts, artifact policy, reporters and global hooks. It contains no environment values of its own: everything variable is imported from <code>src/config/env.config.ts</code>, which has already validated it.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>The shape of the file</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> <span class="tok-p">reporters</span><span class="tok-o">:</span> <span class="tok-t">ReporterDescription</span>[] <span class="tok-o">=</span> [ <span class="tok-c">/* list, html, junit, json, summary, ctrf */</span> ];
+
+<span class="tok-k">export</span> <span class="tok-k">default</span> <span class="tok-f">defineConfig</span>({
+  <span class="tok-p">testDir</span><span class="tok-o">:</span> <span class="tok-s">'./tests'</span>,
+  <span class="tok-p">fullyParallel</span><span class="tok-o">:</span> <span class="tok-k">true</span>,
+  <span class="tok-p">workers</span><span class="tok-o">:</span> config.workers <span class="tok-o">??</span> (config.isCI <span class="tok-o">?</span> <span class="tok-s">'50%'</span> <span class="tok-o">:</span> <span class="tok-k">undefined</span>),
+  <span class="tok-p">retries</span><span class="tok-o">:</span> config.retries,
+  <span class="tok-p">timeout</span><span class="tok-o">:</span> config.timeouts.test,
+  <span class="tok-p">forbidOnly</span><span class="tok-o">:</span> config.isCI,
+  <span class="tok-p">expect</span><span class="tok-o">:</span> { <span class="tok-p">timeout</span><span class="tok-o">:</span> config.timeouts.expect, <span class="tok-p">toHaveScreenshot</span><span class="tok-o">:</span> { <span class="tok-c">/* ... */</span> } },
+  <span class="tok-p">globalSetup</span><span class="tok-o">:</span> <span class="tok-s">'./src/hooks/global.setup.ts'</span>,
+  <span class="tok-p">globalTeardown</span><span class="tok-o">:</span> <span class="tok-s">'./src/hooks/global.teardown.ts'</span>,
+  <span class="tok-p">use</span><span class="tok-o">:</span> { <span class="tok-p">baseURL</span><span class="tok-o">:</span> config.baseURL, <span class="tok-p">trace</span><span class="tok-o">:</span> config.artifacts.trace, <span class="tok-p">testIdAttribute</span><span class="tok-o">:</span> <span class="tok-s">'data-testid'</span> <span class="tok-c">/* ... */</span> },
+  <span class="tok-p">projects</span><span class="tok-o">:</span> [ <span class="tok-c">/* setup, chromium, firefox, webkit, edge, mobile, tablet, visual, accessibility, dark-mode */</span> ],
+  <span class="tok-p">reporter</span><span class="tok-o">:</span> reporters,
+});</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a browser, device profile or a new specialised suite (for example a <code>performance</code> or <code>smoke-only</code> project).</li><li>You need a different default timeout, retry count or worker count for the whole suite.</li><li>You want to add or remove a reporter.</li><li>The application under test must be started by the test run itself (uncomment the <code>webServer</code> block).</li><li>You change where snapshots or artifacts are written.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>To add a browser or device project, copy an existing entry and give it a unique <code>name</code>. Keep <code>dependencies: ['setup']</code> so it inherits authenticated sessions, and keep the <code>testIgnore</code> for the specialised folders so visual and a11y specs do not run in every browser.</p><pre><code>{
+  <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-s">'galaxy-s23'</span>,
+  <span class="tok-p">use</span><span class="tok-o">:</span> { <span class="tok-o">...</span>devices[<span class="tok-s">'Galaxy S9+'</span>] },
+  <span class="tok-p">dependencies</span><span class="tok-o">:</span> [<span class="tok-s">'setup'</span>],
+  <span class="tok-p">testIgnore</span><span class="tok-o">:</span> [<span class="tok-s">'**/visual/**'</span>, <span class="tok-s">'**/a11y/**'</span>],
+},</code></pre></li><li><p>To change a timeout, do NOT hard-code a number here. Change the named budget in <code>src/config/timeouts.ts</code> or the environment variable it reads, so every wait in the framework moves together.</p></li><li><p>To start the app under test with the suite, uncomment the <code>webServer</code> block at the bottom and point <code>command</code> at your dev server script.</p><pre><code><span class="tok-p">webServer</span><span class="tok-o">:</span> {
+  <span class="tok-p">command</span><span class="tok-o">:</span> <span class="tok-s">'npm run start'</span>,
+  <span class="tok-p">url</span><span class="tok-o">:</span> config.baseURL,
+  <span class="tok-p">reuseExistingServer</span><span class="tok-o">:</span> <span class="tok-o">!</span>config.isCI,
+  <span class="tok-p">timeout</span><span class="tok-o">:</span> <span class="tok-n">120_000</span>,
+},</code></pre></li><li><p>To add a reporter, push it onto the <code>reporters</code> array before <code>defineConfig</code> runs. Guard CI-only or opt-in reporters with a condition so local runs stay fast.</p><pre><code><span class="tok-k">if</span> (config.allureEnabled) {
+  reporters.<span class="tok-f">push</span>([<span class="tok-s">'allure-playwright'</span>, { <span class="tok-p">resultsDir</span><span class="tok-o">:</span> <span class="tok-s">'reports/allure-results'</span> }]);
+}</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Playwright resolves this file once, in the parent process, before workers exist. Anything decided here applies to the entire run and cannot be overridden per test, which is exactly why environment resolution happens in <code>env.config.ts</code> first: by the time this file executes, configuration is already validated and typed.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Adding a project without <code>dependencies: ['setup']</code> means its tests start signed out.</li><li>The <code>visual</code> project is deliberately pinned to one browser and viewport; running visual specs elsewhere produces meaningless diffs.</li><li>Passing <code>--reporter=...</code> on the command line replaces the whole reporter list, so <code>reports/summary.json</code> is not written on those runs.</li></ul></div>
+  <p class="related">Related: <code>src/config/env.config.ts</code> &middot; <code>src/config/timeouts.ts</code> &middot; <code>src/hooks/global.setup.ts</code></p>
+  
+</section>
+
+<section class="file" id="f-tsconfig-json">
+  <header class="file-head">
+    <h3><code>tsconfig.json</code></h3>
+    <span class="file-meta">52 lines</span>
+  </header>
+  <p class="file-purpose">Compiler settings and path aliases for the whole repository. Strict mode is on in full, including <code>noUncheckedIndexedAccess</code>, so array and record access must be handled rather than assumed.</p>
+  <div class="table-wrap"><table><thead><tr><th>Setting</th><th>Value</th><th>Why</th></tr></thead><tbody><tr><td><code>strict</code> + <code>noUncheckedIndexedAccess</code></td><td>true</td><td>A test framework that lies about types produces failures nobody can diagnose.</td></tr><tr><td><code>module</code> / <code>moduleResolution</code></td><td><code>ESNext</code> / <code>Bundler</code></td><td>Lets source use extensionless imports, which Playwright resolves at runtime.</td></tr><tr><td><code>noEmit</code> (via script)</td><td>typecheck only</td><td>Playwright transpiles at runtime; the repo never ships compiled JS.</td></tr><tr><td><code>paths</code></td><td><code>@core/*</code>, <code>@components/*</code>, …</td><td>Import by role rather than by relative depth.</td></tr></tbody></table></div>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a new top-level folder under <code>src/</code> that deserves its own alias.</li><li>You need to loosen or tighten a compiler check for the whole repo.</li><li>You upgrade TypeScript and a new flag becomes relevant.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>To add an alias, add it to <code>paths</code> and use it immediately; both <code>tsc</code> and Playwright read this file, so no second registration is needed.</p><pre><code><span class="tok-p">&quot;paths&quot;</span><span class="tok-o">:</span> <span class="tok-o">{</span>
+  <span class="tok-p">&quot;@core/*&quot;</span><span class="tok-o">:</span> <span class="tok-o">[</span><span class="tok-s">&quot;./src/core/*&quot;</span><span class="tok-o">]</span><span class="tok-o">,</span>
+  <span class="tok-p">&quot;@flows/*&quot;</span><span class="tok-o">:</span> <span class="tok-o">[</span><span class="tok-s">&quot;./src/flows/*&quot;</span><span class="tok-o">]</span>
+<span class="tok-o">}</span></code></pre></li><li><p>Never disable <code>strict</code> to make an error go away. Fix the type, or narrow with a documented guard.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Aliases and strictness are repo-wide contracts. Changing them in one place keeps editor, <code>npm run typecheck</code> and the Playwright runtime in agreement; a local override in one file would drift.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li><code>baseUrl</code> is deliberately absent: TypeScript 6 deprecates it, and <code>paths</code> alone resolves relative to this file.</li></ul></div>
+  <p class="related">Related: <code>package.json</code> &middot; <code>eslint.config.mjs</code></p>
+  
+</section>
+<h2 id="ci-containers-and-editor-tooling">CI, containers and editor tooling</h2>
+
+<section class="file" id="f-github-workflows-playwright-yml">
+  <header class="file-head">
+    <h3><code>.github/workflows/playwright.yml</code></h3>
+    <span class="file-meta">179 lines</span>
+  </header>
+  <p class="file-purpose">The GitHub Actions pipeline: a lint gate, a sharded three-browser test matrix, separate accessibility and visual jobs, and a final job that merges every shard into one HTML report. It runs on pushes, pull requests, a nightly schedule, and on demand with an environment and tag filter.</p>
+  <div class="table-wrap"><table><thead><tr><th>Job</th><th>Depends on</th><th>What it does</th></tr></thead><tbody><tr><td><code>lint</code></td><td>—</td><td><code>npm run typecheck</code>, <code>lint</code>, <code>format:check</code>. Fails fast before any browser starts.</td></tr><tr><td><code>test</code></td><td><code>lint</code></td><td>3 browsers x 3 shards = 9 parallel jobs, each uploading a blob report.</td></tr><tr><td><code>accessibility</code></td><td><code>lint</code></td><td>Runs the <code>accessibility</code> project and uploads the axe reports.</td></tr><tr><td><code>visual</code></td><td><code>lint</code></td><td>Runs the <code>visual</code> project on a fixed runner image so baselines stay valid.</td></tr><tr><td><code>report</code></td><td>all of the above</td><td><code>playwright merge-reports</code> turns the blob shards into one browsable HTML report.</td></tr></tbody></table></div>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a browser project or want a different shard count.</li><li>A new secret or repository variable is needed.</li><li>You want a different trigger — for example running only <code>@smoke</code> on pull requests and everything nightly.</li><li>Artifact retention needs to change.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>To change sharding, edit the matrix and the <code>--shard</code> argument together. They must agree or tests will be silently skipped.</p><pre><code><span class="tok-p">strategy</span>:
+<span class="tok-p">  matrix</span>:
+<span class="tok-p">    project</span>: [chromium, firefox, webkit]
+<span class="tok-p">    shard</span>: [<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>, <span class="tok-n">4</span>]
+<span class="tok-c"># ...</span>
+<span class="tok-p">run</span>: npx playwright test --project=<span class="tok-v">${{ matrix.project }}</span> --shard=<span class="tok-v">${{ matrix.shard }}</span>/<span class="tok-n">4</span></code></pre></li><li><p>To run a reduced suite on pull requests and the full suite nightly, branch on the event name.</p><pre><code><span class="tok-p">run</span>: npx playwright test --project=<span class="tok-v">${{ matrix.project }}</span> <span class="tok-v">${{ github.event_name == 'pull_request' &amp;&amp; '--grep @smoke' || '' }}</span></code></pre></li><li><p>To add a credential, define it in the repository settings and pass it through <code>env:</code> on the step. Never inline a secret value.</p><pre><code><span class="tok-p">env</span>:
+<span class="tok-p">  PARTNER_API_KEY</span>: <span class="tok-v">${{ secrets.PARTNER_API_KEY }}</span></code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Sharding is what keeps wall-clock time flat as the suite grows; blob reports plus a merge step are what make a sharded run still readable as one report. Splitting a11y and visual into their own jobs keeps their very different failure modes out of the functional matrix.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Visual baselines are rendered by a specific OS and browser build. Changing <code>runs-on</code> will invalidate every screenshot.</li><li>The browser cache key is derived from <code>package-lock.json</code>; bumping Playwright automatically busts it.</li></ul></div>
+  <p class="related">Related: <code>playwright.config.ts</code> &middot; <code>package.json</code> &middot; <code>Dockerfile</code></p>
+  
+</section>
+
+<section class="file" id="f-vscode-extensions-json">
+  <header class="file-head">
+    <h3><code>.vscode/extensions.json</code></h3>
+    <span class="file-meta">9 lines</span>
+  </header>
+  <p class="file-purpose">Prompts new contributors to install the Playwright test runner, ESLint, Prettier and EditorConfig extensions.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>A tool becomes part of the standard workflow.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add its marketplace identifier to <code>recommendations</code>.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>The Playwright extension provides in-editor run, debug and trace viewing; without it, newcomers fall back to raw CLI and miss the best debugging tools available.</p></div>
+  
+  <p class="related">Related: <code>.vscode/settings.json</code></p>
+  
+</section>
+
+<section class="file" id="f-vscode-settings-json">
+  <header class="file-head">
+    <h3><code>.vscode/settings.json</code></h3>
+    <span class="file-meta">20 lines</span>
+  </header>
+  <p class="file-purpose">Format on save with Prettier, ESLint auto-fix on save, the workspace TypeScript version, non-relative import suggestions (so the aliases are offered), Playwright browser reuse, and noise folders hidden from search.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>A setting helps everyone on the team. Personal preferences belong in your user settings, not here.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the key. Keep the list short — a bloated workspace settings file quietly overrides personal setups.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Shared editor behaviour means the code you commit is already formatted and linted, so the pre-commit hook rarely has to intervene.</p></div>
+  
+  <p class="related">Related: <code>.vscode/extensions.json</code></p>
+  
+</section>
+
+<section class="file" id="f-docker-compose-yml">
+  <header class="file-head">
+    <h3><code>docker-compose.yml</code></h3>
+    <span class="file-meta">23 lines</span>
+  </header>
+  <p class="file-purpose">Wraps the image with the environment variables, volume mounts and shared-memory settings a browser needs. Reports, results and the tests folder are mounted so output and updated baselines land back on your machine.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>A new environment variable must reach the container, or you need another directory mounted.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Pass variables through with a default so the file works even when your shell has nothing set.</p><pre><code><span class="tok-p">environment</span>:
+<span class="tok-p">  FEATURE_FLAGS</span>: <span class="tok-v">${FEATURE_FLAGS:-}</span></code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Chromium crashes on Docker’s default 64 MB of shared memory; <code>shm_size: 2gb</code> and <code>ipc: host</code> are the fix, and they belong with the run configuration rather than in every engineer’s notes.</p></div>
+  
+  <p class="related">Related: <code>Dockerfile</code></p>
+  
+</section>
+
+<section class="file" id="f-dockerfile">
+  <header class="file-head">
+    <h3><code>Dockerfile</code></h3>
+    
+  </header>
+  <p class="file-purpose">Builds a test image from the official Playwright base image pinned to the same version as <code>@playwright/test</code>, with browsers, system libraries and fonts already present. Running here reproduces CI rendering exactly.</p>
+  <figure class="code" data-lang="shell"><figcaption><span>Usage</span><span class="lang">Shell</span></figcaption><pre><code><span class="tok-f">docker</span> compose build
+<span class="tok-f">docker</span> compose run <span class="tok-a">--rm</span> ui-tests <span class="tok-a">--project</span>=chromium <span class="tok-a">--grep</span> @smoke</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You upgrade Playwright — the image tag must move with it.</li><li>The suite needs an extra system package (a font, a PDF tool, a database client).</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Keep the image tag and the installed <code>@playwright/test</code> version identical. A mismatch produces confusing driver errors.</p><pre><code><span class="tok-k">FROM</span> mcr.microsoft.com/playwright:v1.62.1-jammy</code></pre></li><li><p>Add system packages before <code>npm ci</code> so the dependency layer stays cached.</p><pre><code><span class="tok-k">RUN</span> apt-get update &amp;&amp; apt-get install -y <span class="tok-a">--no-install-recommends</span> fonts-noto-color-emoji &amp;&amp; rm -rf /var/lib/apt/lists/*</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Font and rendering differences between a developer laptop and CI are the classic cause of visual tests that pass locally and fail in the pipeline. The container removes that variable.</p></div>
+  
+  <p class="related">Related: <code>docker-compose.yml</code> &middot; <code>.github/workflows/playwright.yml</code></p>
+  
+</section>
+
+<section class="file" id="f-makefile">
+  <header class="file-head">
+    <h3><code>Makefile</code></h3>
+    
+  </header>
+  <p class="file-purpose">A discoverable front door for the npm scripts. <code>make help</code> prints every target with its description, which is faster to scan than <code>package.json</code>.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add an npm script that people will run often, or a multi-step workflow worth naming.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the target with a <code>##</code> comment — <code>make help</code> builds itself from those comments — and add the name to <code>.PHONY</code>.</p><pre><code><span class="tok-f">smoke-staging</span>: <span class="tok-c">## Run smoke tests against staging</span>
+	<span class="tok-p">TEST_ENV</span>=staging npm run test:smoke</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Newcomers look for a Makefile. Giving them one that self-documents shortens the path from clone to first test run.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Make requires real tab characters for recipe indentation; spaces produce a confusing syntax error.</li></ul></div>
+  <p class="related">Related: <code>package.json</code></p>
+  
+</section>
+<h2 id="documentation-tooling">Documentation tooling</h2>
+
+<section class="file" id="f-docs-readme-md">
+  <header class="file-head">
+    <h3><code>docs/README.md</code></h3>
+    <span class="file-meta">41 lines</span>
+  </header>
+  <p class="file-purpose">Explains what each documentation output is, how to regenerate them, and how to add an entry for a new file. The first thing to read when the docs build fails.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a documentation output or change the generation commands.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Update the table and the commands; keep it consistent with the scripts in <code>package.json</code>.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>The build failing on an undocumented file is only a helpful signal if the fix is written down next to it.</p></div>
+  
+  <p class="related">Related: <code>scripts/docs/build-docs.mjs</code> &middot; <code>scripts/docs/content/</code></p>
+  
+</section>
+
+<section class="file" id="f-scripts-docs-artifact-css">
+  <header class="file-head">
+    <h3><code>scripts/docs/artifact.css</code></h3>
+    
+  </header>
+  <p class="file-purpose">The stylesheet for the hosted single-page manual, which has its own visual identity: IBM Plex Sans and Mono with Archivo for display, a cool slate ground and one ultramarine signal colour, plus full light, dark and system theme handling.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You restyle the hosted manual, or add a block type that needs styling there.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Colours are defined as tokens in three places that must stay in step: the bare <code>:root</code> (light), the <code>prefers-color-scheme: dark</code> block guarded with <code>:root:not([data-theme='light'])</code>, and <code>:root[data-theme='dark']</code> for the explicit toggle. Style through the tokens, never with a literal inside a theme block.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>The hosted manual is read on someone else’s screen in their theme, so every colour has to resolve in all three theme states — a colour defined only inside a dark-mode block renders one theme’s text on the other theme’s background.</p></div>
+  
+  <p class="related">Related: <code>scripts/docs/build-docs.mjs</code> &middot; <code>scripts/docs/docs.css</code></p>
+  
+</section>
+
+<section class="file" id="f-scripts-docs-build-docs-mjs">
+  <header class="file-head">
+    <h3><code>scripts/docs/build-docs.mjs</code></h3>
+    <span class="file-meta">696 lines</span>
+  </header>
+  <p class="file-purpose">Merges the authored content modules with <code>docs/generated/api.json</code> and writes the HTML documentation site into <code>docs/site/</code>, including the single-page <code>print.html</code> used to produce the PDF and <code>artifact.html</code> used for the hosted version. It fails the build if any file in the repository has no documentation entry.</p>
+  <figure class="code" data-lang="shell"><figcaption><span>Run it</span><span class="lang">Shell</span></figcaption><pre><code><span class="tok-f">npm</span> run docs:html    <span class="tok-c"># site only</span>
+<span class="tok-f">npm</span> run docs         <span class="tok-c"># extract + site + PDF</span></code></pre></figure>
+<aside class="callout note"><span class="callout-tag">Note</span><div>The completeness check is the point: adding a source file without documenting it breaks <code>npm run docs</code>, so the documentation cannot silently fall behind the framework.</div></aside>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a documentation page, reorder navigation, or change the visual design of the site.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the page to the <code>PAGES</code> array with its id, title and content, and it appears in the navigation of every page automatically.</p></li><li><p>To document a new source file, add an entry keyed by its repository-relative path to the matching module in <code>scripts/docs/content/</code>.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Generating the site from data rather than hand-maintaining HTML is what makes it feasible to keep 100+ file descriptions accurate over time.</p></div>
+  
+  <p class="related">Related: <code>scripts/docs/content/</code> &middot; <code>scripts/docs/build-pdf.mjs</code></p>
+  
+</section>
+
+<section class="file" id="f-scripts-docs-build-pdf-mjs">
+  <header class="file-head">
+    <h3><code>scripts/docs/build-pdf.mjs</code></h3>
+    <span class="file-meta">58 lines</span>
+  </header>
+  <p class="file-purpose">Opens <code>docs/site/print.html</code> in the Chromium that ships with Playwright and prints it to <code>docs/playwright-ui-framework-documentation.pdf</code> with A4 pages, margins, and a header and footer carrying the document title and page numbers.</p>
+  <figure class="code" data-lang="shell"><figcaption><span>Run it</span><span class="lang">Shell</span></figcaption><pre><code><span class="tok-f">npm</span> run docs:pdf</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You want different paper size, margins, or header and footer content.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Adjust the options passed to <code>page.pdf()</code>. The header and footer are HTML fragments with Chromium’s special classes for page numbers.</p><pre><code><span class="tok-k">await</span> page.<span class="tok-f">pdf</span>({
+  <span class="tok-p">path</span><span class="tok-o">:</span> outputPath,
+  <span class="tok-p">format</span><span class="tok-o">:</span> <span class="tok-s">'A4'</span>,
+  <span class="tok-p">printBackground</span><span class="tok-o">:</span> <span class="tok-k">true</span>,
+  <span class="tok-p">margin</span><span class="tok-o">:</span> { <span class="tok-p">top</span><span class="tok-o">:</span> <span class="tok-s">'18mm'</span>, <span class="tok-p">bottom</span><span class="tok-o">:</span> <span class="tok-s">'18mm'</span>, <span class="tok-p">left</span><span class="tok-o">:</span> <span class="tok-s">'14mm'</span>, <span class="tok-p">right</span><span class="tok-o">:</span> <span class="tok-s">'14mm'</span> },
+  <span class="tok-p">footerTemplate</span><span class="tok-o">:</span> <span class="tok-s">'&lt;div style=&quot;font-size:8px&quot;&gt;&lt;span class=&quot;pageNumber&quot;&gt;&lt;/span&gt; / &lt;span class=&quot;totalPages&quot;&gt;&lt;/span&gt;&lt;/div&gt;'</span>,
+});</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>The framework already depends on Playwright, so generating the PDF with it adds no new tooling and guarantees the PDF matches the HTML exactly.</p></div>
+  
+  <p class="related">Related: <code>scripts/docs/build-docs.mjs</code></p>
+  
+</section>
+
+<section class="file" id="f-scripts-docs-content">
+  <header class="file-head">
+    <h3><code>scripts/docs/content/</code></h3>
+    
+  </header>
+  <p class="file-purpose">The prose source of this documentation, split into modules by area: <code>guides.mjs</code> for the long-form pages, and <code>files.*.mjs</code> for the per-file reference. Each file entry carries a purpose, when to change it, how to change it, why the change belongs there, gotchas and related files.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>The shape of a file entry</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-s">'src/components/form/button.ts'</span><span class="tok-o">:</span> {
+  <span class="tok-p">group</span><span class="tok-o">:</span> <span class="tok-s">'components-form'</span>,
+  <span class="tok-p">purpose</span><span class="tok-o">:</span> <span class="tok-s">'What the file is for.'</span>,
+  <span class="tok-p">changeWhen</span><span class="tok-o">:</span> [<span class="tok-s">'Situations that require editing it'</span>],
+  <span class="tok-p">changeHow</span><span class="tok-o">:</span> [{ <span class="tok-p">text</span><span class="tok-o">:</span> <span class="tok-s">'Step'</span>, <span class="tok-p">code</span><span class="tok-o">:</span> <span class="tok-s">'snippet'</span> }],
+  <span class="tok-p">why</span><span class="tok-o">:</span> <span class="tok-s">'Why this is the right place for that change.'</span>,
+  <span class="tok-p">gotchas</span><span class="tok-o">:</span> [<span class="tok-s">'Traps'</span>],
+  <span class="tok-p">related</span><span class="tok-o">:</span> [<span class="tok-s">'other/file.ts'</span>],
+}</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>Any time you add, remove or meaningfully change a file in the repository.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add or edit the entry keyed by the repository-relative path, then run <code>npm run docs</code>. The build fails if a file has no entry, which is your reminder.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Keeping prose beside a generated API surface gives the best of both: intent and rationale are written by a human, while signatures and members are always read from the code.</p></div>
+  
+  <p class="related">Related: <code>scripts/docs/build-docs.mjs</code></p>
+  
+</section>
+
+<section class="file" id="f-scripts-docs-docs-css">
+  <header class="file-head">
+    <h3><code>scripts/docs/docs.css</code></h3>
+    
+  </header>
+  <p class="file-purpose">The single stylesheet for all three outputs: the screen layout (sidebar, tables, callouts, API blocks), the light and dark palettes, and the print sheet including the PDF cover page and page-break rules.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You change the visual design, add a block type that needs styling, or adjust the PDF page setup.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Screen colours live in the <code>:root</code> custom properties and their dark-scheme overrides. Print rules live in the <code>body.print</code> and <code>@media print</code> sections at the bottom.</p><pre><code>body.print .file { page<span class="tok-o">-</span><span class="tok-k">break</span><span class="tok-o">-</span><span class="tok-p">inside</span><span class="tok-o">:</span> avoid; <span class="tok-k">break</span><span class="tok-o">-</span><span class="tok-p">inside</span><span class="tok-o">:</span> avoid; }</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>One stylesheet for screen and print means a design change updates the site and the PDF together, rather than leaving the PDF looking a version behind.</p></div>
+  
+  <p class="related">Related: <code>scripts/docs/build-docs.mjs</code> &middot; <code>scripts/docs/build-pdf.mjs</code></p>
+  
+</section>
+
+<section class="file" id="f-scripts-docs-extract-api-mjs">
+  <header class="file-head">
+    <h3><code>scripts/docs/extract-api.mjs</code></h3>
+    <span class="file-meta">177 lines</span>
+  </header>
+  <p class="file-purpose">Walks the repository and parses every TypeScript file with the TypeScript compiler API, recording exported classes, functions, interfaces, types, constants and re-exports along with their JSDoc summaries and public member signatures. The result is written to <code>docs/generated/api.json</code>.</p>
+  <figure class="code" data-lang="shell"><figcaption><span>Run it</span><span class="lang">Shell</span></figcaption><pre><code><span class="tok-f">npm</span> run docs:api   <span class="tok-c"># writes docs/generated/api.json</span></code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You want an additional detail in the reference (decorators, parameter docs, private members).</li><li>A new file type should be inventoried.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Extend <code>memberSignature</code> or the statement loop in the extractor. Everything it records automatically appears in the generated pages — no page template needs editing.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Hand-written API lists rot within one sprint. Reading the AST means the reference is always the code that actually shipped, and a forgotten method cannot silently go undocumented.</p></div>
+  
+  <p class="related">Related: <code>scripts/docs/build-docs.mjs</code></p>
+  
+</section>
+
+<section class="file" id="f-scripts-docs-highlight-mjs">
+  <header class="file-head">
+    <h3><code>scripts/docs/highlight.mjs</code></h3>
+    <span class="file-meta">410 lines &middot; 3 exports</span>
+  </header>
+  <p class="file-purpose">Colours every code snippet at build time. It detects the language of a snippet (TypeScript, shell, YAML, JSON, env file or Dockerfile), tokenises it with a single-pass lexer, and emits <code>&lt;span class=&quot;tok-*&quot;&gt;</code> markup that the stylesheets theme.</p>
+  <aside class="callout note"><span class="callout-tag">Note</span><div>Highlighting happens during the build, not in the browser. A runtime library could not colour the PDF at all, and would add a CDN dependency to pages that otherwise work offline.</div></aside>
+<figure class="code" data-lang="ts"><figcaption><span>Token classes emitted</span><span class="lang">TypeScript</span></figcaption><pre><code>tok<span class="tok-o">-</span>c  comment      tok<span class="tok-o">-</span>f  <span class="tok-k">function</span>
+tok<span class="tok-o">-</span>k  keyword      tok<span class="tok-o">-</span>t  <span class="tok-k">type</span>
+tok<span class="tok-o">-</span>s  <span class="tok-t">string</span>       tok<span class="tok-o">-</span>p  property
+tok<span class="tok-o">-</span>n  <span class="tok-t">number</span>       tok<span class="tok-o">-</span>o  operator
+tok<span class="tok-o">-</span>r  regex        tok<span class="tok-o">-</span>v  variable
+tok<span class="tok-o">-</span>a  flag</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>A snippet is highlighted as the wrong language.</li><li>You add snippets in a language the lexer does not know.</li><li>A keyword or token type is coloured incorrectly.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Language detection lives in <code>detectLanguage</code>. The subtle case it guards is that a TypeScript object property (<code>maxUploadMb: raw.MAX_UPLOAD_MB,</code>) looks exactly like a YAML key — the <code>LOOKS_LIKE_CODE</code> pattern is what separates them.</p><pre><code><span class="tok-k">const</span> <span class="tok-t">LOOKS_LIKE_CODE</span> <span class="tok-o">=</span>
+  <span class="tok-r">/=&gt;|\b(?:const|let|var|function|await|async|import|export|class|interface|extends|return|new|this)\b|[;,]\s*$/m</span>;</code></pre></li><li><p>To add a language, write a lexer built from one master pattern with named groups and register it in the <code>LEXERS</code> map. A single pass is what prevents the double-escaping bugs that come from highlighting already-escaped HTML.</p><pre><code><span class="tok-k">const</span> <span class="tok-t">LEXERS</span> <span class="tok-o">=</span> {
+  <span class="tok-p">ts</span><span class="tok-o">:</span> highlightTs,
+  <span class="tok-p">json</span><span class="tok-o">:</span> highlightJson,
+  <span class="tok-p">sql</span><span class="tok-o">:</span> highlightSql,   <span class="tok-c">// new</span>
+};</code></pre></li><li><p>To force a language for one snippet, set <code>lang</code> on the content block instead of adjusting detection for everyone.</p><pre><code>{ <span class="tok-k">type</span><span class="tok-o">:</span> <span class="tok-s">'code'</span>, <span class="tok-p">lang</span><span class="tok-o">:</span> <span class="tok-s">'shell'</span>, <span class="tok-p">caption</span><span class="tok-o">:</span> <span class="tok-s">'Run it'</span>, <span class="tok-p">text</span><span class="tok-o">:</span> <span class="tok-s">'npm run docs'</span> }</code></pre></li><li><p>Colours are not defined here. Add or change them in the <code>--sx-*</code> custom properties in <code>scripts/docs/docs.css</code> (site and print) and <code>scripts/docs/artifact.css</code> (hosted manual).</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Emitting classes rather than inline colours is what lets one highlighter serve three outputs with three different palettes — warm on the site, ink-safe in the PDF, cool in the hosted manual — and lets the hosted page recolour itself when the reader switches theme.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>The lexer escapes HTML as it goes; never pass it text that is already escaped, or entities will be double-encoded.</li><li>Template literals are highlighted recursively so <code>${...}</code> interpolations read as code rather than as string content.</li></ul></div>
+  <p class="related">Related: <code>scripts/docs/render.mjs</code> &middot; <code>scripts/docs/docs.css</code> &middot; <code>scripts/docs/artifact.css</code></p>
+  <details class="api"><summary>API surface (3 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">detectLanguage</span>(code)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>LANGUAGE_LABEL</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">highlight</span>(code, lang)</code></div><p class="api-doc">Highlights a snippet. Pass <code>lang</code> to override the detected language. Returns HTML-escaped markup ready to place inside &lt;pre&gt;&lt;code&gt;.</p></div></details>
+</section>
+
+<section class="file" id="f-scripts-docs-render-mjs">
+  <header class="file-head">
+    <h3><code>scripts/docs/render.mjs</code></h3>
+    <span class="file-meta">197 lines &middot; 9 exports</span>
+  </header>
+  <p class="file-purpose">Turns the structured content blocks (paragraphs, lists, tables, code, callouts, step lists, trees) and the extracted API data into HTML. Shared by the multi-page site, the print sheet and the published artifact so all three cannot disagree.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You need a new block type — a diagram, a definition list, a tabbed example.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add a case to <code>renderBlock</code> and a matching style rule in the stylesheet inside <code>build-docs.mjs</code>.</p><pre><code><span class="tok-k">case</span> <span class="tok-s">'diagram'</span><span class="tok-o">:</span>
+  <span class="tok-k">return</span> <span class="tok-s">`&lt;figure class=&quot;diagram&quot;&gt;</span><span class="tok-o">${</span>block.svg<span class="tok-o">}</span><span class="tok-s">&lt;figcaption&gt;</span><span class="tok-o">${</span><span class="tok-f">inline</span>(block.caption)<span class="tok-o">}</span><span class="tok-s">&lt;/figcaption&gt;&lt;/figure&gt;`</span>;</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>One renderer means adding a block type improves every output format at once.</p></div>
+  
+  <p class="related">Related: <code>scripts/docs/build-docs.mjs</code></p>
+  <details class="api"><summary>API surface (9 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">codeBlock</span>(text, { caption, lang } <span class="tok-o">=</span> {})</code></div><p class="api-doc">Renders a syntax-highlighted code block with its language labelled.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">esc</span>(value <span class="tok-o">=</span> <span class="tok-s">''</span>)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">inline</span>(text <span class="tok-o">=</span> <span class="tok-s">''</span>)</code></div><p class="api-doc">Inline markup: <code>code</code>, <strong>bold</strong>, <a href="href">text</a>.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderBlock</span>(block)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderBlocks</span>(blocks <span class="tok-o">=</span> [])</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">slug</span>(text <span class="tok-o">=</span> <span class="tok-s">''</span>)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">fileAnchor</span>(filePath)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderApi</span>(entry)</code></div><p class="api-doc">Renders the auto-extracted API surface of one source file.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderFileEntry</span>(filePath, doc, apiEntry)</code></div><p class="api-doc">Renders one documented file: purpose, change guidance and API.</p></div></details>
+</section></div>
+    <footer class="page-foot">
+      <div class="pager">
+        <a class="prev" href="structure.html">&larr; Project structure</a><a class="next" href="reference-foundation.html">Reference: config, core &amp; types &rarr;</a>
+      </div>
+      <p>Generated from source by <code>npm run docs</code>. 151 files documented, 331 exports extracted.</p>
+    </footer>
+  </main>
+</div>
+<script>
+document.querySelectorAll('.filter').forEach((input) => {
+  input.addEventListener('input', () => {
+    const term = input.value.toLowerCase();
+    const table = document.getElementById(input.dataset.filterTarget);
+    if (!table) return;
+    for (const row of table.tBodies[0].rows) {
+      row.hidden = term !== '' && !row.textContent.toLowerCase().includes(term);
+    }
+  });
+});
+const navFilter = document.getElementById('nav-filter');
+if (navFilter) {
+  navFilter.addEventListener('input', () => {
+    const term = navFilter.value.toLowerCase();
+    document.querySelectorAll('#toc li').forEach((li) => {
+      li.hidden = term !== '' && !li.textContent.toLowerCase().includes(term);
+    });
+  });
+}
+</script>
+</body>
+</html>

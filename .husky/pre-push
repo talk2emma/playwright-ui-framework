@@ -1,0 +1,3 @@
+# Typecheck before pushing: a red pipeline caused by a type error is the
+# cheapest failure to prevent locally.
+npm run typecheck

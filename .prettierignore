@@ -1,0 +1,10 @@
+node_modules
+dist
+reports
+test-results
+playwright-report
+blob-report
+package-lock.json
+**/*-snapshots/**
+docs/generated
+docs/site

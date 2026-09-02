@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference: config, core &amp; types — Playwright UI Framework</title>
+<meta name="description" content="The foundation every other layer is built on">
+<style>/* Documentation stylesheet: screen layout, print sheet and PDF cover. */
+
+:root {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f2;
+  --border: #e2e1dd;
+  --border-strong: #cfcec9;
+  --text: #1f1e1c;
+  --text-2: #56544f;
+  --text-3: #82807a;
+  --accent: #b0492c;
+  --accent-soft: #fdf2ee;
+  --code-bg: #f6f5f3;
+  --note: #2f6f8f;
+  --note-bg: #eef5f9;
+  --warn: #a2610a;
+  --warn-bg: #fdf4e6;
+  --rule: #4a6b3d;
+  --rule-bg: #f0f5ed;
+  --sx-comment: #8a867d;
+  --sx-keyword: #9c3f6d;
+  --sx-string: #3d7a52;
+  --sx-number: #96591b;
+  --sx-fn: #2f5f92;
+  --sx-type: #7a4a9e;
+  --sx-prop: #b0492c;
+  --sx-op: #6f6b63;
+  --sx-var: #a1531f;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sidebar-w: 268px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17171a;
+    --surface: #1e1e22;
+    --surface-2: #26262b;
+    --border: #32323a;
+    --border-strong: #43434d;
+    --text: #ecebe7;
+    --text-2: #b3b1aa;
+    --text-3: #8b8981;
+    --accent: #e8825f;
+    --accent-soft: #2c211d;
+    --code-bg: #232329;
+    --note: #7fb6d4;
+    --note-bg: #1c262c;
+    --warn: #d8a552;
+    --warn-bg: #2a2419;
+    --rule: #9dc389;
+    --rule-bg: #1f2620;
+    --sx-comment: #7d7a72;
+    --sx-keyword: #e08bb4;
+    --sx-string: #86c99a;
+    --sx-number: #dfa86a;
+    --sx-fn: #8ab6e8;
+    --sx-type: #c2a0e8;
+    --sx-prop: #e8825f;
+    --sx-op: #9a958b;
+    --sx-var: #e0a06a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  z-index: 10;
+}
+.skip:focus { left: 0; }
+
+/* ---------------------------------------------------------------- layout */
+
+.layout { display: flex; align-items: flex-start; }
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.1rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.brand { display: flex; gap: 0.7rem; align-items: center; }
+.brand-mark {
+  flex: 0 0 34px; height: 34px; border-radius: 8px;
+  background: var(--accent); color: #fff;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px; letter-spacing: 0.02em;
+}
+.brand strong { display: block; font-size: 14px; line-height: 1.25; }
+.brand span { font-size: 12px; color: var(--text-3); }
+
+.filter {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.filter:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.nav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.nav a {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+.nav a:hover { background: var(--surface-2); color: var(--text); }
+.nav a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.sidebar-foot a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.sidebar-foot a:hover { text-decoration: underline; }
+
+main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 900px;
+  padding: 2.6rem clamp(1.1rem, 4vw, 3rem) 4rem;
+}
+
+/* ------------------------------------------------------------- typography */
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 11.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 650;
+}
+
+h1 {
+  margin: 0 0 0.4rem;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.subtitle { margin: 0; color: var(--text-2); font-size: 17px; max-width: 62ch; }
+
+.page-head { padding-bottom: 1.4rem; border-bottom: 1px solid var(--border); margin-bottom: 1.8rem; }
+
+h2 {
+  margin: 2.6rem 0 0.9rem;
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+h3 { margin: 2rem 0 0.6rem; font-size: 1.13rem; font-weight: 650; }
+h4 {
+  margin: 1.2rem 0 0.4rem;
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+
+p { margin: 0.85rem 0; max-width: 74ch; }
+ul, ol { margin: 0.85rem 0; padding-left: 1.35rem; max-width: 74ch; }
+li { margin: 0.3rem 0; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.855em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.08em 0.34em;
+  word-break: break-word;
+}
+
+pre {
+  margin: 0;
+  overflow-x: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 12.9px;
+  line-height: 1.55;
+}
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+figure.code { margin: 1.1rem 0; }
+figure.code figcaption {
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 0 0.35rem 0.15rem;
+  font-weight: 600;
+}
+
+pre.tree {
+  font-size: 12.4px;
+  line-height: 1.5;
+  background: var(--surface);
+}
+
+/* ------------------------------------------------------- syntax highlight */
+
+.tok-c { color: var(--sx-comment); font-style: italic; }
+.tok-k { color: var(--sx-keyword); }
+.tok-s { color: var(--sx-string); }
+.tok-r { color: var(--sx-string); }
+.tok-n { color: var(--sx-number); }
+.tok-f { color: var(--sx-fn); }
+.tok-t { color: var(--sx-type); }
+.tok-p { color: var(--sx-prop); }
+.tok-o { color: var(--sx-op); }
+.tok-v { color: var(--sx-var); }
+.tok-a { color: var(--sx-type); }
+
+figure.code figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+figure.code figcaption .lang {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.05rem 0.3rem;
+  text-transform: none;
+}
+
+/* --------------------------------------------------------------- callouts */
+
+.callout {
+  display: flex;
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  max-width: 74ch;
+}
+.callout p { margin: 0; }
+.callout-tag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding-top: 0.15rem;
+}
+.callout.note { background: var(--note-bg); border-color: color-mix(in srgb, var(--note) 30%, transparent); }
+.callout.note .callout-tag { color: var(--note); }
+.callout.warn { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+.callout.warn .callout-tag { color: var(--warn); }
+.callout.rule { background: var(--rule-bg); border-color: color-mix(in srgb, var(--rule) 32%, transparent); }
+.callout.rule .callout-tag { color: var(--rule); }
+
+/* ----------------------------------------------------------------- tables */
+
+.table-wrap { overflow-x: auto; margin: 1.2rem 0; border: 1px solid var(--border); border-radius: 9px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--surface-2); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-2); font-weight: 650; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface); }
+td code { font-size: 12.2px; }
+
+/* ------------------------------------------------------------------ steps */
+
+ol.steps { list-style: none; counter-reset: step; padding-left: 0; max-width: 78ch; }
+ol.steps > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.2rem;
+  margin: 0.9rem 0;
+}
+ol.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+ol.steps > li > p { margin: 0 0 0.5rem; }
+
+/* ------------------------------------------------------------ file blocks */
+
+.file {
+  margin: 1.6rem 0;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+.file-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.file-head h3 { margin: 0; font-size: 1rem; }
+.file-head code { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); font-size: 13px; }
+.file-meta { font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.file-purpose { margin: 0.7rem 0 0; }
+
+.change { margin-top: 1.1rem; padding-top: 0.6rem; border-top: 1px dashed var(--border); }
+.change ul, .change ol { margin-top: 0.4rem; }
+.change.why p { color: var(--text-2); }
+.related { margin-top: 1rem; font-size: 12.5px; color: var(--text-3); }
+.related code { font-size: 11.8px; }
+
+/* -------------------------------------------------------------------- api */
+
+details.api { margin-top: 1.1rem; border-top: 1px dashed var(--border); padding-top: 0.7rem; }
+details.api > summary {
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 650;
+}
+details.api[open] > summary { margin-bottom: 0.8rem; color: var(--text-2); }
+
+.api-item { margin: 0.9rem 0; padding-left: 0.8rem; border-left: 2px solid var(--border); }
+.api-head { display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; }
+.api-head code { background: none; border: 0; padding: 0; font-size: 13px; font-weight: 600; }
+.api-heritage { font-size: 11.5px; color: var(--text-3); font-family: var(--mono); }
+.api-doc { margin: 0.3rem 0 0.4rem; font-size: 13.5px; color: var(--text-2); }
+.api-shape { font-size: 12px; margin-top: 0.4rem; }
+table.api-members { font-size: 13px; margin-top: 0.4rem; }
+table.api-members td { padding: 0.3rem 0.6rem 0.3rem 0; border-bottom: 1px solid var(--border); }
+table.api-members td:first-child { width: 46%; }
+table.api-members code { font-size: 12.1px; }
+
+.badge {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.badge-class, .badge-interface { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 22%, transparent); }
+.badge-function, .badge-fn { background: var(--rule-bg); color: var(--rule); border-color: color-mix(in srgb, var(--rule) 25%, transparent); }
+.badge-type { background: var(--note-bg); color: var(--note); border-color: color-mix(in srgb, var(--note) 25%, transparent); }
+.badge-const { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+
+/* -------------------------------------------------------------------- toc */
+
+.toc {
+  margin: 0 0 2rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.toc h2 {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.toc ul { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 1.6rem; }
+.toc li { break-inside: avoid; margin: 0.18rem 0; }
+.toc a { font-size: 13.4px; text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* ----------------------------------------------------------------- footer */
+
+.page-foot { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-3); }
+.pager { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; font-size: 13.5px; }
+.pager a { text-decoration: none; font-weight: 600; }
+.pager a:hover { text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .layout { flex-direction: column; }
+  .sidebar { position: static; width: 100%; height: auto; flex: none; border-right: 0; border-bottom: 1px solid var(--border); }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .toc ul { columns: 1; }
+  main { padding-top: 1.6rem; }
+}
+
+/* ------------------------------------------------------------ print sheet */
+
+body.print {
+  background: #fff;
+  color: #16150f;
+  font-size: 10.6pt;
+  line-height: 1.5;
+  --sx-comment: #6f6b63;
+  --sx-keyword: #8d3560;
+  --sx-string: #2f6942;
+  --sx-number: #855017;
+  --sx-fn: #295585;
+  --sx-type: #6c3f8f;
+  --sx-prop: #9e3f24;
+  --sx-op: #5e5a53;
+  --sx-var: #8f4718;
+}
+body.print .print-page { padding: 0 0 1.5rem; }
+body.print main, body.print .sidebar { all: unset; }
+body.print h1.print-h1 {
+  font-family: var(--serif);
+  font-size: 21pt;
+  margin: 0 0 0.2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid #16150f;
+}
+body.print h2 { font-size: 14pt; margin-top: 1.4rem; }
+body.print h3 { font-size: 11.6pt; }
+body.print pre { font-size: 8.4pt; background: #f6f5f3; border-color: #ddd; }
+body.print table { font-size: 9pt; }
+body.print .file { border-color: #ddd; }
+body.print table.api-members td:first-child { width: 58%; }
+body.print .api-item { break-inside: auto; }
+body.print .toc, body.print .pager, body.print .skip, body.print .filter { display: none; }
+body.print details.api { display: block; }
+body.print details.api > summary { list-style: none; }
+
+.cover {
+  min-height: 245mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4mm;
+  page-break-after: always;
+  break-after: page;
+}
+.cover h1 { font-size: 40pt; margin: 0.2rem 0 0.6rem; letter-spacing: -0.02em; }
+.cover .eyebrow { font-size: 10pt; letter-spacing: 0.14em; }
+.cover-sub { font-size: 14pt; color: #4a4842; max-width: 30ch; margin: 0 0 3rem; }
+.cover-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); gap: 1.2rem 2rem; margin: 0; border-top: 2px solid #16150f; padding-top: 1.2rem; }
+.cover-meta div { margin: 0; }
+.cover-meta dt { font-size: 8.5pt; letter-spacing: 0.09em; text-transform: uppercase; color: #6d6b64; }
+.cover-meta dd { margin: 0.15rem 0 0; font-size: 13pt; font-weight: 600; }
+
+.contents { page-break-after: always; break-after: page; }
+.print-toc { list-style: none; padding: 0; margin: 1.4rem 0 0; counter-reset: toc; }
+.print-toc li { margin: 0.55rem 0; display: grid; grid-template-columns: 2rem 1fr; gap: 0.2rem 0.6rem; align-items: baseline; }
+.print-toc .num { color: #8a887f; font-variant-numeric: tabular-nums; font-size: 10pt; }
+.print-toc a { font-size: 12.5pt; font-weight: 600; text-decoration: none; color: #16150f; }
+.print-toc .sub { grid-column: 2; font-size: 9.4pt; color: #6d6b64; }
+.print-toc .dots { display: none; }
+
+.print-page { page-break-before: always; break-before: page; }
+.print-page:first-of-type { page-break-before: avoid; break-before: avoid; }
+
+@media print {
+  body.print { background: #fff; }
+  pre, .callout, ol.steps > li, .api-item, tr { page-break-inside: avoid; break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; break-after: avoid; }
+  a { color: #16150f; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">PW</span><div><strong>Playwright UI Framework</strong><span>Documentation v1.0</span></div></div>
+    <input id="nav-filter" class="filter" type="search" placeholder="Filter sections…" aria-label="Filter sections">
+    <nav aria-label="Documentation"><ul class="nav"><li><a href="index.html">Overview</a></li><li><a href="architecture.html">Architecture</a></li><li><a href="worked-example.html">Worked example</a></li><li><a href="structure.html">Project structure</a></li><li><a href="reference-root.html">Reference: configuration &amp; tooling</a></li><li><a href="reference-foundation.html" aria-current="page">Reference: config, core &amp; types</a></li><li><a href="reference-components.html">Reference: component library</a></li><li><a href="reference-fixtures.html">Reference: fixtures, hooks, pages &amp; API</a></li><li><a href="reference-utils.html">Reference: utilities, reporters &amp; data</a></li><li><a href="reference-tests.html">Reference: tests &amp; repository docs</a></li><li><a href="playbooks.html">Playbooks</a></li><li><a href="conventions.html">Conventions</a></li><li><a href="troubleshooting.html">Troubleshooting</a></li><li><a href="api-index.html">API index</a></li><li><a href="glossary.html">Glossary</a></li></ul></nav>
+    <div class="sidebar-foot">
+      <a href="playwright-ui-framework-documentation.pdf" download>Download PDF</a>
+      <span>Generated 2026-09-01</span>
+    </div>
+  </aside>
+  <main id="main">
+    <header class="page-head">
+      <p class="eyebrow">Playwright UI Framework</p>
+      <h1>Reference: config, core &amp; types</h1>
+      <p class="subtitle">The foundation every other layer is built on</p>
+    </header>
+    <nav class="toc" aria-label="On this page"><h2>On this page</h2><ul id="toc"><li><a href="#configuration-src-config">Configuration (src/config)</a></li><li><a href="#core-src-core">Core (src/core)</a></li><li><a href="#types-src-types">Types (src/types)</a></li></ul></nav>
+    <div class="content"><h2 id="configuration-src-config">Configuration (src/config)</h2>
+
+<section class="file" id="f-src-config-env-config-ts">
+  <header class="file-head">
+    <h3><code>src/config/env.config.ts</code></h3>
+    <span class="file-meta">195 lines &middot; 3 exports</span>
+  </header>
+  <p class="file-purpose">The only file in the framework permitted to read <code>process.env</code>. It loads <code>.env</code>, then <code>.env.&lt;TEST_ENV&gt;</code> on top, validates everything against a zod schema, and exports one frozen <code>config</code> object plus <code>getUser(role)</code> for credentials.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>What consumers see</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">import</span> { config, getUser } <span class="tok-k">from</span> <span class="tok-s">'@config/index'</span>;
+
+config.baseURL;            <span class="tok-c">// resolved URL for the selected environment</span>
+config.timeouts.action;    <span class="tok-c">// validated number, never a string</span>
+config.artifacts.trace;    <span class="tok-c">// 'on' | 'off' | 'retain-on-failure' | 'on-first-retry'</span>
+config.paths.downloads;    <span class="tok-c">// absolute path, directories created by global setup</span>
+
+<span class="tok-k">const</span> admin <span class="tok-o">=</span> <span class="tok-f">getUser</span>(<span class="tok-s">'admin'</span>);   <span class="tok-c">// throws a named error if the secret is missing</span></code></pre></figure>
+<ul><li><code>booleanish(fallback)</code> and <code>numeric(fallback)</code> pre-process raw strings into real booleans and numbers, falling back to a documented default instead of throwing on an empty variable.</li><li>Real process variables always beat <code>.env</code> files, so CI secrets are never overwritten by a stray local file.</li><li><code>HEADLESS</code> is forced to true when <code>CI</code> is set — a headed browser on a CI runner hangs.</li><li>Validation failure raises one error listing every offending variable, before a single browser starts.</li></ul>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You introduce a new environment variable.</li><li>You add a user role that needs credentials.</li><li>A default value proves wrong for most runs.</li><li>You need a new derived path under <code>config.paths</code>.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the variable to the zod schema with a sensible fallback.</p><pre><code><span class="tok-k">const</span> schema <span class="tok-o">=</span> z.<span class="tok-t">object</span>({
+  <span class="tok-c">// ...</span>
+  <span class="tok-t">FEATURE_FLAGS</span><span class="tok-o">:</span> z.<span class="tok-t">string</span>().<span class="tok-f">optional</span>(),
+  <span class="tok-t">MAX_UPLOAD_MB</span><span class="tok-o">:</span> <span class="tok-f">numeric</span>(<span class="tok-n">25</span>),
+});</code></pre></li><li><p>Expose it on the exported <code>config</code> object with the shape callers should see, converting or splitting it here rather than at every call site.</p><pre><code><span class="tok-k">export</span> <span class="tok-k">const</span> config <span class="tok-o">=</span> {
+  <span class="tok-c">// ...</span>
+  <span class="tok-p">featureFlags</span><span class="tok-o">:</span> (raw.<span class="tok-t">FEATURE_FLAGS</span> <span class="tok-o">??</span> <span class="tok-s">''</span>).<span class="tok-f">split</span>(<span class="tok-s">','</span>).<span class="tok-f">map</span>((f) <span class="tok-o">=&gt;</span> f.<span class="tok-f">trim</span>()).<span class="tok-f">filter</span>(<span class="tok-t">Boolean</span>),
+  <span class="tok-p">maxUploadMb</span><span class="tok-o">:</span> raw.<span class="tok-t">MAX_UPLOAD_MB</span>,
+} <span class="tok-k">as</span> <span class="tok-k">const</span>;</code></pre></li><li><p>Document it in <code>.env.example</code> in the same commit, and add it to the CI workflow if it must be set there.</p></li><li><p>For a new credentialled role, add the variables to the schema and a row to the <code>CREDENTIALS</code> map; <code>getUser</code> then validates it automatically.</p><pre><code><span class="tok-k">const</span> <span class="tok-t">CREDENTIALS</span><span class="tok-o">:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">UserRole</span>, { username<span class="tok-o">?:</span> <span class="tok-t">string</span>; password<span class="tok-o">?:</span> <span class="tok-t">string</span> }<span class="tok-o">&gt;</span> <span class="tok-o">=</span> {
+  <span class="tok-c">// ...</span>
+  <span class="tok-p">auditor</span><span class="tok-o">:</span> { <span class="tok-p">username</span><span class="tok-o">:</span> raw.<span class="tok-t">AUDITOR_USER</span>, <span class="tok-p">password</span><span class="tok-o">:</span> raw.<span class="tok-t">AUDITOR_PASSWORD</span> },
+};</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Centralising environment access converts a whole class of silent misconfiguration — a suite pointed at the wrong host, a timeout parsed as <code>NaN</code>, a login attempted with <code>undefined</code> — into one loud, immediate, specific error. Reading <code>process.env</code> anywhere else reintroduces exactly that risk.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>The role name must also exist in the <code>UserRole</code> union in <code>src/types/index.ts</code>, or TypeScript will reject the <code>CREDENTIALS</code> entry.</li><li>This module executes at import time. Keep it free of side effects beyond reading files and creating no I/O.</li></ul></div>
+  <p class="related">Related: <code>src/config/environments.ts</code> &middot; <code>src/config/timeouts.ts</code> &middot; <code>.env.example</code> &middot; <code>src/types/index.ts</code></p>
+  <details class="api"><summary>API surface (3 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>config</code></div><p class="api-doc">The single, validated, strongly-typed view of runtime configuration. Nothing in the framework should read <code>process.env</code> directly.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">getUser</span>(<span class="tok-p">role</span><span class="tok-o">:</span> <span class="tok-t">UserRole</span>)<span class="tok-o">:</span> <span class="tok-t">TestUser</span></code></div><p class="api-doc">Resolves credentials for a role, failing loudly at the point of use rather than silently logging in as <code>undefined</code>.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>AppConfig</code></div><pre class="api-shape"><code><span class="tok-k">typeof</span> config</code></pre></div></details>
+</section>
+
+<section class="file" id="f-src-config-environments-ts">
+  <header class="file-head">
+    <h3><code>src/config/environments.ts</code></h3>
+    <span class="file-meta">94 lines &middot; 2 exports</span>
+  </header>
+  <p class="file-purpose">Static, non-secret settings for each environment — base URL, API URL, default retries and workers, and whether to ignore HTTPS errors. Safe to commit and the single source of truth for where an environment lives.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>A new environment appears (a preview tier, a regional deployment).</li><li>An existing environment moves to a different URL.</li><li>One environment needs different retry or parallelism defaults — a shared staging box may need fewer workers than a dedicated QA box.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the name to the <code>EnvironmentName</code> union in <code>src/types/index.ts</code> first; TypeScript will then require the matching entry here.</p><pre><code><span class="tok-k">export</span> <span class="tok-k">type</span> <span class="tok-t">EnvironmentName</span> <span class="tok-o">=</span> <span class="tok-s">'local'</span> <span class="tok-o">|</span> <span class="tok-s">'dev'</span> <span class="tok-o">|</span> <span class="tok-s">'qa'</span> <span class="tok-o">|</span> <span class="tok-s">'staging'</span> <span class="tok-o">|</span> <span class="tok-s">'preprod'</span> <span class="tok-o">|</span> <span class="tok-s">'prod'</span>;</code></pre></li><li><p>Add the entry with all five fields.</p><pre><code><span class="tok-p">preprod</span><span class="tok-o">:</span> {
+  <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-s">'preprod'</span>,
+  <span class="tok-p">baseURL</span><span class="tok-o">:</span> <span class="tok-s">'https://preprod.example.com'</span>,
+  <span class="tok-p">apiBaseURL</span><span class="tok-o">:</span> <span class="tok-s">'https://preprod.example.com/api'</span>,
+  <span class="tok-p">retries</span><span class="tok-o">:</span> <span class="tok-n">2</span>,
+  <span class="tok-p">workers</span><span class="tok-o">:</span> <span class="tok-n">4</span>,
+  <span class="tok-p">ignoreHTTPSErrors</span><span class="tok-o">:</span> <span class="tok-k">false</span>,
+},</code></pre></li><li><p>Extend the <code>TEST_ENV</code> enum in the zod schema in <code>env.config.ts</code>, and add the value to the CI workflow’s environment choice list.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>URLs are configuration, not secrets. Keeping them in version control means a reviewer can see exactly which host a change targets, and switching environments is one variable rather than a hunt through scripts.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Never add credentials here. This file is committed; secrets come from the process environment.</li></ul></div>
+  <p class="related">Related: <code>src/config/env.config.ts</code> &middot; <code>src/types/index.ts</code></p>
+  <details class="api"><summary>API surface (2 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>ENVIRONMENTS</code></div><p class="api-doc">Static, non-secret configuration per environment. Secrets never live here — they come from the process environment (see <code>env.config.ts</code>). This file is safe to commit and is the single source of truth for &quot;where does a given environment live&quot;.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">getEnvironment</span>(<span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">EnvironmentName</span>)<span class="tok-o">:</span> <span class="tok-t">EnvironmentConfig</span></code></div></div></details>
+</section>
+
+<section class="file" id="f-src-config-index-ts">
+  <header class="file-head">
+    <h3><code>src/config/index.ts</code></h3>
+    <span class="file-meta">4 lines &middot; 3 exports</span>
+  </header>
+  <p class="file-purpose">Re-exports <code>config</code>, <code>getUser</code>, <code>ENVIRONMENTS</code>, <code>getEnvironment</code> and <code>TIMEOUTS</code> so consumers import from <code>@config/index</code> rather than reaching into individual files.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a file to <code>src/config/</code> that other layers should use.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the re-export line. Keep internal helpers out of the barrel so the public surface stays small.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A single import path means moving or splitting a config file later does not ripple through the codebase.</p></div>
+  
+  <p class="related">Related: <code>src/config/env.config.ts</code></p>
+  <details class="api"><summary>API surface (3 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>config, getUser, AppConfig</code><span class="api-heritage">from './env.config'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>ENVIRONMENTS, getEnvironment</code><span class="api-heritage">from './environments'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>TIMEOUTS, TimeoutKey</code><span class="api-heritage">from './timeouts'</span></div></div></details>
+</section>
+
+<section class="file" id="f-src-config-timeouts-ts">
+  <header class="file-head">
+    <h3><code>src/config/timeouts.ts</code></h3>
+    <span class="file-meta">33 lines &middot; 2 exports</span>
+  </header>
+  <p class="file-purpose">Every wait in the framework references one of these named budgets — <code>INSTANT</code>, <code>SHORT</code>, <code>MEDIUM</code>, <code>LONG</code>, <code>EXTRA_LONG</code>, <code>TEST</code>, <code>HOOK</code>, <code>EXPECT</code>, <code>POLL_INTERVAL</code>, <code>DEBOUNCE</code>, <code>ANIMATION</code> — so tuning flakiness is a single-file change instead of a repo-wide hunt for magic numbers.</p>
+  <div class="table-wrap"><table><thead><tr><th>Budget</th><th>Default</th><th>Use for</th></tr></thead><tbody><tr><td><code>INSTANT</code></td><td>1s</td><td>A class toggle, a fade, a ripple.</td></tr><tr><td><code>SHORT</code></td><td>5s</td><td>Tooltips, dropdown opening, toast appearance.</td></tr><tr><td><code>MEDIUM</code></td><td>15s</td><td>Default for any element interaction.</td></tr><tr><td><code>LONG</code></td><td>30s</td><td>Navigation, route change, heavy client render.</td></tr><tr><td><code>EXTRA_LONG</code></td><td>60s</td><td>Upload, download, report generation.</td></tr><tr><td><code>DEBOUNCE</code></td><td>500ms</td><td>Settle time after typing into a search field.</td></tr><tr><td><code>ANIMATION</code></td><td>300ms</td><td>Settle time before a screenshot comparison.</td></tr></tbody></table></div>
+  <div class="change"><h4>When you need to change it</h4><ul><li>A category of interaction is genuinely slower in your application.</li><li>You need a new named category (for example <code>REPORT_GENERATION</code>).</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add or adjust the named budget, then use the name — never the number — at the call site.</p><pre><code><span class="tok-k">export</span> <span class="tok-k">const</span> <span class="tok-t">TIMEOUTS</span> <span class="tok-o">=</span> {
+  <span class="tok-c">// ...</span>
+  <span class="tok-t">REPORT_GENERATION</span><span class="tok-o">:</span> <span class="tok-n">180_000</span>,
+} <span class="tok-k">as</span> <span class="tok-k">const</span>;
+
+<span class="tok-k">await</span> <span class="tok-k">this</span>.locator.<span class="tok-f">waitFor</span>({ <span class="tok-p">state</span><span class="tok-o">:</span> <span class="tok-s">'visible'</span>, <span class="tok-p">timeout</span><span class="tok-o">:</span> <span class="tok-t">TIMEOUTS</span>.<span class="tok-t">REPORT_GENERATION</span> });</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A raw <code>30000</code> scattered through a suite tells the next reader nothing about intent. A name says what class of wait it is, which makes it safe to tune every wait of that class at once when the application changes.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Raising a timeout hides slowness rather than fixing it. Confirm the wait is legitimately long before increasing a budget.</li></ul></div>
+  <p class="related">Related: <code>src/config/env.config.ts</code> &middot; <code>src/core/base.component.ts</code></p>
+  <details class="api"><summary>API surface (2 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>TIMEOUTS</code></div><p class="api-doc">Centralised timeout budget (milliseconds). Every wait in the framework must reference one of these named budgets so that tuning flakiness is a single-file change rather than a repo-wide grep.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>TimeoutKey</code></div><pre class="api-shape"><code><span class="tok-k">keyof</span> <span class="tok-k">typeof</span> <span class="tok-t">TIMEOUTS</span></code></pre></div></details>
+</section>
+<h2 id="core-src-core">Core (src/core)</h2>
+
+<section class="file" id="f-src-core-base-component-ts">
+  <header class="file-head">
+    <h3><code>src/core/base.component.ts</code></h3>
+    <span class="file-meta">521 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">The most important file in the framework. Every component in <code>src/components/</code> extends this class, so the behaviour that must be identical everywhere — step reporting, structured logging, scroll and stability handling, state inspection, named assertions and failure diagnostics — is written once here and inherited rather than copy-pasted.</p>
+  <ul><li><strong>Reported steps.</strong> <code>this.step(title, fn)</code> wraps every public action in <code>test.step</code>, so a trace reads <code>Table &quot;Results&quot;: sort by &quot;Amount&quot; desc</code> instead of an anonymous click.</li><li><strong>Contextual failures.</strong> A failure is re-thrown naming the component, its selector and the original cause, attached as <code>cause</code>.</li><li><strong>Pre-action hygiene.</strong> <code>prepare()</code> waits for visibility, scrolls into view, and optionally waits for the bounding box to stop moving — before every interaction.</li><li><strong>State inspection.</strong> <code>getState()</code> returns existence, visibility, enablement, editability, checked state, focus, text, value, box and every attribute in one call.</li><li><strong>Named assertions.</strong> <code>expectVisible</code>, <code>expectText</code>, <code>expectCount</code> and friends wrap web-first assertions with messages that identify the component.</li><li><strong>Narrowing.</strong> <code>nth(n)</code> (1-based, to read naturally), <code>first()</code> and <code>filterByText()</code> return a new instance of the same subclass.</li></ul>
+<figure class="code" data-lang="ts"><figcaption><span>The pattern every subclass follows</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">export</span> <span class="tok-k">class</span> <span class="tok-t">Button</span> <span class="tok-k">extends</span> <span class="tok-t">BaseComponent</span> {
+  <span class="tok-k">protected</span> <span class="tok-k">override</span> <span class="tok-k">get</span> <span class="tok-f">componentType</span>()<span class="tok-o">:</span> <span class="tok-t">string</span> {
+    <span class="tok-k">return</span> <span class="tok-s">'Button'</span>;   <span class="tok-c">// shown in logs and step titles</span>
+  }
+
+  <span class="tok-k">async</span> <span class="tok-f">clickWhenReady</span>(<span class="tok-p">options</span><span class="tok-o">:</span> <span class="tok-t">ClickOptions</span> <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span> {
+    <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">step</span>(<span class="tok-s">'click when enabled'</span>, <span class="tok-k">async</span> () <span class="tok-o">=&gt;</span> {   <span class="tok-c">// reported step</span>
+      <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">waitForEnabled</span>();
+      <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">prepare</span>();                                <span class="tok-c">// scroll + stability</span>
+      <span class="tok-k">await</span> <span class="tok-k">this</span>.locator.<span class="tok-f">click</span>({ <span class="tok-p">timeout</span><span class="tok-o">:</span> <span class="tok-k">this</span>.timeout, <span class="tok-o">...</span>options });
+    });
+  }
+}</code></pre></figure>
+  <div class="change"><h4>When you need to change it</h4><ul><li>A behaviour should apply to every element type — a new universal wait, a new diagnostic, a logging change.</li><li>You want to change what happens before every interaction.</li><li>You need a new shared assertion.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the method here only if it is meaningful for every element. If it applies to one family, put it on that component instead.</p><pre><code><span class="tok-c">/** Waits until the element stops reporting an ARIA busy state. */</span>
+<span class="tok-k">async</span> <span class="tok-f">waitForNotBusy</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span> {
+  <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">step</span>(<span class="tok-s">'wait for aria-busy to clear'</span>, <span class="tok-k">async</span> () <span class="tok-o">=&gt;</span> {
+    <span class="tok-k">await</span> <span class="tok-f">expect</span>(<span class="tok-k">this</span>.locator).not.<span class="tok-f">toHaveAttribute</span>(<span class="tok-s">'aria-busy'</span>, <span class="tok-s">'true'</span>, { timeout });
+  });
+}</code></pre></li><li><p>Wrap it in <code>this.step()</code> so it appears in traces, and use <code>this.timeout</code> so per-component overrides are honoured.</p></li><li><p>To change pre-action behaviour for everything, edit <code>prepare()</code>. Measure the cost first — it runs before every single interaction in the suite.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>This is the leverage point of the whole framework: one method here becomes available to all 37 component types with no duplication, and one improvement to error messages improves every failure in the suite.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li><code>getValue()</code> is deliberately named <code>getInputValue()</code> on the base class so components whose value is numeric (<code>Slider</code>, <code>ProgressBar</code>) can define a correctly-typed <code>getValue()</code> of their own.</li><li>Anything added here runs everywhere; an expensive check will slow the entire suite.</li><li><code>nth()</code> is 1-based here while Playwright’s own <code>nth()</code> is 0-based — the class converts.</li></ul></div>
+  <p class="related">Related: <code>src/core/locator.factory.ts</code> &middot; <code>src/core/base.page.ts</code> &middot; <code>src/components/component.factory.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>BaseComponent</code></div><p class="api-doc">The root of the component model. Every UI element type in <code>src/components</code> extends this class, so the behaviour that must be identical everywhere — logging, step reporting, scrolling, stability waits, state inspection, diagnostics on failure — is written once here and inherited rather than copy-pasted. Design rules: - Wrap, never replace, Playwright's auto-waiting. No arbitrary sleeps. - Every public action reports itself as a <code>test.step</code> so traces read like a plain-English script. - Failures carry the component name and selector, not just &quot;locator not found&quot;.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">locator</span><span class="tok-o">:</span> <span class="tok-t">Locator</span></code></td><td></td></tr><tr><td><code><span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">string</span></code></td><td></td></tr><tr><td><code><span class="tok-k">get</span> <span class="tok-p">page</span><span class="tok-o">:</span> <span class="tok-t">Page</span></code></td><td></td></tr><tr><td><code><span class="tok-f">nth</span>(<span class="tok-p">position</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-k">this</span></code></td><td>Narrows to the nth match (1-based) as a new component of the same type.</td></tr><tr><td><code><span class="tok-f">first</span>()<span class="tok-o">:</span> <span class="tok-k">this</span></code></td><td></td></tr><tr><td><code><span class="tok-f">filterByText</span>(<span class="tok-p">text</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>)<span class="tok-o">:</span> <span class="tok-k">this</span></code></td><td>Narrows this component to matches containing the given text.</td></tr><tr><td><code><span class="tok-f">describe</span>()<span class="tok-o">:</span> <span class="tok-t">string</span></code></td><td></td></tr><tr><td><code><span class="tok-f">waitForStable</span>(timeout <span class="tok-o">=</span> <span class="tok-t">TIMEOUTS</span>.<span class="tok-t">SHORT</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Waits until the bounding box stops moving — for animated or lazy content.</td></tr><tr><td><code><span class="tok-f">click</span>(<span class="tok-p">options</span><span class="tok-o">:</span> <span class="tok-t">ClickOptions</span> <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">doubleClick</span>(<span class="tok-p">options</span><span class="tok-o">:</span> <span class="tok-t">ClickOptions</span> <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">rightClick</span>(<span class="tok-p">options</span><span class="tok-o">:</span> <span class="tok-t">ClickOptions</span> <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">forceClick</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Dispatches a DOM click that bypasses actionability checks. Escape hatch for overlays you cannot dismiss — prefer <code>click()</code>.</td></tr><tr><td><code><span class="tok-f">hover</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">focus</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">blur</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">scrollIntoView</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">pressKey</span>(<span class="tok-p">key</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">dragTo</span>(<span class="tok-p">target</span><span class="tok-o">:</span> <span class="tok-t">BaseComponent</span> <span class="tok-o">|</span> <span class="tok-t">Locator</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">isVisible</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">isHidden</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">isEnabled</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">isDisabled</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">isEditable</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">isChecked</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">isFocused</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">exists</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">count</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">number</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">getText</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">getTextContent</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">getAllTexts</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>[]<span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">getInputValue</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td>Raw value of a form control. Named <code>getInputValue</code> rather than <code>getValue</code> so components whose value is not a string (Slider, ProgressBar) can define a correctly-typed <code>getValue()</code> without fighting this signature.</td></tr><tr><td><code><span class="tok-f">getAttribute</span>(<span class="tok-p">attribute</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">null</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">hasAttribute</span>(<span class="tok-p">attribute</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">getCssValue</span>(<span class="tok-p">property</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">hasClass</span>(<span class="tok-p">className</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">getBoundingBox</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">BoundingBox</span> <span class="tok-o">|</span> <span class="tok-k">null</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">getAccessibleName</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td>Accessible name as computed by the browser — what a screen reader announces.</td></tr><tr><td><code><span class="tok-f">getAriaRole</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">null</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">getState</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">ElementState</span><span class="tok-o">&gt;</span></code></td><td>One-shot snapshot of everything observable — invaluable in failure output.</td></tr><tr><td><code><span class="tok-f">getAllAttributes</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">string</span><span class="tok-o">&gt;&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">waitForVisible</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">waitForHidden</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">waitForAttached</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">waitForDetached</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">waitForEnabled</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">waitForText</span>(<span class="tok-p">text</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>, timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectVisible</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectHidden</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectEnabled</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectDisabled</span>(timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectText</span>(<span class="tok-p">expected</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>, timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectContainsText</span>(<span class="tok-p">expected</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>, timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectValue</span>(<span class="tok-p">expected</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>, timeout <span class="tok-o">=</span> <span class="tok-k">this</span>.timeout)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectAttribute</span>(<span class="tok-p">attribute</span><span class="tok-o">:</span> <span class="tok-t">string</span>, <span class="tok-p">expected</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectCount</span>(<span class="tok-p">expected</span><span class="tok-o">:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectFocused</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">highlight</span>(durationMs <span class="tok-o">=</span> <span class="tok-n">1000</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Draws a temporary outline — useful when debugging headed runs.</td></tr><tr><td><code><span class="tok-f">screenshot</span>(name<span class="tok-o">?:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">Buffer</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">innerHTML</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td></td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-core-base-page-ts">
+  <header class="file-head">
+    <h3><code>src/core/base.page.ts</code></h3>
+    <span class="file-meta">185 lines &middot; 1 exports</span>
+  </header>
+  <p class="file-purpose">Base class for page objects. It owns navigation, load verification, page-level waits and page-level assertions, and requires every subclass to declare two things: the <code>path</code> it lives at and a <code>readyIndicator</code> that proves it finished rendering.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>The two required declarations</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">export</span> <span class="tok-k">class</span> <span class="tok-t">CheckoutPage</span> <span class="tok-k">extends</span> <span class="tok-t">BasePage</span> {
+  <span class="tok-k">protected</span> <span class="tok-k">readonly</span> path <span class="tok-o">=</span> <span class="tok-s">'/checkout'</span>;
+  <span class="tok-k">protected</span> <span class="tok-k">readonly</span> <span class="tok-p">readyIndicator</span><span class="tok-o">:</span> <span class="tok-t">SelectorLike</span> <span class="tok-o">=</span> <span class="tok-s">'[data-testid=&quot;checkout-root&quot;]'</span>;
+}</code></pre></figure>
+<ul><li><code>goto()</code> navigates with query parameters and waits until the page is genuinely usable.</li><li><code>waitUntilLoaded()</code> blocks on the ready indicator; override it to add further checks.</li><li><code>waitForIdle()</code> waits for network quiet and an optional spinner to disappear.</li><li><code>actionWithResponse()</code> runs an action and returns the API response it triggered.</li><li><code>isCurrentPage()</code> supports conditional flows without throwing.</li><li><code>checkAccessibility()</code> runs an axe scan on the page.</li></ul>
+  <div class="change"><h4>When you need to change it</h4><ul><li>Every page in your application shares a behaviour — a cookie banner to dismiss, a global spinner, a tenant switch.</li><li>You need a new page-level assertion or wait.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the shared behaviour here so no page object repeats it.</p><pre><code><span class="tok-c">/** Dismisses the consent banner if the application decided to show it. */</span>
+<span class="tok-k">protected</span> <span class="tok-k">async</span> <span class="tok-f">dismissConsentBanner</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span> {
+  <span class="tok-k">const</span> accept <span class="tok-o">=</span> <span class="tok-k">this</span>.page.<span class="tok-f">getByRole</span>(<span class="tok-s">'button'</span>, { <span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-r">/accept all/i</span> });
+  <span class="tok-k">if</span> (<span class="tok-k">await</span> accept.<span class="tok-f">isVisible</span>().<span class="tok-k">catch</span>(() <span class="tok-o">=&gt;</span> <span class="tok-k">false</span>)) <span class="tok-k">await</span> accept.<span class="tok-f">click</span>();
+}</code></pre></li><li><p>To make it automatic, call it from an overridden <code>waitUntilLoaded()</code> — and remember that subclasses overriding that method must call <code>super</code>.</p><pre><code><span class="tok-k">override</span> <span class="tok-k">async</span> <span class="tok-f">waitUntilLoaded</span>(timeout<span class="tok-o">?:</span> <span class="tok-t">number</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span> {
+  <span class="tok-k">await</span> <span class="tok-k">super</span>.<span class="tok-f">waitUntilLoaded</span>(timeout);
+  <span class="tok-k">await</span> <span class="tok-k">this</span>.<span class="tok-f">dismissConsentBanner</span>();
+}</code></pre></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Requiring a ready indicator is what makes navigation deterministic: without it, page objects fall back to arbitrary sleeps, which is the most common source of flakiness in UI suites.</p></div>
+  <div class="change gotcha"><h4>Watch out for</h4><ul><li>Page objects must not contain business assertions. Verifying that the page loaded is in scope; verifying that the order total is $80 is the test’s job.</li></ul></div>
+  <p class="related">Related: <code>src/pages/template.page.ts</code> &middot; <code>src/core/base.component.ts</code></p>
+  <details class="api"><summary>API surface (1 export)</summary><div class="api-item"><div class="api-head"><span class="badge badge-class">class</span><code>BasePage</code></div><p class="api-doc">Base for every page object. A page object owns: the URL it lives at, the components it exposes, and the high-level business actions a test would name out loud. It must NOT contain assertions about business outcomes (those belong in tests) beyond the self-verification of <code>waitUntilLoaded</code>.</p><table class="api-members"><tbody><tr><td><code><span class="tok-p">network</span><span class="tok-o">:</span> <span class="tok-t">NetworkHelper</span></code></td><td></td></tr><tr><td><code><span class="tok-k">get</span> <span class="tok-p">url</span><span class="tok-o">:</span> <span class="tok-t">string</span></code></td><td></td></tr><tr><td><code><span class="tok-f">goto</span>(<span class="tok-p">options</span><span class="tok-o">:</span> { query<span class="tok-o">?:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">string</span><span class="tok-o">&gt;</span>; waitUntilLoaded<span class="tok-o">?:</span> <span class="tok-t">boolean</span> } <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Navigates to this page and waits until it is genuinely usable.</td></tr><tr><td><code><span class="tok-f">waitUntilLoaded</span>(timeout <span class="tok-o">=</span> config.timeouts.navigation)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Blocks until the ready indicator is visible. Override to add more checks.</td></tr><tr><td><code><span class="tok-f">reload</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">goBack</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">goForward</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">isCurrentPage</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">boolean</span><span class="tok-o">&gt;</span></code></td><td>True when the browser is on this page — for conditional flows.</td></tr><tr><td><code><span class="tok-f">title</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">string</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">currentUrl</span>()<span class="tok-o">:</span> <span class="tok-t">string</span></code></td><td></td></tr><tr><td><code><span class="tok-f">waitForIdle</span>(<span class="tok-p">options</span><span class="tok-o">:</span> { spinnerSelector<span class="tok-o">?:</span> <span class="tok-t">string</span>; timeout<span class="tok-o">?:</span> <span class="tok-t">number</span> } <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Waits for the SPA to go quiet: no in-flight requests and no spinners.</td></tr><tr><td><code><span class="tok-f">waitForUrl</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>, timeout <span class="tok-o">=</span> config.timeouts.navigation)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">actionWithResponse</span>(<span class="tok-p">action</span><span class="tok-o">:</span> () <span class="tok-o">=&gt;</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span>, <span class="tok-p">urlPattern</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>, timeout <span class="tok-o">=</span> config.timeouts.navigation)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-t">Response</span><span class="tok-o">&gt;</span></code></td><td>Runs an action and returns the API response it triggered.</td></tr><tr><td><code><span class="tok-f">expectLoaded</span>()<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectUrl</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">expectTitle</span>(<span class="tok-p">pattern</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">RegExp</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td></td></tr><tr><td><code><span class="tok-f">checkAccessibility</span>(<span class="tok-p">options</span><span class="tok-o">:</span> <span class="tok-t">A11yScanOptions</span> <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Scans this page for WCAG violations.</td></tr><tr><td><code><span class="tok-f">captureScreenshot</span>(name <span class="tok-o">=</span> <span class="tok-s">`</span><span class="tok-o">${</span><span class="tok-k">this</span>.constructor.name<span class="tok-o">}</span><span class="tok-s">.png`</span>)<span class="tok-o">:</span> <span class="tok-f">Promise</span><span class="tok-o">&lt;</span><span class="tok-k">void</span><span class="tok-o">&gt;</span></code></td><td>Takes a full-page screenshot and attaches it to the report.</td></tr></tbody></table></div></details>
+</section>
+
+<section class="file" id="f-src-core-index-ts">
+  <header class="file-head">
+    <h3><code>src/core/index.ts</code></h3>
+    <span class="file-meta">4 lines &middot; 3 exports</span>
+  </header>
+  <p class="file-purpose">Re-exports <code>BaseComponent</code>, <code>BasePage</code>, <code>by</code>, <code>resolveLocator</code> and the <code>Scope</code> type.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a file to <code>src/core/</code>.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the re-export so consumers keep using <code>@core/index</code>.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Keeps the framework foundation reachable through one import path.</p></div>
+  
+  <p class="related">Related: <code>src/core/base.component.ts</code></p>
+  <details class="api"><summary>API surface (3 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>BaseComponent</code><span class="api-heritage">from './base.component'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>BasePage</code><span class="api-heritage">from './base.page'</span></div></div><div class="api-item"><div class="api-head"><span class="badge badge-const">re-export</span><code>by, resolveLocator, Scope</code><span class="api-heritage">from './locator.factory'</span></div></div></details>
+</section>
+
+<section class="file" id="f-src-core-locator-factory-ts">
+  <header class="file-head">
+    <h3><code>src/core/locator.factory.ts</code></h3>
+    <span class="file-meta">87 lines &middot; 3 exports</span>
+  </header>
+  <p class="file-purpose">Resolves any <code>SelectorLike</code> — a CSS or XPath string, an existing <code>Locator</code>, or a function that derives one from a scope — into a real Locator, applying the iframe and shadow-DOM options a component declares. Also exports <code>by</code>, the catalogue of locator strategies in order of resilience.</p>
+  <figure class="code" data-lang="ts"><figcaption><span>Why this makes iframes ordinary</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> frame <span class="tok-o">=</span> <span class="tok-k">new</span> <span class="tok-f">Frame</span>(page, <span class="tok-s">'#payment-iframe'</span>);
+<span class="tok-k">const</span> cardNumber <span class="tok-o">=</span> <span class="tok-k">new</span> <span class="tok-f">TextInput</span>(frame.locator, <span class="tok-s">'#card-number'</span>);   <span class="tok-c">// identical API</span></code></pre></figure>
+<div class="table-wrap"><table><thead><tr><th>Preference</th><th>Strategy</th><th>When</th></tr></thead><tbody><tr><td>1</td><td><code>by.testId</code></td><td>Default. Stable against copy and styling changes.</td></tr><tr><td>2</td><td><code>by.role</code></td><td>Accessible and expresses intent.</td></tr><tr><td>3</td><td><code>by.label</code> / <code>by.placeholder</code></td><td>Form controls with visible labels.</td></tr><tr><td>4</td><td><code>by.text</code></td><td>Buttons and links whose text is the contract.</td></tr><tr><td>5</td><td><code>by.css</code></td><td>Legacy markup with nothing better.</td></tr><tr><td>6</td><td><code>by.xpath</code></td><td>Last resort — structural and brittle.</td></tr></tbody></table></div>
+  <div class="change"><h4>When you need to change it</h4><ul><li>Your application needs a locator strategy that is not covered (a framework-specific attribute, a data-cy convention).</li><li>A new scoping mechanism appears — nested shadow roots, a custom portal container.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the strategy to the <code>by</code> object with a short comment about when it is appropriate.</p><pre><code>by.automationId <span class="tok-o">=</span> (<span class="tok-p">scope</span><span class="tok-o">:</span> <span class="tok-t">Page</span> <span class="tok-o">|</span> <span class="tok-t">Locator</span>, <span class="tok-p">id</span><span class="tok-o">:</span> <span class="tok-t">string</span>)<span class="tok-o">:</span> <span class="tok-t">Locator</span> <span class="tok-o">=&gt;</span>
+  scope.<span class="tok-f">locator</span>(<span class="tok-s">`[data-automation-id=&quot;</span><span class="tok-o">${</span>id<span class="tok-o">}</span><span class="tok-s">&quot;]`</span>);</code></pre></li><li><p>If the whole application uses a different test-id attribute, change <code>testIdAttribute</code> in <code>playwright.config.ts</code> instead — then <code>getByTestId</code> and <code>by.testId</code> both follow it.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Centralising resolution is what allows every component to accept three different selector forms without each one re-implementing the logic, and what keeps iframe and shadow-DOM handling out of the component code entirely.</p></div>
+  
+  <p class="related">Related: <code>src/core/base.component.ts</code> &middot; <code>src/components/media/frame.ts</code> &middot; <code>playwright.config.ts</code></p>
+  <details class="api"><summary>API surface (3 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>Scope</code></div><pre class="api-shape"><code><span class="tok-t">Page</span> <span class="tok-o">|</span> <span class="tok-t">Frame</span> <span class="tok-o">|</span> <span class="tok-t">Locator</span> <span class="tok-o">|</span> <span class="tok-t">FrameLocator</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">resolveLocator</span>(<span class="tok-p">scope</span><span class="tok-o">:</span> <span class="tok-t">Scope</span>, <span class="tok-p">selector</span><span class="tok-o">:</span> <span class="tok-t">SelectorLike</span>, <span class="tok-p">options</span><span class="tok-o">:</span> <span class="tok-f">Pick</span><span class="tok-o">&lt;</span><span class="tok-t">ComponentOptions</span>, <span class="tok-s">'frameSelector'</span> <span class="tok-o">|</span> <span class="tok-s">'shadowHost'</span><span class="tok-o">&gt;</span> <span class="tok-o">=</span> {})<span class="tok-o">:</span> <span class="tok-t">Locator</span></code></div><p class="api-doc">Resolves any <code>SelectorLike</code> into a Locator against a scope, applying the iframe and shadow-DOM options that components declare. Centralising this is what lets every component accept a string, a Locator or a builder function without each one re-implementing resolution.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-const">const</span><code>by</code></div><p class="api-doc">Preferred locator strategies, most to least resilient. Teams should reach for <code>byTestId</code> and the role/label helpers first; CSS and XPath exist for legacy applications that give you nothing better.</p></div></details>
+</section>
+<h2 id="types-src-types">Types (src/types)</h2>
+
+<section class="file" id="f-src-types-index-ts">
+  <header class="file-head">
+    <h3><code>src/types/index.ts</code></h3>
+    <span class="file-meta">178 lines &middot; 22 exports</span>
+  </header>
+  <p class="file-purpose">Every cross-cutting type in one place: environment names and shape, user roles, component options, <code>SelectorLike</code>, <code>ElementState</code>, click and fill options, table and sorting types, network mocking and capture shapes, accessibility and visual options, and the retry policy.</p>
+  <ul><li><code>SelectorLike</code> is what lets components accept a string, a Locator or a builder function.</li><li><code>ComponentOptions</code> carries <code>name</code>, <code>timeout</code>, <code>autoScroll</code>, <code>waitForStable</code>, <code>frameSelector</code> and <code>shadowHost</code> — every component extends it for its own selectors.</li><li><code>ElementState</code> is the diagnostic snapshot returned by <code>getState()</code>.</li><li><code>UserRole</code> and <code>EnvironmentName</code> are unions, so adding a value makes TypeScript point at every place that must handle it.</li></ul>
+  <div class="change"><h4>When you need to change it</h4><ul><li>You add a role, an environment, or a concept shared by more than one module.</li><li>A component option becomes generally useful.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the union member or interface field here first, then follow the compiler errors — they are a complete to-do list of everywhere that must be updated.</p><pre><code><span class="tok-k">export</span> <span class="tok-k">type</span> <span class="tok-t">UserRole</span> <span class="tok-o">=</span> <span class="tok-s">'standard'</span> <span class="tok-o">|</span> <span class="tok-s">'admin'</span> <span class="tok-o">|</span> <span class="tok-s">'readonly'</span> <span class="tok-o">|</span> <span class="tok-s">'guest'</span> <span class="tok-o">|</span> <span class="tok-s">'auditor'</span>;</code></pre></li><li><p>Keep types that belong to exactly one component in that component’s file; only genuinely shared shapes belong here.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>A union defined once turns &quot;add a role&quot; from a search-and-hope exercise into a compiler-guided checklist. That property disappears the moment the same union is redeclared elsewhere.</p></div>
+  
+  <p class="related">Related: <code>src/config/environments.ts</code> &middot; <code>src/config/env.config.ts</code> &middot; <code>src/core/base.component.ts</code></p>
+  <details class="api"><summary>API surface (22 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>EnvironmentName</code></div><pre class="api-shape"><code><span class="tok-s">'demo'</span> <span class="tok-o">|</span> <span class="tok-s">'local'</span> <span class="tok-o">|</span> <span class="tok-s">'dev'</span> <span class="tok-o">|</span> <span class="tok-s">'qa'</span> <span class="tok-o">|</span> <span class="tok-s">'staging'</span> <span class="tok-o">|</span> <span class="tok-s">'prod'</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>EnvironmentConfig</code></div><pre class="api-shape"><code><span class="tok-p">name</span><span class="tok-o">:</span> <span class="tok-t">EnvironmentName</span>;
+<span class="tok-p">baseURL</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">apiBaseURL</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">retries</span><span class="tok-o">:</span> <span class="tok-t">number</span>;
+workers<span class="tok-o">?:</span> <span class="tok-t">number</span> <span class="tok-o">|</span> <span class="tok-k">undefined</span>;
+<span class="tok-p">ignoreHTTPSErrors</span><span class="tok-o">:</span> <span class="tok-t">boolean</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>LogLevel</code></div><pre class="api-shape"><code><span class="tok-s">'error'</span> <span class="tok-o">|</span> <span class="tok-s">'warn'</span> <span class="tok-o">|</span> <span class="tok-s">'info'</span> <span class="tok-o">|</span> <span class="tok-s">'debug'</span> <span class="tok-o">|</span> <span class="tok-s">'trace'</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>ArtifactMode</code></div><pre class="api-shape"><code><span class="tok-s">'on'</span> <span class="tok-o">|</span> <span class="tok-s">'off'</span> <span class="tok-o">|</span> <span class="tok-s">'retain-on-failure'</span> <span class="tok-o">|</span> <span class="tok-s">'on-first-retry'</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>UserRole</code></div><pre class="api-shape"><code><span class="tok-s">'standard'</span> <span class="tok-o">|</span> <span class="tok-s">'admin'</span> <span class="tok-o">|</span> <span class="tok-s">'readonly'</span> <span class="tok-o">|</span> <span class="tok-s">'guest'</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>TestUser</code></div><pre class="api-shape"><code><span class="tok-p">role</span><span class="tok-o">:</span> <span class="tok-t">UserRole</span>;
+<span class="tok-p">username</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">password</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+storageStatePath<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+displayName<span class="tok-o">?:</span> <span class="tok-t">string</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>SelectorLike</code></div><p class="api-doc">Anything a component can be built from: a raw CSS/XPath selector, an already-resolved Locator, or a factory that derives one from a scope.</p><pre class="api-shape"><code><span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-t">Locator</span> <span class="tok-o">|</span> ((<span class="tok-p">scope</span><span class="tok-o">:</span> <span class="tok-t">Page</span> <span class="tok-o">|</span> <span class="tok-t">Locator</span>) <span class="tok-o">=&gt;</span> <span class="tok-t">Locator</span>)</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>ComponentOptions</code></div><pre class="api-shape"><code>name<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+timeout<span class="tok-o">?:</span> <span class="tok-t">number</span>;
+autoScroll<span class="tok-o">?:</span> <span class="tok-t">boolean</span>;
+waitForStable<span class="tok-o">?:</span> <span class="tok-t">boolean</span>;
+frameSelector<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+shadowHost<span class="tok-o">?:</span> <span class="tok-t">string</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>ElementState</code></div><p class="api-doc">The observable state of any UI element, used by assertions and diagnostics.</p><pre class="api-shape"><code><span class="tok-p">exists</span><span class="tok-o">:</span> <span class="tok-t">boolean</span>;
+<span class="tok-p">visible</span><span class="tok-o">:</span> <span class="tok-t">boolean</span>;
+<span class="tok-p">enabled</span><span class="tok-o">:</span> <span class="tok-t">boolean</span>;
+<span class="tok-p">editable</span><span class="tok-o">:</span> <span class="tok-t">boolean</span>;
+<span class="tok-p">checked</span><span class="tok-o">:</span> <span class="tok-t">boolean</span> <span class="tok-o">|</span> <span class="tok-k">null</span>;
+<span class="tok-p">focused</span><span class="tok-o">:</span> <span class="tok-t">boolean</span>;
+<span class="tok-p">text</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">value</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">null</span>;
+<span class="tok-p">boundingBox</span><span class="tok-o">:</span> <span class="tok-t">BoundingBox</span> <span class="tok-o">|</span> <span class="tok-k">null</span>;
+<span class="tok-p">attributes</span><span class="tok-o">:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">string</span><span class="tok-o">&gt;</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>BoundingBox</code></div><pre class="api-shape"><code><span class="tok-p">x</span><span class="tok-o">:</span> <span class="tok-t">number</span>;
+<span class="tok-p">y</span><span class="tok-o">:</span> <span class="tok-t">number</span>;
+<span class="tok-p">width</span><span class="tok-o">:</span> <span class="tok-t">number</span>;
+<span class="tok-p">height</span><span class="tok-o">:</span> <span class="tok-t">number</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>ClickOptions</code></div><pre class="api-shape"><code>{ button<span class="tok-o">?:</span> <span class="tok-s">'left'</span> <span class="tok-o">|</span> <span class="tok-s">'right'</span> <span class="tok-o">|</span> <span class="tok-s">'middle'</span>; clickCount<span class="tok-o">?:</span> <span class="tok-t">number</span>; delay<span class="tok-o">?:</span> <span class="tok-t">number</span>; force<span class="tok-o">?:</span> <span class="tok-t">boolean</span>; modifiers<span class="tok-o">?:</span> <span class="tok-f">Array</span><span class="tok-o">&lt;</span><span class="tok-s">'Alt'</span> <span class="tok-o">|</span> <span class="tok-s">'Control'</span> <span class="tok-o">|</span> <span class="tok-s">'ControlOrMeta'</span> <span class="tok-o">|</span> <span class="tok-s">'Meta'</span> <span class="tok-o">|</span> <span class="tok-s">'Shift'</span><span class="tok-o">&gt;</span>; position<span class="tok-o">?:</span> { <span class="tok-p">x</span><span class="tok-o">:</span> <span class="tok-t">number</span>; <span class="tok-p">y</span><span class="tok-o">:</span> <span class="tok-t">number</span> }; timeout<span class="tok-o">?:</span> <span class="tok-t">number</span>; trial<span class="tok-o">?:</span> <span class="tok-t">boolean</span>; noWaitAfter<span class="tok-o">?:</span> <span class="tok-t">boolean</span>; }</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>FillOptions</code></div><pre class="api-shape"><code>{ clearFirst<span class="tok-o">?:</span> <span class="tok-t">boolean</span>; pressSequentially<span class="tok-o">?:</span> <span class="tok-t">boolean</span>; delay<span class="tok-o">?:</span> <span class="tok-t">number</span>; force<span class="tok-o">?:</span> <span class="tok-t">boolean</span>; timeout<span class="tok-o">?:</span> <span class="tok-t">number</span>; validate<span class="tok-o">?:</span> <span class="tok-t">boolean</span>; }</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>TableRow</code></div><pre class="api-shape"><code><span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">string</span><span class="tok-o">&gt;</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>SortDirection</code></div><pre class="api-shape"><code><span class="tok-s">'asc'</span> <span class="tok-o">|</span> <span class="tok-s">'desc'</span> <span class="tok-o">|</span> <span class="tok-s">'none'</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>TableCellAddress</code></div><pre class="api-shape"><code><span class="tok-p">row</span><span class="tok-o">:</span> <span class="tok-t">number</span>;
+<span class="tok-p">column</span><span class="tok-o">:</span> <span class="tok-t">number</span> <span class="tok-o">|</span> <span class="tok-t">string</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>MockResponse</code></div><pre class="api-shape"><code>status<span class="tok-o">?:</span> <span class="tok-t">number</span>;
+headers<span class="tok-o">?:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">string</span><span class="tok-o">&gt;</span>;
+body<span class="tok-o">?:</span> <span class="tok-t">T</span>;
+contentType<span class="tok-o">?:</span> <span class="tok-t">string</span>;
+delayMs<span class="tok-o">?:</span> <span class="tok-t">number</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>CapturedRequest</code></div><pre class="api-shape"><code><span class="tok-p">url</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">method</span><span class="tok-o">:</span> <span class="tok-t">string</span>;
+<span class="tok-p">postData</span><span class="tok-o">:</span> <span class="tok-t">string</span> <span class="tok-o">|</span> <span class="tok-k">null</span>;
+<span class="tok-p">headers</span><span class="tok-o">:</span> <span class="tok-f">Record</span><span class="tok-o">&lt;</span><span class="tok-t">string</span>, <span class="tok-t">string</span><span class="tok-o">&gt;</span>;
+<span class="tok-p">timestamp</span><span class="tok-o">:</span> <span class="tok-t">number</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">type</span><code>WcagTag</code></div><pre class="api-shape"><code><span class="tok-s">'wcag2a'</span> <span class="tok-o">|</span> <span class="tok-s">'wcag2aa'</span> <span class="tok-o">|</span> <span class="tok-s">'wcag21a'</span> <span class="tok-o">|</span> <span class="tok-s">'wcag21aa'</span> <span class="tok-o">|</span> <span class="tok-s">'wcag22aa'</span> <span class="tok-o">|</span> <span class="tok-s">'best-practice'</span></code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>A11yScanOptions</code></div><pre class="api-shape"><code>include<span class="tok-o">?:</span> <span class="tok-t">string</span>[];
+exclude<span class="tok-o">?:</span> <span class="tok-t">string</span>[];
+tags<span class="tok-o">?:</span> <span class="tok-t">WcagTag</span>[];
+disableRules<span class="tok-o">?:</span> <span class="tok-t">string</span>[];
+failOnViolation<span class="tok-o">?:</span> <span class="tok-t">boolean</span>;
+attachReport<span class="tok-o">?:</span> <span class="tok-t">boolean</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>VisualCompareOptions</code></div><pre class="api-shape"><code>maxDiffPixels<span class="tok-o">?:</span> <span class="tok-t">number</span>;
+maxDiffPixelRatio<span class="tok-o">?:</span> <span class="tok-t">number</span>;
+threshold<span class="tok-o">?:</span> <span class="tok-t">number</span>;
+animations<span class="tok-o">?:</span> <span class="tok-s">'allow'</span> <span class="tok-o">|</span> <span class="tok-s">'disabled'</span>;
+mask<span class="tok-o">?:</span> <span class="tok-t">Locator</span>[];
+fullPage<span class="tok-o">?:</span> <span class="tok-t">boolean</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>StepContext</code></div><pre class="api-shape"><code>testInfo<span class="tok-o">?:</span> <span class="tok-t">TestInfo</span>;
+attachScreenshot<span class="tok-o">?:</span> <span class="tok-t">boolean</span>;</code></pre></div><div class="api-item"><div class="api-head"><span class="badge badge-type">interface</span><code>RetryPolicy</code></div><pre class="api-shape"><code><span class="tok-p">attempts</span><span class="tok-o">:</span> <span class="tok-t">number</span>;
+<span class="tok-p">delayMs</span><span class="tok-o">:</span> <span class="tok-t">number</span>;
+backoffFactor<span class="tok-o">?:</span> <span class="tok-t">number</span>;
+retryOn<span class="tok-o">?:</span> (<span class="tok-p">error</span><span class="tok-o">:</span> <span class="tok-t">Error</span>) <span class="tok-o">=&gt;</span> <span class="tok-t">boolean</span>;</code></pre></div></details>
+</section>
+
+<section class="file" id="f-src-types-xlsx-populate-d-ts">
+  <header class="file-head">
+    <h3><code>src/types/xlsx-populate.d.ts</code></h3>
+    
+  </header>
+  <p class="file-purpose">Minimal type declarations for the <code>xlsx-populate</code> package, which ships none. Only the surface the framework uses — <code>fromFileAsync</code>, <code>sheet</code>, <code>sheets</code>, <code>usedRange().value()</code> — is declared.</p>
+  
+  <div class="change"><h4>When you need to change it</h4><ul><li>You start using more of the spreadsheet library’s API, or the package begins shipping its own types.</li></ul></div>
+  <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the method to the interface with the narrowest accurate type. If the package publishes official types, delete this file and remove the reference.</p></li></ol></div>
+  <div class="change why"><h4>Why the change belongs here</h4><p>Declaring only what is used keeps the fiction small and honest; a sprawling hand-written declaration file eventually disagrees with the library and hides real errors.</p></div>
+  
+  <p class="related">Related: <code>src/utils/file.utils.ts</code></p>
+  
+</section></div>
+    <footer class="page-foot">
+      <div class="pager">
+        <a class="prev" href="reference-root.html">&larr; Reference: configuration &amp; tooling</a><a class="next" href="reference-components.html">Reference: component library &rarr;</a>
+      </div>
+      <p>Generated from source by <code>npm run docs</code>. 151 files documented, 331 exports extracted.</p>
+    </footer>
+  </main>
+</div>
+<script>
+document.querySelectorAll('.filter').forEach((input) => {
+  input.addEventListener('input', () => {
+    const term = input.value.toLowerCase();
+    const table = document.getElementById(input.dataset.filterTarget);
+    if (!table) return;
+    for (const row of table.tBodies[0].rows) {
+      row.hidden = term !== '' && !row.textContent.toLowerCase().includes(term);
+    }
+  });
+});
+const navFilter = document.getElementById('nav-filter');
+if (navFilter) {
+  navFilter.addEventListener('input', () => {
+    const term = navFilter.value.toLowerCase();
+    document.querySelectorAll('#toc li').forEach((li) => {
+      li.hidden = term !== '' && !li.textContent.toLowerCase().includes(term);
+    });
+  });
+}
+</script>
+</body>
+</html>
