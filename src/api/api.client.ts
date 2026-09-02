@@ -4,7 +4,7 @@ import { createLogger } from '../utils/logger';
 
 const log = createLogger('ApiClient');
 
-export interface ApiClientOptions {
+interface ApiClientOptions {
   baseURL?: string;
   token?: string;
   extraHeaders?: Record<string, string>;

@@ -14,7 +14,3 @@
  */
 export { test } from './bank.fixture';
 export { expect } from './custom-matchers';
-export type { TestFixtures, WorkerFixtures } from './base.fixture';
-export type { AuthFixtures } from './auth.fixture';
-export { storageStateFor } from './auth.fixture';
-export type { BankFixtures, BankPages } from './bank.fixture';

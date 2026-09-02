@@ -92,7 +92,7 @@ export class DashboardPage extends BasePage {
   }
 }
 
-export type QuickAction = 'transfer' | 'send-money' | 'bill-pay' | 'apply-loan' | 'transactions';
+type QuickAction = 'transfer' | 'send-money' | 'bill-pay' | 'apply-loan' | 'transactions';
 
 /**
  * Turns a displayed money string into a number.

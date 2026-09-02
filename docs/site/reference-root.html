@@ -535,7 +535,7 @@ body.print details.api > summary { list-style: none; }
     <nav aria-label="Documentation"><ul class="nav"><li><a href="index.html">Overview</a></li><li><a href="architecture.html">Architecture</a></li><li><a href="worked-example.html">Worked example</a></li><li><a href="structure.html">Project structure</a></li><li><a href="reference-root.html" aria-current="page">Reference: configuration &amp; tooling</a></li><li><a href="reference-foundation.html">Reference: config, core &amp; types</a></li><li><a href="reference-components.html">Reference: component library</a></li><li><a href="reference-fixtures.html">Reference: fixtures, hooks, pages &amp; API</a></li><li><a href="reference-utils.html">Reference: utilities, reporters &amp; data</a></li><li><a href="reference-tests.html">Reference: tests &amp; repository docs</a></li><li><a href="playbooks.html">Playbooks</a></li><li><a href="conventions.html">Conventions</a></li><li><a href="troubleshooting.html">Troubleshooting</a></li><li><a href="api-index.html">API index</a></li><li><a href="glossary.html">Glossary</a></li></ul></nav>
     <div class="sidebar-foot">
       <a href="playwright-ui-framework-documentation.pdf" download>Download PDF</a>
-      <span>Generated 2026-09-01</span>
+      <span>Generated 2026-09-02</span>
     </div>
   </aside>
   <main id="main">
@@ -677,7 +677,7 @@ body.print details.api > summary { list-style: none; }
 <section class="file" id="f-package-json">
   <header class="file-head">
     <h3><code>package.json</code></h3>
-    <span class="file-meta">82 lines</span>
+    <span class="file-meta">79 lines</span>
   </header>
   <p class="file-purpose">Declares dependencies, the Node engine range, the lint-staged rules and every command the team runs. The scripts are the documented interface to the framework: if a task is worth doing twice, it belongs here rather than in someone’s shell history.</p>
   <div class="table-wrap"><table><thead><tr><th>Script group</th><th>Scripts</th><th>Purpose</th></tr></thead><tbody><tr><td>Run</td><td><code>test</code>, <code>test:headed</code>, <code>test:ui</code>, <code>test:debug</code></td><td>Everyday execution and debugging.</td></tr><tr><td>Slice</td><td><code>test:chromium</code>, <code>test:firefox</code>, <code>test:webkit</code>, <code>test:mobile</code>, <code>test:smoke</code>, <code>test:regression</code>, <code>test:failed</code></td><td>Run a subset by browser or tag.</td></tr><tr><td>Specialised</td><td><code>test:a11y</code>, <code>test:visual</code>, <code>test:visual:update</code></td><td>Accessibility and screenshot suites.</td></tr><tr><td>Report</td><td><code>report</code>, <code>report:allure</code></td><td>Open generated reports.</td></tr><tr><td>Quality</td><td><code>typecheck</code>, <code>lint</code>, <code>lint:fix</code>, <code>format</code>, <code>format:check</code>, <code>validate</code></td><td>Everything CI enforces, runnable locally.</td></tr><tr><td>Housekeeping</td><td><code>clean</code>, <code>install:browsers</code>, <code>codegen</code>, <code>prepare</code></td><td>Environment maintenance.</td></tr><tr><td>Docs</td><td><code>docs</code>, <code>docs:api</code>, <code>docs:html</code>, <code>docs:pdf</code></td><td>Regenerate this documentation.</td></tr></tbody></table></div>
@@ -1001,7 +1001,7 @@ tok<span class="tok-o">-</span>a  flag</code></pre></figure>
 <section class="file" id="f-scripts-docs-render-mjs">
   <header class="file-head">
     <h3><code>scripts/docs/render.mjs</code></h3>
-    <span class="file-meta">197 lines &middot; 9 exports</span>
+    <span class="file-meta">197 lines &middot; 6 exports</span>
   </header>
   <p class="file-purpose">Turns the structured content blocks (paragraphs, lists, tables, code, callouts, step lists, trees) and the extracted API data into HTML. Shared by the multi-page site, the print sheet and the published artifact so all three cannot disagree.</p>
   
@@ -1011,13 +1011,13 @@ tok<span class="tok-o">-</span>a  flag</code></pre></figure>
   <div class="change why"><h4>Why the change belongs here</h4><p>One renderer means adding a block type improves every output format at once.</p></div>
   
   <p class="related">Related: <code>scripts/docs/build-docs.mjs</code></p>
-  <details class="api"><summary>API surface (9 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">codeBlock</span>(text, { caption, lang } <span class="tok-o">=</span> {})</code></div><p class="api-doc">Renders a syntax-highlighted code block with its language labelled.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">esc</span>(value <span class="tok-o">=</span> <span class="tok-s">''</span>)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">inline</span>(text <span class="tok-o">=</span> <span class="tok-s">''</span>)</code></div><p class="api-doc">Inline markup: <code>code</code>, <strong>bold</strong>, <a href="href">text</a>.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderBlock</span>(block)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderBlocks</span>(blocks <span class="tok-o">=</span> [])</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">slug</span>(text <span class="tok-o">=</span> <span class="tok-s">''</span>)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">fileAnchor</span>(filePath)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderApi</span>(entry)</code></div><p class="api-doc">Renders the auto-extracted API surface of one source file.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderFileEntry</span>(filePath, doc, apiEntry)</code></div><p class="api-doc">Renders one documented file: purpose, change guidance and API.</p></div></details>
+  <details class="api"><summary>API surface (6 exports)</summary><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">esc</span>(value <span class="tok-o">=</span> <span class="tok-s">''</span>)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">inline</span>(text <span class="tok-o">=</span> <span class="tok-s">''</span>)</code></div><p class="api-doc">Inline markup: <code>code</code>, <strong>bold</strong>, <a href="href">text</a>.</p></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderBlocks</span>(blocks <span class="tok-o">=</span> [])</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">slug</span>(text <span class="tok-o">=</span> <span class="tok-s">''</span>)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">fileAnchor</span>(filePath)</code></div></div><div class="api-item"><div class="api-head"><span class="badge badge-fn">function</span><code><span class="tok-f">renderFileEntry</span>(filePath, doc, apiEntry)</code></div><p class="api-doc">Renders one documented file: purpose, change guidance and API.</p></div></details>
 </section></div>
     <footer class="page-foot">
       <div class="pager">
         <a class="prev" href="structure.html">&larr; Project structure</a><a class="next" href="reference-foundation.html">Reference: config, core &amp; types &rarr;</a>
       </div>
-      <p>Generated from source by <code>npm run docs</code>. 151 files documented, 331 exports extracted.</p>
+      <p>Generated from source by <code>npm run docs</code>. 138 files documented, 171 exports extracted.</p>
     </footer>
   </main>
 </div>

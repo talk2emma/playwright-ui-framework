@@ -1,1 +1,0 @@
-Sample upload payload for FileUpload component tests.

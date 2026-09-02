@@ -1,21 +1,5 @@
 /** Documentation for form-control components and the component factory. */
 export default {
-  'src/components/index.ts': {
-    group: 'components-core',
-    title: 'Component barrel',
-    purpose:
-      "Re-exports every component class and its options type, plus the `ui` factory. This is the public surface of the component library: `import { Table, Modal, ui } from '@components/index'`.",
-    changeWhen: ['You add a component, or rename an existing one.'],
-    changeHow: [
-      {
-        text: 'Add the export beside its group, and add the matching factory method in `component.factory.ts` in the same commit.',
-        code: `export { Timeline, type TimelineOptions } from './data/timeline';`,
-      },
-    ],
-    why: 'A single import path keeps page objects tidy and lets the library be reorganised internally without touching consumers.',
-    related: ['src/components/component.factory.ts'],
-  },
-
   'src/components/component.factory.ts': {
     group: 'components-core',
     title: 'UI factory',
@@ -44,7 +28,7 @@ readonly submit = factory.button('[data-testid="submit"]', { name: 'Submit order
     gotchas: [
       '`frame()` returns a `Frame`, which is a scope rather than a component — pass `frame.locator` to other factory calls.',
     ],
-    related: ['src/components/index.ts', 'src/core/locator.factory.ts'],
+    related: ['src/core/locator.factory.ts'],
   },
 
   'src/components/form/button.ts': {
@@ -280,8 +264,9 @@ await upload.uploadBuffer('big.bin', 'application/octet-stream', Buffer.alloc(5_
     ],
     changeHow: [
       {
-        text: 'Pass the selectors at construction; use `createFileOfSize()` from the file utilities for size-boundary tests rather than committing large binaries.',
-        code: `const tooBig = await createFileOfSize('over-limit.pdf', 11 * 1024 * 1024);
+        text: 'Pass the selectors at construction. For size-boundary tests, generate the file at run time rather than committing a large binary.',
+        code: `const tooBig = path.join(os.tmpdir(), 'over-limit.pdf');
+fs.writeFileSync(tooBig, Buffer.alloc(11 * 1024 * 1024));
 await upload.upload(tooBig);
 expect(await upload.getErrorMessage()).toContain('10 MB');`,
       },
@@ -370,7 +355,6 @@ await volume.stepBy(3);   // three ArrowRight presses`,
       },
     ],
     why: 'Reading `aria-valuenow` first means a properly labelled widget needs no configuration at all.',
-    related: [],
   },
 
   'src/components/form/color-picker.ts': {

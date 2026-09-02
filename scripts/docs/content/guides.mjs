@@ -575,7 +575,7 @@ STANDARD_PASSWORD=...`,
   {
     type: 'steps',
     items: [
-      { text: '**Where:** copy `src/pages/template.page.ts` to `src/pages/<feature>.page.ts`.' },
+      { text: '**Where:** add `src/pages/<feature>.page.ts`, modelled on an existing page such as `src/pages/bank/transfer.page.ts`.' },
       {
         text: '**What:** set `path` and `readyIndicator`, declare components as readonly fields, and write business actions.',
         code: `export class InvoicesPage extends BasePage {
@@ -592,7 +592,7 @@ STANDARD_PASSWORD=...`,
   }
 }`,
       },
-      { text: '**Where:** export it from `src/pages/index.ts`.' },
+      { text: '**Where:** add it to the `pages` fixture in `src/fixtures/bank.fixture.ts` so specs can reach it.' },
     ],
   },
   {
@@ -654,7 +654,7 @@ STANDARD_PASSWORD=...`,
         text: '**If the timeout is genuinely too short:** raise the named budget in `src/config/timeouts.ts` — never hard-code a number at the call site.',
       },
       {
-        text: '**If the data collides:** use `uniqueId()` or the `testData` fixture so parallel workers cannot share a record.',
+        text: '**If the data collides:** use the `testData` fixture, which seeds faker per test, so parallel workers cannot share a record.',
       },
       {
         text: '**If a third party is unreliable:** stub it with the `network` fixture, or block it.',
@@ -744,7 +744,7 @@ await network.blockThirdParty();`,
   {
     type: 'steps',
     items: [
-      { text: '**Where:** `src/api/endpoints.ts` — add the route.' },
+      { text: '**Where:** the service or fixture that owns the call — the framework has no central route table, so a route lives with the code that uses it.' },
       {
         text: '**Where:** the test, or a fixture if several tests need it. A fixture also gives you automatic cleanup.',
         code: `order: async ({ api }, use) => {
@@ -846,7 +846,7 @@ const report = await ui.link('#open-report').clickAndGetNewTab();`,
       'Read **Overview** and **Architecture** here (about twenty minutes).',
       'Run `npm ci && npx playwright install --with-deps`, then `npm run test:ui`.',
       'Read `src/core/base.component.ts` — it explains more about the framework than any other file.',
-      'Copy `src/pages/template.page.ts` and build a page object for one screen.',
+      'Read `src/pages/bank/transfer.page.ts`, then build a page object for one screen the same way.',
       'Write one `@smoke` test using only page-object methods.',
       'Read **Conventions** before opening the pull request.',
     ],
@@ -968,7 +968,7 @@ export const conventions = [
       ],
       [
         'A hard-coded user in a shared record',
-        '`uniqueId()` or the `testData` fixture',
+        'the `testData` fixture',
         'Parallel workers collide.',
       ],
       [
@@ -1102,7 +1102,7 @@ export const troubleshooting = [
       [
         'Passes alone, fails in parallel',
         'Shared test data.',
-        'Use `uniqueId()` / the `testData` fixture.',
+        'Use the `testData` fixture.',
       ],
       [
         'Passes locally, fails in CI',

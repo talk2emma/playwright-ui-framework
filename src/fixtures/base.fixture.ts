@@ -1,4 +1,4 @@
-import { test as base, type BrowserContext, type Page, type TestInfo } from '@playwright/test';
+import { test as base, type Page, type TestInfo } from '@playwright/test';
 import { config, getUser } from '../config/env.config';
 import { ApiClient } from '../api/api.client';
 import { ui, type UiFactory } from '../components/component.factory';
@@ -9,12 +9,12 @@ import { generateUser, seedFaker, type GeneratedUser } from '../utils/data.utils
 import type { AppConfig } from '../config/env.config';
 import type { TestUser, UserRole } from '../types';
 
-export interface WorkerFixtures {
+interface WorkerFixtures {
   /** One API client per worker — reused across the worker's tests. */
   api: ApiClient;
 }
 
-export interface TestFixtures {
+interface TestFixtures {
   /** Validated runtime configuration. */
   appConfig: AppConfig;
   /** Logger scoped to the running test. */
@@ -150,5 +150,3 @@ function hash(value: string): number {
   }
   return Math.abs(result);
 }
-
-export type { BrowserContext, Page };

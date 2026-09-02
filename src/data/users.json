@@ -1,7 +1,0 @@
-{
-  "roles": {
-    "standard": { "displayName": "Standard User", "permissions": ["read"] },
-    "admin": { "displayName": "Administrator", "permissions": ["read", "write", "delete"] },
-    "readonly": { "displayName": "Read Only", "permissions": ["read"] }
-  }
-}

@@ -1,4 +1,4 @@
-import type { Locator, Page, TestInfo } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 /* -------------------------------------------------------------------------- */
 /* Environment                                                                 */
@@ -16,8 +16,6 @@ export interface EnvironmentConfig {
 }
 
 export type LogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace';
-
-export type ArtifactMode = 'on' | 'off' | 'retain-on-failure' | 'on-first-retry';
 
 /* -------------------------------------------------------------------------- */
 /* Users / roles                                                               */
@@ -108,11 +106,6 @@ export type TableRow = Record<string, string>;
 
 export type SortDirection = 'asc' | 'desc' | 'none';
 
-export interface TableCellAddress {
-  row: number;
-  column: number | string;
-}
-
 /* -------------------------------------------------------------------------- */
 /* Network                                                                     */
 /* -------------------------------------------------------------------------- */
@@ -148,30 +141,4 @@ export interface A11yScanOptions {
   failOnViolation?: boolean;
   /** Attach an HTML report of the scan to the test result. */
   attachReport?: boolean;
-}
-
-export interface VisualCompareOptions {
-  maxDiffPixels?: number;
-  maxDiffPixelRatio?: number;
-  threshold?: number;
-  animations?: 'allow' | 'disabled';
-  mask?: Locator[];
-  fullPage?: boolean;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Reporting                                                                   */
-/* -------------------------------------------------------------------------- */
-
-export interface StepContext {
-  testInfo?: TestInfo;
-  attachScreenshot?: boolean;
-}
-
-export interface RetryPolicy {
-  attempts: number;
-  delayMs: number;
-  backoffFactor?: number;
-  /** Return true to retry on this error, false to fail fast. */
-  retryOn?: (error: Error) => boolean;
 }
