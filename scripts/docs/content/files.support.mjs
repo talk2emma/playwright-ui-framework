@@ -66,7 +66,7 @@ test('checkout is clean @smoke', async ({ page, consoleErrors }) => {
 
 export const test = base.extend<TestFixtures, WorkerFixtures>({
   tenant: async ({ api }, use) => {
-    const tenant = await api.post<Tenant>('/tenants', { name: uniqueId('tenant') });
+    const tenant = await api.post<Tenant>('/tenants', { name: generateUser(faker).username });
     await use(tenant);
     await api.delete(\`/tenants/\${tenant.id}\`);   // always clean up
   },
@@ -293,69 +293,6 @@ await login.signIn(username, password);`,
     ],
     related: ['src/fixtures/auth.fixture.ts', 'src/config/env.config.ts', '.gitignore'],
   },
-
-  'src/pages/template.page.ts': {
-    group: 'pages',
-    title: 'Page-object template',
-    purpose:
-      'A copy-me starting point that encodes the four page-object conventions: declare `path` and `readyIndicator`; build components once as readonly fields; expose business actions rather than selector wrappers; keep business assertions out.',
-    blocks: [
-      {
-        type: 'code',
-        caption: 'The shape of a real page object',
-        text: `export class CheckoutPage extends BasePage {
-  protected readonly path = '/checkout';
-  protected readonly readyIndicator: SelectorLike = '[data-testid="checkout-root"]';
-
-  private readonly factory = ui(this.page);
-
-  readonly items       = this.factory.table('[data-testid="line-items"]', { name: 'Line items' });
-  readonly promoCode   = this.factory.input('[data-testid="promo"]', { name: 'Promo code' });
-  readonly applyPromo  = this.factory.button('[data-testid="apply-promo"]', { name: 'Apply promo' });
-  readonly toast       = this.factory.alert('[role="status"]', { name: 'Toast' });
-
-  /** Business action, not a selector wrapper. */
-  async applyDiscount(code: string): Promise<string> {
-    await this.promoCode.type(code);
-    await this.applyPromo.clickAndWaitForCompletion();
-    return this.toast.waitForMessage();
-  }
-}`,
-      },
-    ],
-    changeWhen: [
-      'You are creating a page object — copy this file. Edit the template itself only when a convention changes.',
-    ],
-    changeHow: [
-      {
-        text: 'Copy to `src/pages/<feature>.page.ts`, rename the class, set `path` and `readyIndicator`, replace the components, then export it from `src/pages/index.ts`.',
-      },
-      {
-        text: 'If a method reads like the DOM (`clickButtonFour`), it belongs in a component. If it reads like a user story (`applyDiscount`), it belongs here.',
-      },
-    ],
-    why: 'A template is cheaper to follow than a written convention. Anyone can copy a file; not everyone reads the style guide before their first page object.',
-    related: ['src/core/base.page.ts', 'src/pages/index.ts'],
-  },
-
-  'src/pages/index.ts': {
-    group: 'pages',
-    title: 'Page registry',
-    purpose:
-      'Exports every page object so tests and fixtures have one import path, and so a `pages` fixture can construct them all in one place if you add one.',
-    changeWhen: ['You add a page object.'],
-    changeHow: [
-      {
-        text: 'Add the export. If tests construct the same pages repeatedly, consider a fixture that builds them all.',
-        code: `pages: async ({ page }, use) => {
-  await use({ login: new LoginPage(page), checkout: new CheckoutPage(page) });
-},`,
-      },
-    ],
-    why: 'A registry keeps the import surface flat and makes a page-bundle fixture a small step rather than a refactor.',
-    related: ['src/pages/template.page.ts'],
-  },
-
   'src/api/api.client.ts': {
     group: 'api',
     title: 'API client',
@@ -391,29 +328,8 @@ await expect(ordersPage.rowFor(order.id)).toBeVisible();`,
       },
     ],
     why: 'Restricting this client to setup keeps the boundary clear: UI tests verify the interface, and the API is used to arrange state quickly. Testing the API itself belongs in an API suite.',
-    related: ['src/api/endpoints.ts', 'src/utils/retry.utils.ts'],
+    related: ['src/utils/retry.utils.ts'],
   },
-
-  'src/api/endpoints.ts': {
-    group: 'api',
-    title: 'Endpoint registry',
-    purpose:
-      'Every API path the suite touches, in one place, with functions for parameterised paths. Tests and fixtures reference these constants rather than raw strings.',
-    changeWhen: ['You start using a new endpoint, or the backend changes a route.'],
-    changeHow: [
-      {
-        text: 'Add it to the matching group, using a function when the path takes parameters.',
-        code: `invoices: {
-  list: '/invoices',
-  byId: (id: string): string => \`/invoices/\${id}\`,
-  download: (id: string): string => \`/invoices/\${id}/pdf\`,
-},`,
-      },
-    ],
-    why: 'A backend route change becomes a one-line edit instead of a repository-wide search through string literals.',
-    related: ['src/api/api.client.ts'],
-  },
-
   'src/reporters/summary.reporter.ts': {
     group: 'reporters',
     title: 'Summary reporter',
@@ -468,20 +384,6 @@ for (const failure of summary.failures) core.error(\`\${failure.title}: \${failu
     gotchas: [
       'Passing `--reporter=...` on the command line replaces the configured reporters, so this one does not run on those invocations.',
     ],
-    related: ['playwright.config.ts', 'src/reporters/index.ts'],
-  },
-
-  'src/reporters/index.ts': {
-    group: 'reporters',
-    title: 'Reporter barrel',
-    purpose: 'Re-exports the summary reporter for programmatic use.',
-    changeWhen: ['You add a reporter.'],
-    changeHow: [
-      {
-        text: 'Add the export, and register the reporter by path in `playwright.config.ts` — Playwright loads reporters by file path, not by import.',
-      },
-    ],
-    why: 'Keeps the reporter list discoverable next to the code that implements it.',
-    related: ['src/reporters/summary.reporter.ts'],
+    related: ['playwright.config.ts'],
   },
 };

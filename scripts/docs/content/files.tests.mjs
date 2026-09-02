@@ -391,6 +391,5 @@ expect(displayed, \`shows \${displayed} but the active and pending loans sum to 
       },
     ],
     why: 'Layout, spacing and alignment are what a screenshot is good at and an assertion is bad at. Everything else should be an assertion.',
-    related: ['src/utils/visual.utils.ts'],
   },
 };

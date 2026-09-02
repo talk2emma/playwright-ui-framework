@@ -33,7 +33,7 @@ await results.clickRowAction({ Name: 'Ada' }, 'button[aria-label="Edit"]');`,
         text: 'Add table-wide behaviour as a method here so every table gets it, and use `getColumnIndex()` so it keeps working when columns move.',
         code: `async getColumnTotal(columnName: string): Promise<number> {
   const values = await this.getColumnValues(columnName);
-  return values.reduce((sum, value) => sum + extractNumber(value), 0);
+  return values.reduce((sum, value) => sum + Number(normalizeText(value).replace(/[^\\d.-]/g, '')), 0);
 }`,
       },
     ],
@@ -105,7 +105,6 @@ await results.clickRowAction({ Name: 'Ada' }, 'button[aria-label="Edit"]');`,
       },
     ],
     why: 'Expanding ancestors in order is the only reliable way to reach a leaf in a lazily rendered tree, and it is worth writing once.',
-    related: [],
   },
 
   'src/components/data/pagination.ts': {
@@ -208,7 +207,6 @@ await nav.navigateTo(['Reports', 'Sales', 'By region']);`,
       },
     ],
     why: 'Encoding the open gesture as configuration keeps one class usable for both click-driven and hover-driven navigation.',
-    related: [],
   },
 
   'src/components/navigation/breadcrumb.ts': {
@@ -221,7 +219,6 @@ await nav.navigateTo(['Reports', 'Sales', 'By region']);`,
       { text: 'Pass `itemSelector` and `separator` so trail text is cleaned correctly.' },
     ],
     why: 'Stripping the separator from item text is what makes trail assertions readable rather than full of slashes and chevrons.',
-    related: [],
   },
 
   'src/components/navigation/stepper.ts': {
@@ -242,7 +239,6 @@ await nav.navigateTo(['Reports', 'Sales', 'By region']);`,
       },
     ],
     why: 'Keeping step navigation in the component lets a checkout test read as business steps rather than as button clicks.',
-    related: [],
   },
 
   'src/components/feedback/modal.ts': {
@@ -302,7 +298,6 @@ expect(await confirmDialog.isFocusTrapped()).toBe(true);`,
       },
     ],
     why: 'Native `title` tooltips never appear in the DOM, so the component reads the attribute directly — otherwise those tests would be impossible to write.',
-    related: [],
   },
 
   'src/components/feedback/progress.ts': {
@@ -345,7 +340,6 @@ expect(await confirmDialog.isFocusTrapped()).toBe(true);`,
       },
     ],
     why: 'A broken image is still a visible element. Checking the decoded bitmap is the only assertion that catches a 404 asset.',
-    related: [],
   },
 
   'src/components/media/media-player.ts': {
@@ -365,7 +359,6 @@ expect(await confirmDialog.isFocusTrapped()).toBe(true);`,
     gotchas: [
       'Autoplay policies block programmatic `play()` with sound in some browsers; mute first when that applies.',
     ],
-    related: [],
   },
 
   'src/components/media/canvas.ts': {
@@ -383,7 +376,6 @@ expect(await signature.isBlank()).toBe(false);`,
     ],
     why: 'Pixel and blank checks are the only assertions available for canvas content, so providing them here prevents every test from re-implementing `getImageData` logic.',
     gotchas: ['`getPixelColor` and `isBlank` require a same-origin, non-tainted canvas.'],
-    related: ['src/utils/visual.utils.ts'],
   },
 
   'src/components/media/frame.ts': {
@@ -428,7 +420,6 @@ const pay  = new Button(payment.locator, '#submit');
       },
     ],
     why: 'Autoplay is a behaviour worth asserting and easy to get wrong; `waitForAutoAdvance()` gives it a bounded, explicit check.',
-    related: [],
   },
 
   'src/components/advanced/drag-drop.ts': {
@@ -536,6 +527,6 @@ const total = await feed.loadAll(30);`,
       },
     ],
     why: 'Hovering a mark and reading its tooltip is usually the only way to verify a data value, because the rendered chart itself carries no accessible text.',
-    related: ['src/components/media/canvas.ts', 'src/utils/visual.utils.ts'],
+    related: ['src/components/media/canvas.ts'],
   },
 };

@@ -9,16 +9,17 @@ import { normalizeText } from '../../utils/string.utils';
 import type { Locator } from '@playwright/test';
 
 /** How a field should be driven. `auto` infers it from the DOM. */
-export type FieldKind =
-  'auto' | 'text' | 'select' | 'dropdown' | 'checkbox' | 'radio' | 'toggle' | 'file';
+type FieldKind = 'auto' | 'text' | 'select' | 'dropdown' | 'checkbox' | 'radio' | 'toggle' | 'file';
 
-export interface FieldSpec {
+interface FieldSpec {
   kind?: FieldKind;
   /** Overrides label-based lookup. */
   selector?: string;
 }
 
-export type FormData = Record<string, string | number | boolean | string[]>;
+/** The shape `fill()` accepts. Shadows the DOM `FormData` deliberately: this
+ * is a plain data object, not a multipart body. */
+type FormData = Record<string, string | number | boolean | string[]>;
 
 /**
  * Composite component for a whole `<form>`.

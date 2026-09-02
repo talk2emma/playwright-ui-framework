@@ -42,7 +42,7 @@ log.child('promo').debug('Server responded', { status: 200 });   // scope: Check
     group: 'utils',
     title: 'Retry and polling helpers',
     purpose:
-      '`sleep`, `retry` with exponential backoff and a selective `retryOn` predicate, `waitUntil` for polling a condition, and `withTimeout` for bounding any promise.',
+      '`waitUntil` — polls a condition until it holds or the timeout elapses, and fails with a message naming the condition. Used where Playwright has no web-first assertion to wait on, such as a progress bar reaching a value.',
     blocks: [
       {
         type: 'warn',
@@ -70,16 +70,13 @@ log.child('promo').debug('Server responded', { status: 200 });   // scope: Check
     group: 'utils',
     title: 'Test data generation',
     purpose:
-      'Faker-based generation: `generateUser()` for a complete person, `uniqueId()` for collision-proof markers, random strings, integers and choices, `seedFaker()` for reproducibility, and `EDGE_CASE_STRINGS` — a catalogue of inputs that historically break forms.',
+      'Seeded, reproducible test data. `seedFaker` makes a run repeatable from the test title, and `generateUser` builds a complete person. Generate rather than hard-code: a suite whose fixtures say `alice@example.com` fails the second time it runs against a uniqueness constraint.',
     blocks: [
       {
         type: 'code',
-        caption: 'Boundary coverage without inventing strings',
-        text: `import { EDGE_CASE_STRINGS } from '@utils/data.utils';
-
-for (const [name, value] of Object.entries(EDGE_CASE_STRINGS)) {
-  test(\`name field rejects \${name}\`, async ({ ui }) => { /* ... */ });
-}`,
+        caption: 'Reproducible data, different per test',
+        text: `const faker = seedFaker(testInfo.title);   // same title -> same data
+const user  = generateUser(faker);         // a complete, valid person`,
       },
     ],
     changeWhen: [
@@ -92,9 +89,6 @@ for (const [name, value] of Object.entries(EDGE_CASE_STRINGS)) {
   return \`\${country}\${faker.string.numeric(2)}\${faker.string.alpha({ length: 4, casing: 'upper' })}\${faker.string.numeric(14)}\`;
 }`,
       },
-      {
-        text: 'Add new edge cases to `EDGE_CASE_STRINGS` so every form test inherits the coverage.',
-      },
     ],
     why: 'Generated data with unique markers is what lets parallel workers run the same test without colliding on a shared record — the most common cause of "passes alone, fails in parallel".',
     gotchas: [
@@ -105,38 +99,37 @@ for (const [name, value] of Object.entries(EDGE_CASE_STRINGS)) {
 
   'src/utils/file.utils.ts': {
     group: 'utils',
-    title: 'File and test-data helpers',
+    title: 'File and path helpers',
     purpose:
-      'Reading JSON, CSV and Excel test data; resolving paths against the data directory; creating temporary and exact-size files for upload tests; checking existence; waiting for a download to stabilise; deleting; listing; and writing JSON.',
+      'Creating a directory if it is missing, and resolving a path against the test-data directory so callers can pass a name relative to `src/data` instead of a relative path that depends on where the caller lives.',
     blocks: [
       {
         type: 'code',
-        caption: 'Data-driven from a spreadsheet the business maintains',
-        text: `const cases = await readExcel<{ input: string; expected: string }>('pricing-cases.xlsx');
-for (const row of cases) {
-  test(\`prices \${row.input}\`, async () => { /* ... */ });
-}`,
+        caption: 'The whole module',
+        text: `ensureDir(config.paths.storage);              // used by auth.setup.ts
+resolveDataPath('cases.json');                // -> <root>/src/data/cases.json`,
+      },
+      {
+        type: 'p',
+        text: 'This module used to carry readers for JSON, CSV, Excel and NDJSON, plus temporary-file and download-stabilising helpers. No test ever called any of them, so they were removed along with the `csv-parse` and `xlsx-populate` dependencies they pulled in.',
       },
     ],
-    changeWhen: ['You add a data format, or need a new file-based helper.'],
+    changeWhen: ['A test needs to read a data file, or needs a generated file on disk.'],
     changeHow: [
       {
-        text: 'Add the reader beside the others and route it through `resolveDataPath` so callers can pass a name relative to `src/data`.',
+        text: 'Add the reader here and route it through `resolveDataPath`, so a caller passes a name relative to `src/data` rather than a path relative to itself. Add it in the same change as the test that reads it, not before.',
       },
       {
-        text: 'For size-boundary upload tests, generate the file rather than committing a large binary.',
-        code: `const oversize = await createFileOfSize('over-limit.pdf', 11 * 1024 * 1024);`,
+        text: 'For size-boundary upload tests, generate the file at run time rather than committing a large binary.',
       },
     ],
-    why: '`waitForStableFile` waits until a file exists and stops growing, which is the only reliable definition of "the download finished" — file existence alone races the writer.',
-    related: ['src/components/form/file-upload.ts', 'src/types/xlsx-populate.d.ts'],
   },
 
   'src/utils/string.utils.ts': {
     group: 'utils',
     title: 'String helpers',
     purpose:
-      '`normalizeText` (collapse whitespace — DOM text is messy), `extractNumber` and `extractNumbers` (parse "$1,234.50"), case-insensitive contains, kebab-case, truncate, regex escaping, secret masking for logs, and currency stripping.',
+      '`normalizeText` — collapses the whitespace the DOM inserts, so an assertion compares the text a person sees rather than the text the markup happens to contain. It is the single most-used helper in the framework: every component that reads text routes through it.',
     changeWhen: [
       'Your application formats values in a way the parsers do not handle — a different decimal separator, a suffix like "1.2k".',
     ],
@@ -144,8 +137,8 @@ for (const row of cases) {
       {
         text: 'Extend the parser here rather than in the assertion, so every test parses the same way.',
         code: `export function parseCompactNumber(value: string): number {
-  const match = /^([\\d.]+)([km])$/i.exec(value.trim());
-  if (!match) return extractNumber(value);
+  const match = /^([\\d.]+)([km])$/i.exec(normalizeText(value));
+  if (!match) return Number(normalizeText(value).replace(/[^\\d.-]/g, ''));
   return Number(match[1]) * (match[2].toLowerCase() === 'k' ? 1_000 : 1_000_000);
 }`,
       },
@@ -158,16 +151,16 @@ for (const row of cases) {
     group: 'utils',
     title: 'Date helpers',
     purpose:
-      'Dependency-free, locale-independent date handling: ISO formatting, shifting by day/week/month/year, relative dates, token formatting (`YYYY-MM-DD`, `DD/MM/YYYY`, `MMMM YYYY`), same-day comparison and human-readable durations.',
+      '`toIsoDate` and `format` for writing dates into inputs and comparing them, and `humanizeDuration` for readable log and report output.',
     changeWhen: ['You need a token the formatter does not support, or timezone-aware handling.'],
     changeHow: [
       {
-        text: 'Add the token to the replacement map and to the regular expression in `format`. For timezone-sensitive assertions, freeze the clock instead of computing offsets.',
-        code: `await freezeTime(page, new Date('2026-01-15T09:00:00Z'));`,
+        text: "Add the token to the replacement map and to the regular expression in `format`. For timezone-sensitive assertions, freeze the clock with Playwright's own clock API instead of computing offsets.",
+        code: `await page.clock.setFixedTime(new Date('2026-01-15T09:00:00Z'));`,
       },
     ],
     why: 'Tests that compute "today" against a live clock fail at midnight and on daylight-saving boundaries. Freezing the page clock makes date-dependent UI deterministic.',
-    related: ['src/components/form/date-picker.ts', 'src/utils/browser.utils.ts'],
+    related: ['src/components/form/date-picker.ts'],
   },
 
   'src/utils/network.utils.ts': {
@@ -209,33 +202,33 @@ await network.setOffline(true);                     // offline banner`,
 
   'src/utils/browser.utils.ts': {
     group: 'utils',
-    title: 'Browser, tab, dialog and storage helpers',
+    title: 'Console capture',
     purpose:
-      'Everything that happens around the page rather than inside it: opening and switching tabs, handling native dialogs, downloading files, clipboard access, geolocation, freezing the clock, emulating colour scheme and print media, capturing console and page errors, and reading or clearing local storage and cookies.',
+      'Console capture: `captureConsole` records console errors, uncaught exceptions and failed requests into a container the `consoleErrors` fixture owns, so a test can assert the page logged nothing unexpected.',
     blocks: [
       {
         type: 'code',
-        caption: 'The awkward parts, made ordinary',
-        text: `const popup    = await openNewTab(context, () => page.click('#open-report'));
-const dialog   = await handleNextDialog(page, 'accept');       // register BEFORE the action
-const download = await downloadFile(page, () => page.click('#export'));
-await freezeTime(page, new Date('2026-01-15T09:00:00Z'));
-await emulateMedia(page, { colorScheme: 'dark', reducedMotion: 'reduce' });`,
+        caption: 'Assert the page logged nothing unexpected',
+        text: `const capture = createConsoleCapture();   // the fixture owns the container
+captureConsole(page, capture);            // it fills as the test runs
+
+// ... drive the page ...
+expect(capture.errors, capture.errors.join('\\n')).toEqual([]);`,
       },
     ],
     changeWhen: [
-      'You need another browser-level capability — permissions, service workers, HAR recording, CDP access.',
+      'You need to record another signal from the page — a specific console channel, a resource-timing entry.',
     ],
     changeHow: [
       {
-        text: 'Add the helper here and export it from `src/utils/index.ts`. If every test needs it, promote it to a fixture instead.',
+        text: 'Add the helper here and import it directly where it is needed. If every test needs it, promote it to a fixture instead.',
       },
     ],
-    why: 'Playwright auto-dismisses dialogs unless a handler is registered first, which is why `handleNextDialog` must be called before the action that opens one. Encoding that ordering in a helper prevents a subtle and common mistake.',
+    why: 'A page that throws in the console is usually broken even when the assertions pass. Capturing into a container the fixture owns means the check costs a test nothing to opt into.',
     gotchas: [
       '`captureConsole(page, into)` records into an existing container — that is how the `consoleErrors` fixture avoids depending on `page`.',
     ],
-    related: ['src/fixtures/base.fixture.ts', 'src/components/navigation/link.ts'],
+    related: ['src/fixtures/base.fixture.ts'],
   },
 
   'src/utils/a11y.utils.ts': {
@@ -270,57 +263,6 @@ await emulateMedia(page, { colorScheme: 'dark', reducedMotion: 'reduce' });`,
     why: '`failOnViolation` defaults to true on purpose: accessibility regressions should break the build, not accumulate in a report nobody opens.',
     related: ['src/fixtures/custom-matchers.ts', 'src/core/base.page.ts'],
   },
-
-  'src/utils/visual.utils.ts': {
-    group: 'utils',
-    title: 'Visual regression helpers',
-    purpose:
-      '`stabilizePage` (disable animations and transitions, hide the caret, wait for fonts), `comparePage`, `compareElement` and `compareResponsive` across several widths, plus `DEFAULT_MASK_SELECTORS` for regions that legitimately change between runs.',
-    blocks: [
-      {
-        type: 'note',
-        text: 'Prefer `compareElement` over `comparePage`. Component-level baselines fail for one reason; full-page baselines fail for any reason.',
-      },
-      {
-        type: 'code',
-        caption: 'Masking dynamic regions',
-        text: `export const DEFAULT_MASK_SELECTORS = [
-  '[data-testid="timestamp"]',
-  '[data-visual-ignore]',
-  '.dynamic-date',
-  'video',
-];`,
-      },
-    ],
-    changeWhen: ['A new dynamic region causes false diffs, or the tolerance needs adjusting.'],
-    changeHow: [
-      {
-        text: 'Add the selector to `DEFAULT_MASK_SELECTORS`, or ask for `data-visual-ignore` on the element — that attribute is already masked everywhere.',
-      },
-      {
-        text: 'Update baselines deliberately, and review the images in the pull request.',
-        code: `npm run test:visual:update`,
-      },
-    ],
-    why: 'Baselines are OS- and browser-specific, which is why the `visual` project is pinned to one browser and viewport and the CI job to one runner image. Changing either invalidates every screenshot.',
-    related: ['playwright.config.ts', '.github/workflows/playwright.yml'],
-  },
-
-  'src/utils/index.ts': {
-    group: 'utils',
-    title: 'Utilities barrel',
-    purpose:
-      'Re-exports every utility so consumers import from `@utils/index` rather than reaching into individual files.',
-    changeWhen: ['You add a utility or a new utility module.'],
-    changeHow: [
-      {
-        text: 'Add the named export. Keep internal helpers unexported so the public surface stays intentional.',
-      },
-    ],
-    why: 'One import path keeps utilities discoverable through editor autocomplete instead of requiring people to know the file layout.',
-    related: ['src/utils/logger.ts'],
-  },
-
   'src/data/README.md': {
     group: 'data',
     title: 'Test-data guidance',
@@ -335,48 +277,6 @@ await emulateMedia(page, { colorScheme: 'dark', reducedMotion: 'reduce' });`,
     why: 'A data directory without rules becomes a graveyard of stale records that quietly couple unrelated tests to each other.',
     related: ['src/utils/file.utils.ts', 'src/utils/data.utils.ts'],
   },
-
-  'src/data/users.json': {
-    group: 'data',
-    title: 'Role definitions',
-    purpose:
-      'Role display names and expected permissions — reference data for authorisation assertions. Deliberately contains no credentials.',
-    changeWhen: ['A role gains or loses a permission, or a new role appears.'],
-    changeHow: [
-      {
-        text: 'Update the entry, and update `UserRole` in `src/types/index.ts` if the set of roles changed.',
-      },
-    ],
-    why: 'Keeping expected permissions as data lets one parameterised test cover the whole authorisation matrix.',
-    related: ['src/types/index.ts', 'src/config/env.config.ts'],
-  },
-
-  'src/data/sample-users.csv': {
-    group: 'data',
-    title: 'Sample CSV data',
-    purpose:
-      'A small example of the CSV shape `readCsv()` returns, so the data-driven pattern is demonstrable immediately.',
-    changeWhen: ['You replace it with real case data, or delete it once you have your own.'],
-    changeHow: [{ text: 'Keep the header row — `readCsv` uses it as the object keys.' }],
-    why: 'A working example removes the first friction point for anyone writing a data-driven test.',
-    related: ['src/utils/file.utils.ts'],
-  },
-
-  'src/data/files/sample.txt': {
-    group: 'data',
-    title: 'Sample upload file',
-    purpose:
-      'A tiny payload for exercising the `FileUpload` component without committing binaries.',
-    changeWhen: ['You need a fixture of a specific type — a PDF, an image, a spreadsheet.'],
-    changeHow: [
-      {
-        text: 'Add small real files here; generate large ones at runtime with `createFileOfSize()` instead of committing them.',
-      },
-    ],
-    why: 'Large binaries in a test repository slow every clone and every CI checkout, forever.',
-    related: ['src/components/form/file-upload.ts'],
-  },
-
   'tests/README.md': {
     group: 'tests',
     title: 'Test conventions',
@@ -415,7 +315,7 @@ await emulateMedia(page, { colorScheme: 'dark', reducedMotion: 'reduce' });`,
       },
     ],
     why: 'Isolating visual tests keeps pixel comparison on one fixed rendering stack, where it is meaningful.',
-    related: ['src/utils/visual.utils.ts', 'playwright.config.ts'],
+    related: ['playwright.config.ts'],
   },
 
   'tests/a11y/.gitkeep': {
@@ -475,6 +375,5 @@ await emulateMedia(page, { colorScheme: 'dark', reducedMotion: 'reduce' });`,
       },
     ],
     why: 'A one-screen table is the fastest way to answer "does the framework already have something for this?"',
-    related: ['src/components/index.ts'],
   },
 };

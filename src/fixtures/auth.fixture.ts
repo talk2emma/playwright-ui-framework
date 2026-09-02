@@ -5,7 +5,7 @@ import { config, getUser } from '../config/env.config';
 import type { BrowserContext, Page } from '@playwright/test';
 import type { UserRole } from '../types';
 
-export interface AuthFixtures {
+interface AuthFixtures {
   /** A context already signed in as the standard user. */
   authenticatedContext: BrowserContext;
   /** A page already signed in as the standard user. */
@@ -64,9 +64,7 @@ export const test = baseTest.extend<AuthFixtures>({
  * Undefined means "start signed out" rather than a hard failure, so a suite
  * that does not use auth still runs.
  */
-export function storageStateFor(role: UserRole): string | undefined {
+function storageStateFor(role: UserRole): string | undefined {
   const target = getUser(role).storageStatePath ?? path.join(config.paths.storage, `${role}.json`);
   return fs.existsSync(target) ? target : undefined;
 }
-
-export { expect } from './custom-matchers';

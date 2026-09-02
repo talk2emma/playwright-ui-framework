@@ -153,22 +153,6 @@ await this.locator.waitFor({ state: 'visible', timeout: TIMEOUTS.REPORT_GENERATI
     ],
     related: ['src/config/env.config.ts', 'src/core/base.component.ts'],
   },
-
-  'src/config/index.ts': {
-    group: 'config',
-    title: 'Config barrel',
-    purpose:
-      'Re-exports `config`, `getUser`, `ENVIRONMENTS`, `getEnvironment` and `TIMEOUTS` so consumers import from `@config/index` rather than reaching into individual files.',
-    changeWhen: ['You add a file to `src/config/` that other layers should use.'],
-    changeHow: [
-      {
-        text: 'Add the re-export line. Keep internal helpers out of the barrel so the public surface stays small.',
-      },
-    ],
-    why: 'A single import path means moving or splitting a config file later does not ripple through the codebase.',
-    related: ['src/config/env.config.ts'],
-  },
-
   'src/core/base.component.ts': {
     group: 'core',
     title: 'BaseComponent — the foundation of every UI element',
@@ -290,7 +274,7 @@ protected async dismissConsentBanner(): Promise<void> {
     gotchas: [
       'Page objects must not contain business assertions. Verifying that the page loaded is in scope; verifying that the order total is $80 is the test’s job.',
     ],
-    related: ['src/pages/template.page.ts', 'src/core/base.component.ts'],
+    related: ['src/core/base.component.ts'],
   },
 
   'src/core/locator.factory.ts': {
@@ -339,17 +323,6 @@ const cardNumber = new TextInput(frame.locator, '#card-number');   // identical 
       'playwright.config.ts',
     ],
   },
-
-  'src/core/index.ts': {
-    group: 'core',
-    title: 'Core barrel',
-    purpose: 'Re-exports `BaseComponent`, `BasePage`, `by`, `resolveLocator` and the `Scope` type.',
-    changeWhen: ['You add a file to `src/core/`.'],
-    changeHow: [{ text: 'Add the re-export so consumers keep using `@core/index`.' }],
-    why: 'Keeps the framework foundation reachable through one import path.',
-    related: ['src/core/base.component.ts'],
-  },
-
   'src/types/index.ts': {
     group: 'types',
     title: 'Shared type definitions',
@@ -385,22 +358,5 @@ const cardNumber = new TextInput(frame.locator, '#card-number');   // identical 
       'src/config/env.config.ts',
       'src/core/base.component.ts',
     ],
-  },
-
-  'src/types/xlsx-populate.d.ts': {
-    group: 'types',
-    title: 'Ambient types for xlsx-populate',
-    purpose:
-      'Minimal type declarations for the `xlsx-populate` package, which ships none. Only the surface the framework uses — `fromFileAsync`, `sheet`, `sheets`, `usedRange().value()` — is declared.',
-    changeWhen: [
-      'You start using more of the spreadsheet library’s API, or the package begins shipping its own types.',
-    ],
-    changeHow: [
-      {
-        text: 'Add the method to the interface with the narrowest accurate type. If the package publishes official types, delete this file and remove the reference.',
-      },
-    ],
-    why: 'Declaring only what is used keeps the fiction small and honest; a sprawling hand-written declaration file eventually disagrees with the library and hides real errors.',
-    related: ['src/utils/file.utils.ts'],
   },
 };

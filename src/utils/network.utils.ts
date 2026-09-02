@@ -135,7 +135,7 @@ export class NetworkHelper {
   }
 }
 
-export const DEFAULT_BLOCKED_HOSTS = [
+const DEFAULT_BLOCKED_HOSTS = [
   'google-analytics.com',
   'googletagmanager.com',
   'doubleclick.net',

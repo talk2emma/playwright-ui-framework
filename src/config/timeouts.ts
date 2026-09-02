@@ -28,5 +28,3 @@ export const TIMEOUTS = {
   /** Animation settle time before a visual comparison. */
   ANIMATION: 300,
 } as const;
-
-export type TimeoutKey = keyof typeof TIMEOUTS;

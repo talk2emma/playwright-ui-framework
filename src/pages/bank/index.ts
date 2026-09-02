@@ -5,12 +5,9 @@
  * spec have one import path. Adding a page means one export and one line in
  * the fixture.
  */
-export { VISIBLE_LISTBOX } from './dropdown-panel';
-export { BankShell } from './bank-shell';
 export type { NavDestination } from './bank-shell';
 export { LoginPage } from './login.page';
-export { DashboardPage, parseCurrency } from './dashboard.page';
-export type { QuickAction } from './dashboard.page';
+export { DashboardPage } from './dashboard.page';
 export { AccountsPage } from './accounts.page';
 export { AccountDetailPage } from './account-detail.page';
 export { TransferPage } from './transfer.page';

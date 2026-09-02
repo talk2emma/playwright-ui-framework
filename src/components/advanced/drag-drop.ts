@@ -1,7 +1,7 @@
 import { BaseComponent } from '../../core/base.component';
 import type { Locator } from '@playwright/test';
 
-export interface DragOptions {
+interface DragOptions {
   /** Number of intermediate mouse moves. More steps = more HTML5 events fired. */
   steps?: number;
   /** Pause at the source before moving — some libraries need a hold to start. */

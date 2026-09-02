@@ -1,13 +1,22 @@
-# Test data
+# Static test data
 
-Static fixtures live here; anything unique per run should be generated at
-runtime with `generateUser()` / `uniqueId()` from `@utils/data.utils` so
-parallel workers never collide on the same record.
+Files here are checked into the repository, so everything in this folder must be
+safe to make public.
 
-| File         | Purpose                                                                                       |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| `users.json` | Role definitions and expected permissions (no credentials — those come from the environment). |
-| `files/`     | Sample upload payloads. Generate size-boundary files at runtime with `createFileOfSize()`.    |
+| File          | Format     | Read by                                   | Purpose                                                            |
+| ------------- | ---------- | ----------------------------------------- | ------------------------------------------------------------------ |
+| `personas.ts` | TypeScript | `auth.setup.ts`, `bank.fixture.ts`, specs | The SecureBank demo accounts and the seeded facts tests assert on. |
 
-Never commit real credentials or production data. Credentials come from
-`.env` / CI secrets and are read through `getUser(role)`.
+## Why there is so little here
+
+An earlier version of this folder carried a JSON user table, a CSV case matrix
+and a sample upload, together with `readJson`, `readCsv` and `readExcel` helpers
+in `src/utils/file.utils.ts` to read them. Nothing ever did. The helpers and the
+files were removed together.
+
+The lesson is worth keeping: add a data file when a test reads it, in the same
+change as the test. Fixtures added in advance of a need are indistinguishable
+from fixtures nobody needs.
+
+Note that `personas.ts` is TypeScript rather than JSON on purpose — the compiler
+checks that a spec asking for `PERSONAS.frozen` gets a persona that exists.

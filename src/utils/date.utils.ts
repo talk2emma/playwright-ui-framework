@@ -1,35 +1,6 @@
-export type DateUnit = 'day' | 'week' | 'month' | 'year';
-
 /** ISO date portion only: 2026-08-31 */
 export function toIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
-}
-
-export function today(): Date {
-  return new Date();
-}
-
-export function shift(date: Date, amount: number, unit: DateUnit): Date {
-  const result = new Date(date.getTime());
-  switch (unit) {
-    case 'day':
-      result.setDate(result.getDate() + amount);
-      break;
-    case 'week':
-      result.setDate(result.getDate() + amount * 7);
-      break;
-    case 'month':
-      result.setMonth(result.getMonth() + amount);
-      break;
-    case 'year':
-      result.setFullYear(result.getFullYear() + amount);
-      break;
-  }
-  return result;
-}
-
-export function daysFromNow(days: number): Date {
-  return shift(today(), days, 'day');
 }
 
 /**
@@ -73,10 +44,6 @@ export function format(date: Date, pattern = 'YYYY-MM-DD'): string {
     /YYYY|YY|MMMM|MMM|MM|M|DD|D|HH|mm|ss/g,
     (token) => replacements[token] ?? token,
   );
-}
-
-export function isSameDay(a: Date, b: Date): boolean {
-  return toIsoDate(a) === toIsoDate(b);
 }
 
 /** Human-readable elapsed time, for logs and reports. */

@@ -38,7 +38,7 @@ import {
 import { PERSONAS, type Persona, type PersonaName } from '../data/personas';
 
 /** Every page object, constructed against the current page. */
-export interface BankPages {
+interface BankPages {
   readonly login: LoginPage;
   readonly dashboard: DashboardPage;
   readonly accounts: AccountsPage;
@@ -52,7 +52,7 @@ export interface BankPages {
   readonly profile: ProfilePage;
 }
 
-export interface BankFixtures {
+interface BankFixtures {
   /** All page objects. Construction is cheap — they only build locators. */
   bank: BankPages;
   /**
@@ -94,5 +94,3 @@ export const test = base.extend<BankFixtures>({
     await use(await signInAs('standard'));
   },
 });
-
-export { expect } from './custom-matchers';

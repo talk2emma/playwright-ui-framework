@@ -7,7 +7,7 @@ import { type EnvironmentConfig, type EnvironmentName } from '../types';
  * `env.config.ts`). This file is safe to commit and is the single source of
  * truth for "where does a given environment live".
  */
-export const ENVIRONMENTS: Record<EnvironmentName, EnvironmentConfig> = {
+const ENVIRONMENTS: Record<EnvironmentName, EnvironmentConfig> = {
   /**
    * The default target: **SecureBank**, a real banking application published
    * at qaplayground.com specifically for automation practice.

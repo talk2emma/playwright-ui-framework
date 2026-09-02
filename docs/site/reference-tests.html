@@ -535,7 +535,7 @@ body.print details.api > summary { list-style: none; }
     <nav aria-label="Documentation"><ul class="nav"><li><a href="index.html">Overview</a></li><li><a href="architecture.html">Architecture</a></li><li><a href="worked-example.html">Worked example</a></li><li><a href="structure.html">Project structure</a></li><li><a href="reference-root.html">Reference: configuration &amp; tooling</a></li><li><a href="reference-foundation.html">Reference: config, core &amp; types</a></li><li><a href="reference-components.html">Reference: component library</a></li><li><a href="reference-fixtures.html">Reference: fixtures, hooks, pages &amp; API</a></li><li><a href="reference-utils.html">Reference: utilities, reporters &amp; data</a></li><li><a href="reference-tests.html" aria-current="page">Reference: tests &amp; repository docs</a></li><li><a href="playbooks.html">Playbooks</a></li><li><a href="conventions.html">Conventions</a></li><li><a href="troubleshooting.html">Troubleshooting</a></li><li><a href="api-index.html">API index</a></li><li><a href="glossary.html">Glossary</a></li></ul></nav>
     <div class="sidebar-foot">
       <a href="playwright-ui-framework-documentation.pdf" download>Download PDF</a>
-      <span>Generated 2026-09-01</span>
+      <span>Generated 2026-09-02</span>
     </div>
   </aside>
   <main id="main">
@@ -815,7 +815,7 @@ body.print details.api > summary { list-style: none; }
   <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the spec here — the <code>visual</code> project is the only one that runs this folder, and every other project ignores it.</p></li></ol></div>
   <div class="change why"><h4>Why the change belongs here</h4><p>Isolating visual tests keeps pixel comparison on one fixed rendering stack, where it is meaningful.</p></div>
   
-  <p class="related">Related: <code>src/utils/visual.utils.ts</code> &middot; <code>playwright.config.ts</code></p>
+  <p class="related">Related: <code>playwright.config.ts</code></p>
   
 </section>
 
@@ -834,7 +834,7 @@ body.print details.api > summary { list-style: none; }
   <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Refresh baselines deliberately, never as a reflex.</p><pre><code><span class="tok-f">npm</span> run test:visual:update</code></pre></li><li><p>Review the resulting image diff before committing it — that review is the entire value of the test.</p></li></ol></div>
   <div class="change why"><h4>Why the change belongs here</h4><p>Layout, spacing and alignment are what a screenshot is good at and an assertion is bad at. Everything else should be an assertion.</p></div>
   
-  <p class="related">Related: <code>src/utils/visual.utils.ts</code></p>
+  
   
 </section>
 <h2 id="repository-documentation">Repository documentation</h2>
@@ -865,7 +865,7 @@ body.print details.api > summary { list-style: none; }
   <div class="change"><h4>How to change it</h4><ol class="steps"><li><p>Add the row here and the entry in <code>scripts/docs/content/files.components-*.mjs</code>; the generated API surface updates itself.</p></li></ol></div>
   <div class="change why"><h4>Why the change belongs here</h4><p>A one-screen table is the fastest way to answer &quot;does the framework already have something for this?&quot;</p></div>
   
-  <p class="related">Related: <code>src/components/index.ts</code></p>
+  
   
 </section>
 
@@ -887,7 +887,7 @@ body.print details.api > summary { list-style: none; }
       <div class="pager">
         <a class="prev" href="reference-utils.html">&larr; Reference: utilities, reporters &amp; data</a><a class="next" href="playbooks.html">Playbooks &rarr;</a>
       </div>
-      <p>Generated from source by <code>npm run docs</code>. 151 files documented, 331 exports extracted.</p>
+      <p>Generated from source by <code>npm run docs</code>. 138 files documented, 171 exports extracted.</p>
     </footer>
   </main>
 </div>

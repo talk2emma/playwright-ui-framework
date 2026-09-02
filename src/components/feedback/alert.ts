@@ -4,7 +4,7 @@ import { TIMEOUTS } from '../../config/timeouts';
 import type { ComponentOptions, SelectorLike } from '../../types';
 import type { Scope } from '../../core/locator.factory';
 
-export type AlertSeverity = 'success' | 'info' | 'warning' | 'error' | 'unknown';
+type AlertSeverity = 'success' | 'info' | 'warning' | 'error' | 'unknown';
 
 export interface AlertOptions extends ComponentOptions {
   messageSelector?: string;

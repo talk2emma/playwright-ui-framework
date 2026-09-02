@@ -7,9 +7,9 @@ import type { A11yScanOptions, WcagTag } from '../types';
 
 const log = createLogger('A11y');
 
-export const DEFAULT_WCAG_TAGS: WcagTag[] = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
+const DEFAULT_WCAG_TAGS: WcagTag[] = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
-export interface A11yReport {
+interface A11yReport {
   violations: Result[];
   passes: number;
   incomplete: number;
@@ -84,7 +84,7 @@ export async function scanAccessibility(
 }
 
 /** Compact, reviewable rendering of axe violations for the failure message. */
-export function formatViolations(violations: Result[]): string {
+function formatViolations(violations: Result[]): string {
   return violations
     .map((violation, index) => {
       const nodes = violation.nodes
