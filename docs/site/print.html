@@ -930,7 +930,7 @@ src/config/     Validated environment configuration.</code></pre>
 <section class="file" id="f-playwright-config-ts">
   <header class="file-head">
     <h3><code>playwright.config.ts</code></h3>
-    <span class="file-meta">207 lines</span>
+    <span class="file-meta">225 lines</span>
   </header>
   <p class="file-purpose">The single entry point Playwright reads before anything else runs. It declares the browser projects, timeouts, artifact policy, reporters and global hooks. It contains no environment values of its own: everything variable is imported from <code>src/config/env.config.ts</code>, which has already validated it.</p>
   <figure class="code" data-lang="ts"><figcaption><span>The shape of the file</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> <span class="tok-p">reporters</span><span class="tok-o">:</span> <span class="tok-t">ReporterDescription</span>[] <span class="tok-o">=</span> [ <span class="tok-c">/* list, html, junit, json, summary, ctrf */</span> ];

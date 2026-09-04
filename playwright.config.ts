@@ -38,6 +38,23 @@ if (config.isCI) {
   reporters.push(['github'], ['blob', { outputDir: 'blob-report' }]);
 }
 
+/**
+ * Chromium-only launch switches.
+ *
+ * `--disable-dev-shm-usage` stops Chromium exhausting the 64MB /dev/shm that
+ * CI containers typically provide. It is a Chromium flag: WebKit refuses to
+ * start when it is passed one it does not know —
+ * "Cannot parse arguments: Unknown option --disable-dev-shm-usage" — and
+ * Firefox ignores it silently, which is worse, because it hides the mistake
+ * until a WebKit job runs.
+ *
+ * So it is applied per project rather than in the global `use` block. Add
+ * engine-specific switches here, never above.
+ */
+const chromiumLaunch = {
+  launchOptions: { slowMo: config.slowMo, args: ['--disable-dev-shm-usage'] },
+};
+
 export default defineConfig({
   testDir: './tests',
   outputDir: './test-results',
@@ -93,9 +110,10 @@ export default defineConfig({
     video: config.artifacts.video,
     screenshot: config.artifacts.screenshot,
 
+    /* `slowMo` is understood by every engine; engine-specific switches are
+     * applied per project via `chromiumLaunch` below. */
     launchOptions: {
       slowMo: config.slowMo,
-      args: ['--disable-dev-shm-usage'],
     },
 
     // Locators resolved by this attribute keep tests decoupled from styling.
@@ -122,7 +140,7 @@ export default defineConfig({
     /* Desktop browsers */
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], ...chromiumLaunch },
       dependencies: ['setup'],
       testIgnore: ['**/visual/**', '**/a11y/**'],
     },
@@ -140,7 +158,7 @@ export default defineConfig({
     },
     {
       name: 'edge',
-      use: { ...devices['Desktop Edge'], channel: 'msedge' },
+      use: { ...devices['Desktop Edge'], channel: 'msedge', ...chromiumLaunch },
       dependencies: ['setup'],
       testIgnore: ['**/visual/**', '**/a11y/**'],
     },
@@ -148,7 +166,7 @@ export default defineConfig({
     /* Mobile and tablet emulation */
     {
       name: 'mobile-chrome',
-      use: { ...devices['Pixel 7'] },
+      use: { ...devices['Pixel 7'], ...chromiumLaunch },
       dependencies: ['setup'],
       testIgnore: ['**/visual/**', '**/a11y/**'],
     },
@@ -170,20 +188,24 @@ export default defineConfig({
       // Pixel comparison is meaningful only on one fixed rendering stack.
       name: 'visual',
       testDir: './tests/visual',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 720 } },
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+        ...chromiumLaunch,
+      },
       dependencies: ['setup'],
     },
     {
       name: 'accessibility',
       testDir: './tests/a11y',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], ...chromiumLaunch },
       dependencies: ['setup'],
     },
 
     /* Cross-cutting conditions */
     {
       name: 'dark-mode',
-      use: { ...devices['Desktop Chrome'], colorScheme: 'dark' },
+      use: { ...devices['Desktop Chrome'], colorScheme: 'dark', ...chromiumLaunch },
       dependencies: ['setup'],
       testIgnore: ['**/visual/**', '**/a11y/**'],
     },
