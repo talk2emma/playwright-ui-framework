@@ -13,8 +13,11 @@ on:
       environment:
         description: Target environment
         type: choice
-        options: [dev, qa, staging, prod]
-        default: dev
+        # `dev`, `qa`, `staging` and `prod` are placeholder hosts in
+        # src/config/environments.ts. Choosing one without also setting the
+        # BASE_URL variable will fail against a domain that does not resolve.
+        options: [demo, dev, qa, staging, prod]
+        default: demo
       grep:
         description: Tag filter (e.g. @smoke)
         type: string
@@ -25,7 +28,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TEST_ENV: ${{ github.event.inputs.environment || 'dev' }}
+  # `demo` (https://qaplayground.com) is the only environment this repository
+  # has a real target for, so it is what every automatic run uses. The named
+  # deployment environments are placeholders that do not resolve.
+  TEST_ENV: ${{ github.event.inputs.environment || 'demo' }}
   CI: true
   HEADLESS: true
 
