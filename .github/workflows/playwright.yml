@@ -61,7 +61,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
         with:
-          browsers: ${{ matrix.project }}
+          # Chromium as well as the matrix browser: the `setup` project
+          # declares no `use` block, so it runs on Playwright's default, and
+          # every browser project depends on it. A firefox job with only
+          # firefox installed fails before its first test, in `setup`.
+          browsers: chromium ${{ matrix.project }}
 
       - name: Run tests
         run: npx playwright test --project=${{ matrix.project }} --shard=${{ matrix.shard }}/3 ${{ github.event.inputs.grep && format('--grep {0}', github.event.inputs.grep) || '' }}
@@ -119,11 +123,28 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           browsers: chromium
-      # Baselines are OS-specific; this job must match the container that
-      # generated them, which is why visual runs are pinned to ubuntu-latest.
-      - run: npm run test:visual
+      # Baselines are per-platform (see snapshotPathTemplate). The committed
+      # ones were recorded on macOS, so Linux has none yet.
+      #
+      # `--update-snapshots=missing` writes only the baselines that do not
+      # exist and compares every one that does. So the first run here records
+      # the Linux set and the next run starts policing it — rather than
+      # failing forever on a comparison that was never valid.
+      #
+      # Commit the artifact below to turn this into a real gate. Once the
+      # Linux baselines are in the repository this flag becomes a no-op.
+      - run: npx playwright test --project=visual --update-snapshots=missing
         env:
           BASE_URL: ${{ vars.BASE_URL }}
+
+      - name: Upload newly recorded baselines
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-baselines-linux
+          path: tests/visual/__screenshots__/
+          retention-days: 7
+
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

@@ -41,7 +41,15 @@ if (config.isCI) {
 export default defineConfig({
   testDir: './tests',
   outputDir: './test-results',
-  snapshotPathTemplate: '{testDir}/{testFileDir}/__screenshots__/{projectName}/{arg}{ext}',
+  /*
+   * `{platform}` is load-bearing. Font rasterisation and scrollbar metrics
+   * differ between operating systems, so a baseline recorded on macOS never
+   * matches a Linux CI render. Without the platform in the path the two are
+   * compared anyway and the suite is permanently red for a reason that looks
+   * like a real regression.
+   */
+  snapshotPathTemplate:
+    '{testDir}/{testFileDir}/__screenshots__/{projectName}/{arg}-{platform}{ext}',
 
   /* Execution ------------------------------------------------------------ */
   fullyParallel: true,
