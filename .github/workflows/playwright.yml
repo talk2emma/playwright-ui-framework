@@ -46,7 +46,11 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      # Bounded so a registry stall fails in five minutes with a clear step
+      # name, instead of sitting until the job timeout with no output.
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --fund=false
+        timeout-minutes: 5
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run format:check
@@ -68,7 +72,11 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
-      - run: npm ci
+      # Bounded so a registry stall fails in five minutes with a clear step
+      # name, instead of sitting until the job timeout with no output.
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --fund=false
+        timeout-minutes: 5
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -77,8 +85,15 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
 
+      # The binaries are cached; the system libraries are not, because each job
+      # starts on a clean runner. Splitting the two means a cache hit skips the
+      # ~150MB download and still gets the apt packages it needs.
+      - name: Install browser system dependencies
+        run: npx playwright install-deps ${{ matrix.project }}
+
       - name: Install browsers
-        run: npx playwright install --with-deps ${{ matrix.project }}
+        if: steps.browser-cache.outputs.cache-hit != 'true'
+        run: npx playwright install ${{ matrix.project }}
 
       - name: Run tests
         run: npx playwright test --project=${{ matrix.project }} --shard=${{ matrix.shard }}/3 ${{ github.event.inputs.grep && format('--grep {0}', github.event.inputs.grep) || '' }}
@@ -117,7 +132,11 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      # Bounded so a registry stall fails in five minutes with a clear step
+      # name, instead of sitting until the job timeout with no output.
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --fund=false
+        timeout-minutes: 5
       - run: npx playwright install --with-deps chromium
       - run: npm run test:a11y
         env:
@@ -140,7 +159,11 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      # Bounded so a registry stall fails in five minutes with a clear step
+      # name, instead of sitting until the job timeout with no output.
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --fund=false
+        timeout-minutes: 5
       - run: npx playwright install --with-deps chromium
       # Baselines are OS-specific; this job must match the container that
       # generated them, which is why visual runs are pinned to ubuntu-latest.
@@ -166,7 +189,11 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      # Bounded so a registry stall fails in five minutes with a clear step
+      # name, instead of sitting until the job timeout with no output.
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --fund=false
+        timeout-minutes: 5
 
       - uses: actions/download-artifact@v4
         with:
