@@ -123,21 +123,17 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           browsers: chromium
-      # Baselines are per-platform (see snapshotPathTemplate). The committed
-      # ones were recorded on macOS, so Linux has none yet.
-      #
-      # `--update-snapshots=missing` writes only the baselines that do not
-      # exist and compares every one that does. So the first run here records
-      # the Linux set and the next run starts policing it — rather than
-      # failing forever on a comparison that was never valid.
-      #
-      # Commit the artifact below to turn this into a real gate. Once the
-      # Linux baselines are in the repository this flag becomes a no-op.
-      - run: npx playwright test --project=visual --update-snapshots=missing
+      # Baselines are per-platform (see snapshotPathTemplate) and both sets are
+      # committed: `-darwin` for developer machines, `-linux` for this runner.
+      # No update flag — a missing baseline should fail here rather than be
+      # silently recorded, which is the difference between a gate and a rubber
+      # stamp. Add a new one by running the suite locally and, for Linux,
+      # taking it from the artifact below.
+      - run: npm run test:visual
         env:
           BASE_URL: ${{ vars.BASE_URL }}
 
-      - name: Upload newly recorded baselines
+      - name: Upload the recorded baselines
         if: always()
         uses: actions/upload-artifact@v4
         with:
