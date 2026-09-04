@@ -42,15 +42,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      # Bounded so a registry stall fails in five minutes with a clear step
-      # name, instead of sitting until the job timeout with no output.
-      - name: Install dependencies
-        run: npm ci --prefer-offline --no-audit --fund=false
-        timeout-minutes: 5
+      - uses: ./.github/actions/setup
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run format:check
@@ -67,33 +59,9 @@ jobs:
         shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      # Bounded so a registry stall fails in five minutes with a clear step
-      # name, instead of sitting until the job timeout with no output.
-      - name: Install dependencies
-        run: npm ci --prefer-offline --no-audit --fund=false
-        timeout-minutes: 5
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: browser-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
-
-      # The binaries are cached; the system libraries are not, because each job
-      # starts on a clean runner. Splitting the two means a cache hit skips the
-      # ~150MB download and still gets the apt packages it needs.
-      - name: Install browser system dependencies
-        run: npx playwright install-deps ${{ matrix.project }}
-
-      - name: Install browsers
-        if: steps.browser-cache.outputs.cache-hit != 'true'
-        run: npx playwright install ${{ matrix.project }}
+          browsers: ${{ matrix.project }}
 
       - name: Run tests
         run: npx playwright test --project=${{ matrix.project }} --shard=${{ matrix.shard }}/3 ${{ github.event.inputs.grep && format('--grep {0}', github.event.inputs.grep) || '' }}
@@ -128,16 +96,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
-          cache: npm
-      # Bounded so a registry stall fails in five minutes with a clear step
-      # name, instead of sitting until the job timeout with no output.
-      - name: Install dependencies
-        run: npm ci --prefer-offline --no-audit --fund=false
-        timeout-minutes: 5
-      - run: npx playwright install --with-deps chromium
+          browsers: chromium
       - run: npm run test:a11y
         env:
           BASE_URL: ${{ vars.BASE_URL }}
@@ -155,16 +116,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
-          cache: npm
-      # Bounded so a registry stall fails in five minutes with a clear step
-      # name, instead of sitting until the job timeout with no output.
-      - name: Install dependencies
-        run: npm ci --prefer-offline --no-audit --fund=false
-        timeout-minutes: 5
-      - run: npx playwright install --with-deps chromium
+          browsers: chromium
       # Baselines are OS-specific; this job must match the container that
       # generated them, which is why visual runs are pinned to ubuntu-latest.
       - run: npm run test:visual
@@ -185,15 +139,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      # Bounded so a registry stall fails in five minutes with a clear step
-      # name, instead of sitting until the job timeout with no output.
-      - name: Install dependencies
-        run: npm ci --prefer-offline --no-audit --fund=false
-        timeout-minutes: 5
+      - uses: ./.github/actions/setup
 
       - uses: actions/download-artifact@v4
         with:
