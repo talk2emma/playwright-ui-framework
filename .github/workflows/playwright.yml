@@ -6,8 +6,15 @@ on:
   pull_request:
     branches: [main, master, develop]
   schedule:
-    # Nightly full-matrix run at 02:00 UTC.
-    - cron: '0 2 * * *'
+    # Nightly full-matrix run, at 02:37 UTC rather than 02:00.
+    #
+    # GitHub queues scheduled workflows on a shared pool and delays them under
+    # load, and the top of the hour is the most contended slot there is —
+    # everyone writes `0 2 * * *`. Measured on this repository, the 02:00 cron
+    # actually fired at 07:10 and 07:06 on consecutive days, roughly five hours
+    # late. An off-peak minute is free and makes "nightly" mean approximately
+    # what it says.
+    - cron: '37 2 * * *'
   workflow_dispatch:
     inputs:
       environment:

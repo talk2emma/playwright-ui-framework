@@ -930,7 +930,7 @@ src/config/     Validated environment configuration.</code></pre>
 <section class="file" id="f-playwright-config-ts">
   <header class="file-head">
     <h3><code>playwright.config.ts</code></h3>
-    <span class="file-meta">225 lines</span>
+    <span class="file-meta">229 lines</span>
   </header>
   <p class="file-purpose">The single entry point Playwright reads before anything else runs. It declares the browser projects, timeouts, artifact policy, reporters and global hooks. It contains no environment values of its own: everything variable is imported from <code>src/config/env.config.ts</code>, which has already validated it.</p>
   <figure class="code" data-lang="ts"><figcaption><span>The shape of the file</span><span class="lang">TypeScript</span></figcaption><pre><code><span class="tok-k">const</span> <span class="tok-p">reporters</span><span class="tok-o">:</span> <span class="tok-t">ReporterDescription</span>[] <span class="tok-o">=</span> [ <span class="tok-c">/* list, html, junit, json, summary, ctrf */</span> ];
@@ -1012,7 +1012,7 @@ src/config/     Validated environment configuration.</code></pre>
 <section class="file" id="f-github-workflows-playwright-yml">
   <header class="file-head">
     <h3><code>.github/workflows/playwright.yml</code></h3>
-    <span class="file-meta">175 lines</span>
+    <span class="file-meta">182 lines</span>
   </header>
   <p class="file-purpose">The GitHub Actions pipeline: a lint gate, a sharded three-browser test matrix, separate accessibility and visual jobs, and a final job that merges every shard into one HTML report. It runs on pushes, pull requests, a nightly schedule, and on demand with an environment and tag filter.</p>
   <div class="table-wrap"><table><thead><tr><th>Job</th><th>Depends on</th><th>What it does</th></tr></thead><tbody><tr><td><code>lint</code></td><td>—</td><td><code>npm run typecheck</code>, <code>lint</code>, <code>format:check</code>. Fails fast before any browser starts.</td></tr><tr><td><code>test</code></td><td><code>lint</code></td><td>3 browsers x 3 shards = 9 parallel jobs, each uploading a blob report.</td></tr><tr><td><code>accessibility</code></td><td><code>lint</code></td><td>Runs the <code>accessibility</code> project and uploads the axe reports.</td></tr><tr><td><code>visual</code></td><td><code>lint</code></td><td>Runs the <code>visual</code> project on a fixed runner image so baselines stay valid.</td></tr><tr><td><code>report</code></td><td>all of the above</td><td><code>playwright merge-reports</code> turns the blob shards into one browsable HTML report.</td></tr></tbody></table></div>
